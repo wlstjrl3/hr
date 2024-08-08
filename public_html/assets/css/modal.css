@@ -1,0 +1,118 @@
+.modalForm{
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index:2;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.15s linear;
+}
+.modalBg{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+.modalWindow{
+    position:absolute;
+    z-index:3;    
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:100%;
+    max-width:960px;
+    background:#FFF;
+    box-shadow: 0px 0px 20px rgba(0,0,0,0.5);
+    border-radius:5px;
+    overflow:hidden;
+}
+.modalHeader{
+    background: #DDD;
+    padding:10px;
+    border-bottom: 1px solid #CCC;
+}
+.modalHeader button{
+    float:right;
+    padding:0 3px;
+    border:0px;
+    background: #DDD;
+}
+.modalHeader button:after{
+    display:inline-block;
+    content:"\00D7";
+    font-size:30px;
+    margin:-5px 0 -10px 0;
+    color:#777;
+}
+.modalBody{
+    padding:10px;
+    max-height:calc(100vh - 170px);
+    overflow: auto;
+    background: #EEE;
+}
+.modalFooter{
+    text-align:right;
+    background: #DDD;
+    padding:10px;
+    border-top: 1px solid #CCC;
+}
+.modalGrpFrame{
+    border:1px solid #AAA;
+    border-radius: 6px;
+    padding:10px 0px 20px 10px;
+    margin:0 0 10px 0;
+}
+.modalGrp{
+    float:left;
+    width:100%;
+}
+.modalHd{
+    margin:10px 0 0 0;
+    padding-left:5px;
+    font-size:13px;
+    font-weight: 900;
+}
+.modalBd select{
+    border:1px solid #CCC;
+    border-radius:3px;
+    padding:6px 7px 7px 7px;
+    margin:0px 3px;
+    width:calc(100% - 20px);
+}
+.modalBd input{
+    border:1px solid #CCC;
+    border-radius:3px;
+    padding:7px;
+    margin:0px 3px;
+    width:calc(100% - 20px);
+}
+.modalBd input:disabled, .modalBd select:disabled{
+    background: #DDD;
+}
+.modalBd input[type='date']{
+    padding:6px 7px;
+}
+.modalBd textarea:disabled{
+    background: #DDD;
+}
+
+@media(min-width:480px){
+    .modalGrp{
+        width:50%;
+    }
+}
+@media(min-width:720px){
+
+}
+@media(min-width:960px){
+    .modalGrp{
+        width:33.3%;
+    }
+}
+@media(min-width:1280px){
+
+}
+@media(min-width:1600px){
+
+}

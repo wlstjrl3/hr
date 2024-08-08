@@ -1,0 +1,59 @@
+.colGrp{
+    float:left;
+    width:100%;
+    border:1px solid #CDD;
+    margin:-1px 0 0 -1px;
+}
+.colHd{
+    padding:11px;
+    float:left;
+    width:30%;
+    text-align: right;
+}
+.colHd2L{
+    padding:4px 11px;
+    float:left;
+    width:30%;
+    text-align: right;
+}
+.colBd{
+    float:left;
+    padding:5px;
+    width:70%;
+}
+.colBd input, .colBd select{
+    width:100%;
+    padding:5px;
+}
+
+.dualDateBox{
+    width:calc(50% - 5px) !important;
+}
+.upload-name{
+    padding:5px;
+}
+@media(min-width:480px){
+    .colGrp{
+        width:50%;
+    }
+}
+@media(min-width:720px){
+
+}
+@media(min-width:960px){
+    .dataTables_wrapper{
+        padding:20px;    
+        border-radius:5px;
+    }
+    .colGrp{
+        width:33.3%;
+    }  
+}
+@media(min-width:1280px){
+    .colGrp{
+        width:25%;
+    }
+}
+@media(min-width:1600px){
+
+}

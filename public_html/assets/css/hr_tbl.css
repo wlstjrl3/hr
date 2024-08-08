@@ -1,0 +1,111 @@
+.hr_tbl{
+    border-collapse:collapse;
+    width:100%;
+}
+.hr_tbl .odd{
+    background: rgba(255,255,255,.03);
+}
+.hr_tbl .even{
+    background: rgba(0,0,0,.03);
+}
+.hr_tbl thead {
+    visibility: hidden;
+    position: absolute;
+}
+.hr_tbl tr {
+    border-bottom: 1px solid #777;
+    height:35px; /*auto 로 지정시 전체 내용이 보여짐*/
+    /*반응형 작은 가로길이에서 기본 숨김 스타일을 위한 세팅*/
+    display: block;
+    overflow: hidden;
+    /*내림 버튼을 누르면 height 를 auto로 바꿔서 전체가 보이도록 자바스크립트 처리 예정*/
+}
+.hr_tbl tbody tr:hover{
+    background:rgba(0,100,140,.1);
+}
+.hr_tbl td{
+    border:0px;
+    padding:10px 12px;
+}
+.hr_tbl th p{ /*제목열을 클릭하여 정렬순서를 바꿀예정이므로 th내에 꽉차게 지정*/
+    padding:10px;
+}
+.hr_tbl td {
+    border-bottom: 1px solid #ddd;
+    display: block; /*이 코드로 인해 cell이 아래쪽으로 떨어지게 된다.*/
+    text-align: center;
+    float:left;
+    width:45%; /*가장 좌측에 10%의 공간은 반응형 컬럼 열기 버튼을 위해 사용되었음*/
+}
+
+.hr_tbl td::before {
+    content: attr(data-label); /*data-label을 가상요소 표출*/
+    font-size:11px;
+    font-weight: 800;
+    float: left;
+}
+.hr_tbl .openCol{
+    width:10% !important;
+    padding:0;
+}
+.hr_tbl a{
+    display: block;
+    padding:10px 3px;
+    border-radius:6px;
+    background-color: #6BD;
+    color:white;
+    cursor: pointer;
+}
+.pagination a:hover{
+    background-color: rgba(0,100,140,.1);
+}
+@media(min-width:480px){
+    .xScroll{
+        clear:both;
+        overflow-x: scroll;
+    }
+    .width1500{
+        width:1500px;
+    }
+    .width2000{
+        width:2000px;
+    }
+    .width2500{
+        width:2500px;
+    }
+    .hr_tbl thead {
+        visibility: visible;
+        position: relative;
+        border-bottom: 2px solid #777;
+    }
+    .hr_tbl tr {
+        border-bottom: 1px solid #ddd;
+        height:auto;
+        display: table-row;
+        overflow: auto;
+    }
+    .hr_tbl td {
+        border-bottom: none;
+        display: table-cell; /*일반 테이블 셀로*/
+        float:none;
+        width:auto;
+    }
+    .hr_tbl .openCol{
+        display: none;
+    }
+    .hr_tbl td::before {
+        content: "";
+    }    
+}
+@media(min-width:720px){
+
+}
+@media(min-width:960px){
+  
+}
+@media(min-width:1280px){
+
+}
+@media(min-width:1600px){
+
+}

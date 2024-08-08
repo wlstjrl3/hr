@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+*{
+    margin:0px;padding:0px;
+    word-break:break-all;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    font-family: 'Nanum Gothic', sans-serif;
+    font-style:normal;
+}
+/*크롬브라우저에서 폰트 안티앨리어싱*/
+b,p,h1,h2,h3,h4,h5,h6,span{
+    transform : rotate(0.03deg);
+}
+hr{
+    opacity: .3;
+}
+span{
+    display:inline-block;
+}
+a{
+    text-decoration: none;
+    display: inline-block;
+    transform : rotate(0.03deg);
+}
+/*///////////////////////////////*/
+select[readonly] {
+    background-color: #ddd;
+    pointer-events: none;
+}
+li{list-style: none;}
+html {
+    scroll-behavior: smooth;
+    background-color: #EEE;
+}
+h1,h2,h3,h4,h5,h6{font-weight: 700;}
+h1,.fs1{font-size:36px;}
+h2,.fs2{font-size:30px;}
+h3,.fs3{font-size:24px;}
+h4,.fs4{font-size:18px;}
+h5,.fs5{font-size:16px;}
+h6,.fs6{font-size:14px;}
+span,a,b,p,label,input,.fs7{font-size:12px;}
+.fs8{font-size:10px;}
+span,a,p,input{font-weight: 400;}
+input:focus, select:focus{
+    outline: 0;
+}
+.container, .footer{
+    max-width: 1280px;
+    margin:0 auto;
+}
+.floatR{
+    float:right;
+}
+.floatL{
+    float:left;
+}
+.clearB{
+    clear:both;
+}
+.mrgCenter{
+    margin:0 auto;
+}
+.txtCenter{
+    text-align: center;
+}
+.rndCorner{
+    border-radius: 6px;
+}
+.hidden{
+    display: none !important;
+}
+.fontWThin{
+    font-weight:100;
+}
+.fontWSlim{
+    font-weight:400;
+}
+.fontWBold{
+    font-weight:700;
+}
+.fontWExtr{
+    font-weight:800;
+}
+.lineHS{
+    line-height: 100%;
+}
+.lineHM{
+    line-height: 130%;
+}
+.lineHW{
+    line-height: 150%;
+}
+.lineHE{
+    line-height: 180%;
+}
+.pointer{
+    cursor:pointer;
+}
+.clW{color:white;}
+.clB{color:black;}
+.cl1{color:rgb(0,90,130);}
+.cl2{color:rgba(0,100,140,.9);}
+.cl3{color:rgba(0,100,140,.6);}
+.cl4{color:rgba(0,100,140,.3);}
+.cl5{color:rgba(0,100,140,.1);}
+.clBg1{background:rgb(0,90,130);}
+.clBg2{background:rgba(0,100,140,.9);}
+.clBg3{background:rgba(0,100,140,.6);}
+.clBg4{background:rgba(0,100,140,.3);}
+.clBg5{background:rgba(0,100,140,.1);}
+.clBr0{border:0px;}
+.clBr1{border:1px solid rgb(0,90,130);}
+.clBr2{border:1px solid rgba(0,100,140,.9);}
+.clBr3{border:1px solid rgba(0,100,140,.6);}
+.clBr4{border:1px solid rgba(0,100,140,.3);}
+.clBr5{border:1px solid rgba(0,100,140,.1);}
+.clBrC{border:1px solid #CCC;}
+
+.pddL{padding:15px 35px;}
+.pddM{padding:12px 25px;}
+.pddS{padding:8px 10px;}/*아이콘과 함께 사용 ex)휴지통 */
+.pddSS{padding:7px 5px;}
+.sharp{ /*테이블 컬럼값 등의 폰트 디자인보다 선명도가 중요한 경우 사용*/
+    transform : rotate(0deg) !important;
+}
+/*반응형 사이즈 지정 위의 전체설정이 mobile이고 아래쪽으로 tablet 및 desktop*/
+@media(min-width:480px){
+    .tableOutFrm{
+        border:1px solid #CCC;
+        border-radius: 6px;
+        padding:15px;
+
+        overflow: auto;
+    }
+}
+@media(min-width:720px){
+    h1,.fs1{font-size:48px;}
+    h2,.fs2{font-size:40px;}
+    h3,.fs3{font-size:32px;}
+    h4,.fs4{font-size:24px;}
+    h5,.fs5{font-size:18px;}
+    h6,.fs6{font-size:16px;}
+    span,a,b,p,label,input,.fs7{font-size:14px;}
+    .fs8{font-size:12px;}
+    .container{
+        padding:0px 30px;
+    }
+}
