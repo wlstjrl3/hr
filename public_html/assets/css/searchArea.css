@@ -4,22 +4,24 @@
     border:1px solid #CDD;
     margin:-1px 0 0 -1px;
 }
-.colHd{
-    padding:11px;
+.colHd, .colHd2L{
     float:left;
     width:30%;
     text-align: right;
+}
+.colHd{
+    padding:11px;
 }
 .colHd2L{
     padding:4px 11px;
-    float:left;
-    width:30%;
-    text-align: right;
 }
-.colBd{
+.colBd, .colBd2L{
     float:left;
     padding:5px;
     width:70%;
+}
+.colBd2L{
+    padding:0 5px;
 }
 .colBd input, .colBd select{
     width:100%;

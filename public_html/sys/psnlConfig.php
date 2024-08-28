@@ -54,7 +54,7 @@
         echo json_encode($datas, JSON_UNESCAPED_UNICODE);
     }else if($_REQUEST['CRUD']=='D'){
         //기본 쿼리
-        $sql = "DELETE FROM BONDANG_HR.USER_TB WHERE USER_CD = '".$_REQUEST['USER_CD']."'";
+        $sql = "DELETE FROM BONDANG_HR.PSNL_INFO WHERE PSNL_CD = '".$_REQUEST['PSNL_CD']."'";
         echo $sql; //오류 점검용 쿼리
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);

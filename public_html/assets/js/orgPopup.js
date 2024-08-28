@@ -31,19 +31,22 @@ mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가�
 window.onload = function() {
     document.getElementById("ORG_NM").focus();
     setTimeout(() => {
-        if(document.querySelector(".hr_tbl").children[1].children.length==1){ //값이 하나만 존재한다면 즉시 바인딩 처리한다.
-            opener.document.getElementById('orgCd').value = document.querySelector(".hr_tbl").children[1].children[0].children[1].innerText
-            opener.document.getElementById('orgNm').value = document.querySelector(".hr_tbl").children[1].children[0].children[2].innerText;
+        let tmp = document.querySelector(".hr_tbl").children[1].children;
+        if(tmp.length==1&&tmp[0].children[0].innerText!="데이터가 없습니다."){ //값이 하나만 존재한다면 즉시 바인딩 처리한다.
+            opener.document.getElementById('orgCd').value = tmp[0].children[1].innerText
+            opener.document.getElementById('orgNm').value = tmp[0].children[2].innerText;
+            opener.document.getElementById('orgSerchPop').focus();
             window.close();
         }
         document.querySelector(".hr_tbl").querySelectorAll('tr').forEach(tr => { //아니라면 각 행에 클릭 이벤트를 추가한다.
             tr.addEventListener('click', (target)=>{
                 opener.document.getElementById('orgCd').value = target.currentTarget.children[1].innerText
                 opener.document.getElementById('orgNm').value = target.currentTarget.children[2].innerText;
+                opener.document.getElementById('orgSerchPop').focus();
                 window.close();
             });
         });
-    }, 200);
+    }, 800);
 };
 
 //검색 필터링을 위한 코드
@@ -53,11 +56,16 @@ document.querySelectorAll(".filter").forEach((f,key)=>{
         mytbl.hrDt.xhr.page=0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
         mytbl.show("myTbl");
         setTimeout(() => {
-            if(document.querySelector(".hr_tbl").children[1].children.length==1){ //값이 하나만 존재한다면 즉시 바인딩 처리한다.
-                opener.document.getElementById('orgCd').value = document.querySelector(".hr_tbl").children[1].children[0].children[1].innerText
-                opener.document.getElementById('orgNm').value = document.querySelector(".hr_tbl").children[1].children[0].children[2].innerText;
+            let tmp = document.querySelector(".hr_tbl").children[1].children;
+            if(tmp.length==1&&tmp[0].children[0].innerText!="데이터가 없습니다."){ //값이 하나만 존재한다면 즉시 바인딩 처리한다.
+                opener.document.getElementById('orgCd').value = tmp[0].children[1].innerText
+                opener.document.getElementById('orgNm').value = tmp[0].children[2].innerText;
+                opener.document.getElementById('orgSerchPop').focus();
                 window.close();
             }
         }, 200);          
     });
 });
+
+//팝업창의 경우 행을 클릭했을때 개별 정보 끌어오기가 아닌 무응답으로 처리
+function trDataXHR(idx){ }

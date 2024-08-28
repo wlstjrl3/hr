@@ -20,6 +20,7 @@ class hr_tbl{
                 var tableData = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
                 let totalCnt = JSON.parse(xhr.response)['totalCnt'];
                 let filterCnt = JSON.parse(xhr.response)['filterCnt'];
+                //let query = JSON.parse(xhr.response)['query'];
 //테이블 객체 생성 이벤트//
                 let table = document.querySelector('#'+tbNm) //외부에서 호출할때 적은 테이블 ID로 오브젝트를 준비한다.
                 table.classList.add('hr_tbl'); //해당 오브젝트에 hr_tbl이라는 클래스 명칭을 추가한다.
@@ -196,11 +197,16 @@ class hr_tbl{
 
                     let clTitle = [];
                     this.hrDt.columns.forEach((cl) => {
-                        clTitle.push(cl.title);
+                    //    clTitle.push(cl.title); //페이지의 제목열을 엑셀파일 제목열로 푸시
                     });
                     XLSX.utils.sheet_add_aoa(worksheet, [clTitle], { origin: "A1" });
                     /* create an XLSX file and try to save to Presidents.xlsx */
-                    XLSX.writeFile(workbook, "Presidents.xlsx", { compression: true });    
+
+                    // 오늘 날짜
+                    const today = new Date();const year = today.getFullYear();const month = (today.getMonth() + 1).toString().padStart(2, '0');const day = today.getDate().toString().padStart(2, '0'); 
+                    const yyyymmdd = `${year}${month}${day}`;
+
+                    XLSX.writeFile(workbook, yyyymmdd+window.location.pathname+".xlsx", { compression: true });    
                 } else {
                     console.error(xhr.status, xhr.statusText);
                 }

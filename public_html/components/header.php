@@ -38,39 +38,39 @@
                                 └&nbsp;직원 현황
                             </a>
                         </li>
-                        <li>
-                            <a href="/psnlInfo">
-                                └&nbsp;직원 인사기본
+                        <!--li>
+                            <a href="/psnlDtl">
+                                └&nbsp;[개]직원 인사기본
                             </a>
                         </li>
                         <li>
                             <a href="/">
-                                └&nbsp;소속별 직원 근무현황
+                                └&nbsp;[개]소속별 직원 근무현황
+                            </a>
+                        </li-->
+                        <li>
+                            <a href="/fmlList">
+                                └&nbsp;가족정보 관리
                             </a>
                         </li>
                         <li>
-                            <a href="/">
-                                └&nbsp;가족관계 관리
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/">
+                            <a href="/lcsList">
                                 └&nbsp;자격/면허 관리
                             </a>
                         </li>
                         <li>
-                            <a href="/">
-                                └&nbsp;상벌/직무평가 관리
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/">
+                            <a href="/insList">
                                 └&nbsp;보증보험 정보 관리
                             </a>
                         </li>
                         <li>
                             <a href="/">
-                                └&nbsp;퇴사자 관리
+                                <span class="cl6">└&nbsp;상벌/직무평가 관리</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/">
+                                <span class="cl6">└&nbsp;퇴사자 관리</span>
                             </a>
                         </li>
                     </ul>
@@ -83,17 +83,17 @@
                     <ul>
                         <li>
                             <a href="/">
-                                └&nbsp;승급 대상자 현황
+                                <span class="cl6">└&nbsp;승급 대상자 현황</span>
                             </a>
                         </li>
                         <li>
                             <a href="/">
-                                └&nbsp;일괄 호봉 갱신
+                                <span class="cl6">└&nbsp;일괄 호봉 갱신</span>
                             </a>
                         </li>
                         <li>
                             <a href="/">
-                                └&nbsp;개별 승급
+                                <span class="cl6">└&nbsp;개별 승급</span>
                             </a>
                         </li>
                     </ul>
@@ -105,18 +105,23 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="/">
+                            <a href="/salaryList.php">
                                 └&nbsp;연도별 급호봉 테이블
                             </a>
                         </li>
                         <li>
                             <a href="/">
-                                └&nbsp;조정수당 관리
+                                <span class="cl6">└&nbsp;근무일수/시간</span>
                             </a>
                         </li>
                         <li>
                             <a href="/">
-                                └&nbsp;급여 정보
+                                <span class="cl6">└&nbsp;조정수당 관리</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/">
+                                <span class="cl6">└&nbsp;급여 정보</span>
                             </a>
                         </li>
                     </ul>
@@ -128,15 +133,15 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="/">
+                            <a href="/orgList">
                                 └&nbsp;조직 현황
                             </a>
                         </li>
-                        <li>
+                        <!--li>
                             <a href="/">
-                                └&nbsp;조직 관리
+                                └&nbsp;조직정보 트리
                             </a>
-                        </li>
+                        </li-->
                     </ul>
                     <hr>
                 </li>                                          

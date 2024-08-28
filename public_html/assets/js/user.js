@@ -137,14 +137,16 @@ modalEdtBtn.addEventListener("click",()=>{
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
             ///////////////////////////////////////////////////여기수정중 여기수정중 여기수정중 여기수정중 여기수정중 여기수정중 여기수정중 여기수정중 여기수정중 여기수정중
-            console.log("userConfig 정보 기록 완료");
-            //alert("기록 되었습니다.");
-            //mytbl.hrDt.xhr.where.USER_ID="7"; //이런 형식으로 조건문 위치를 싹 스캔하여 전체 필터 적용할것
-            mytbl.show('myTbl'); //테이블의 아이디
-            modalClose();
-
+            if(res==""){
+                console.log("userConfig 정보 기록 완료");
+                //mytbl.hrDt.xhr.where.USER_ID="7"; //이런 형식으로 조건문 위치를 싹 스캔하여 전체 필터 적용가능
+                mytbl.show('myTbl'); //테이블의 아이디
+                modalClose();
+            }else{
+                alert("오류발생! 아래 코드를 개발자에게 전달해주세요.\n\n"+res);
+            }
         }else{
-            console.log("userConfig 정보 기록 에러!!!");
+            alert(xhr.statusText+" 정보 기록 에러!!!");
         }
     }    
 });
