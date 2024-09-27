@@ -33,8 +33,8 @@
     $_SESSION["USER_NM"]=$row['USER_NM'];
     $_SESSION["USER_AUTH"]=$row['USER_AUTH'];
     echo "<script> 
-        alert('".$row['USER_NM']."님 환영합니다!');
-        document.location.href='/'; 
+        console.log('".$row['USER_NM']."님 환영합니다!');
+        document.location.href='/psnlTotal'; 
     </script>"; 
 ?>
     </BODY>

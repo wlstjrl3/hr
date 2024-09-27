@@ -1,0 +1,10 @@
+#showColList{
+    position:absolute;
+    margin:8px 0 0 113px;
+    border:1px solid #000;
+    background: rgba(255,255,255,1);
+    padding:12px 8px;
+    border-radius: 4px;
+    z-index:2;
+    display: none;
+}

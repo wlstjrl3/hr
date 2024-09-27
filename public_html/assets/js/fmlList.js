@@ -7,7 +7,8 @@ var mytbl = new hr_tbl({
         columXHR: '',
         key : psnlKey.value, //api 호출할 보안 개인인증키
         where: {
-            PSNL_CD : '', //filter의 값 변동이 생기면 여기에 즉시 추가 값을 더하고 xhr을 호출한다.
+            PSNL_CD : document.getElementById("PSNL_CD").value,
+            PSNM_NM : document.getElementById("PSNL_NM").value,
         },
         order: {
             column : '0',

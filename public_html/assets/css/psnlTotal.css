@@ -1,0 +1,26 @@
+.modalBody div{
+    border-radius: 6px;
+    background-color: #EEE;
+    padding:5px;
+    margin:5px 0 ;
+}
+
+.modalBody table{
+    border-collapse: collapse;
+    width:100%;
+}
+.modalBody td,.modalBody th{
+    border:1px solid #999;
+    background-color: white;
+    padding:7px;
+}
+.modalBody th{
+    background-color: #EEF5FB;
+}
+.modalBody th span{
+    font-weight: 700;
+}
+#psnlTbl th{width:10%;}
+#psnlTbl td{width:15%;}
+
+#opiTbl th:nth-child(1,2,3){width:10%;}

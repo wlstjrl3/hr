@@ -143,8 +143,6 @@ input:focus, select:focus{
         border:1px solid #CCC;
         border-radius: 6px;
         padding:15px;
-
-        overflow: auto;
     }
 }
 @media(min-width:720px){

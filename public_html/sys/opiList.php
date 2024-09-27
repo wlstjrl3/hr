@@ -4,45 +4,36 @@
     include "../dbconn/dbconn.php";
     if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
     //갯수 카운트 쿼리
-    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_FAMILY A";
+    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_OPINION A";
     //기본 쿼리
-    $sql = "SELECT C.ORG_NM,B.PSNL_NM,A.* FROM BONDANG_HR.PSNL_FAMILY A
+    $sql = "SELECT C.ORG_NM,B.PSNL_NM,A.*,
+    CASE 
+    WHEN OPI_TYPE=1 THEN '긍정' 
+    WHEN OPI_TYPE=2 THEN '부정' 
+    WHEN OPI_TYPE=3 THEN '포상' 
+    WHEN OPI_TYPE=4 THEN '징계' END AS OPI_TYPE_KOR
+     FROM BONDANG_HR.PSNL_OPINION A 
     LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
-    LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD";    
+    LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD";
     //조건문 지정
     $whereSql = " WHERE 1=1"; //" WHERE PSNL_CD='".@$_REQUEST['PSNL_CD']."'";
     if(@$_REQUEST['PSNL_CD']){
         $whereSql=$whereSql." AND A.PSNL_CD='".@$_REQUEST['PSNL_CD']."'";
     }
-    if(@$_REQUEST['FML_NM']){
-        $whereSql=$whereSql." AND FML_NM LIKE '%".$_REQUEST['FML_NM']."%'";
+    if(@$_REQUEST['OPI_DT_From']){
+        $whereSql=$whereSql." AND OPI_DT >= '".$_REQUEST['OPI_DT_From']."'";
     }
-    if(@$_REQUEST['FML_RELATION']){
-        $whereSql=$whereSql." AND FML_RELATION LIKE '%".$_REQUEST['FML_RELATION']."%'";
+    if(@$_REQUEST['OPI_DT_To']){
+        $whereSql=$whereSql." AND OPI_DT <= '".$_REQUEST['OPI_DT_To']."'";
     }
-    if(@$_REQUEST['FML_BIRTH']){
-        $whereSql=$whereSql." AND FML_BIRTH LIKE '%".$_REQUEST['FML_BIRTH']."%'";
+    if(@$_REQUEST['OPI_PERSON']){
+        $whereSql=$whereSql." AND OPI_PERSON LIKE '%".$_REQUEST['OPI_PERSON']."%'";
     }
-    if(@$_REQUEST['FML_DTL']){
-        $whereSql=$whereSql." AND FML_DTL LIKE '%".$_REQUEST['FML_DTL']."%'";
+    if(@$_REQUEST['OPI_DTL']){
+        $whereSql=$whereSql." AND OPI_DTL LIKE '%".$_REQUEST['OPI_DTL']."%'";
     }
-    if(@$_REQUEST['FML_PAY_From']){
-        $whereSql=$whereSql." AND FML_PAY >= '".$_REQUEST['FML_PAY_From']."'";
-    }
-    if(@$_REQUEST['FML_PAY_To']){
-        $whereSql=$whereSql." AND FML_PAY <= '".$_REQUEST['FML_PAY_To']."'";
-    }
-    if(@$_REQUEST['FML_STT_DT_From']){
-        $whereSql=$whereSql." AND FML_STT_DT >= '".$_REQUEST['FML_STT_DT_From']."'";
-    }
-    if(@$_REQUEST['FML_STT_DT_To']){
-        $whereSql=$whereSql." AND FML_STT_DT <= '".$_REQUEST['FML_STT_DT_To']."'";
-    }
-    if(@$_REQUEST['FML_END_DT_From']){
-        $whereSql=$whereSql." AND FML_END_DT >= '".$_REQUEST['FML_END_DT_From']."'";
-    }
-    if(@$_REQUEST['FML_END_DT_To']){
-        $whereSql=$whereSql." AND FML_END_DT <= '".$_REQUEST['FML_END_DT_To']."'";
+    if(@$_REQUEST['OPI_TYPE']){
+        $whereSql=$whereSql." AND OPI_TYPE = '".$_REQUEST['OPI_TYPE']."'";
     }
     //정렬 기준 지정
     $orderSql = "";
@@ -56,7 +47,7 @@
     }
     $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
     $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
-
+    
     $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
     mysqli_close($conn);
 

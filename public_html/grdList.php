@@ -3,47 +3,25 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>사용자 정보 </b>
+            <b>개별 급호봉 정보 </b>
             <button></button>
         </div>
         <div class="modalBody">
+            <p>직원정보 : <b>조직 직책 성명</b></p>
             <div class="modalGrp">
                 <div class="modalHd">일련번호</div>
                 <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
             </div>            
             <div class="modalGrp">
-                <div class="modalHd">아이디</div>
+                <div class="modalHd">승급변동일</div>
+                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">급</div>
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">사용자성명</div>
-                <div class="modalBd"><input autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">새 비밀번호</div>
-                <div class="modalBd"><input type="password" placeholder="비밀번호 변경시에만 작성" autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">비밀번호 확인</div>
-                <div class="modalBd"><input type="password" placeholder="비밀번호 변경시에만 작성" autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">사용자권한</div>
-                <div class="modalBd"><select>
-                    <option value="user">사용자</option>
-                    <option value="admin">관리자</option>
-                </select></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">이메일</div>
-                <div class="modalBd"><input autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">직책</div>
-                <div class="modalBd"><input autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">부서</div>
+                <div class="modalHd">호</div>
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
@@ -62,43 +40,44 @@
 <div class="container">
 
     <h4 class="cl3 pddS">
-        사용자 관리
+        개별 급호봉 관리
     </h4>
 
     <div class="searchArea">
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>아이디</b></span></div>
-            <div class="colBd"><input id="USER_ID" class="filter"></div>
+            <div class="colHd2L clBg5 cl2"><span><b>개인코드<br>/ 조직명</b></span></div>
+            <div class="colBd">
+                <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;" value="<?php echo @$_REQUEST['PSNL_CD'];?>"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;" value="<?php echo @$_REQUEST['ORG_NM'];?>">
+            </div>
+        </div>        
+        <div class="colGrp">
+            <div class="colHd2L clBg5 cl2">
+                <span><b>직책<br>/ 직원성명</b></span><br>
+            </div>
+            <div class="colBd" style="">
+                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;" value="<?php echo @$_REQUEST['POSITION'];?>">
+                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM'];?>">
+                <button id="psnlSerchPop" style="padding:3px;">검색</button>
+            </div>    
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>성명</b></span></div>
-            <div class="colBd"><input id="USER_NM" class="filter"></div>
+            <div class="colHd clBg5 cl2"><span><b>승급변동일</b></span></div>
+            <div class="colBd"><input class="dualDateBox dateBox filter" id="ADVANCE_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="ADVANCE_DT_To"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>권한</b></span></div>
-            <div class="colBd"><select id="USER_AUTH" class="filter">
-            <option value="">전체</option><option value="user">사용자</option><option value="admin">관리자</option>
-            </select></div>
+            <div class="colHd clBg5 cl2"><span><b>급</b></span></div>
+            <div class="colBd"><input id="GRD_GRADE" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>이메일</b></span></div>
-            <div class="colBd"><input id="EMAIL" class="filter"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>직책</b></span></div>
-            <div class="colBd"><input id="POSITION" class="filter"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>부서</b></span></div>
-            <div class="colBd"><input id="ORG_NM" class="filter"></div>
+            <div class="colHd clBg5 cl2"><span><b>호</b></span></div>
+            <div class="colBd"><input id="GRD_PAY" class="filter"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>메모</b></span></div>
-            <div class="colBd"><input id="MEMO" class="filter"></div>
-        </div>
+            <div class="colBd"><input id="GRD_DTL" class="filter"></div>
+        </div> 
+        <div class="clearB"></div>
     </div>
-    <div class="clearB"></div>
-
     <br>
     <div class="tableOutFrm">
         <div class="pddS floatL">
@@ -126,7 +105,8 @@
 <script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='/assets/js/modal.js'></script>
 <script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/user.js'></script>
+<script type='text/javascript' src='/assets/js/grdList.js'></script>
+<script type='text/javascript' src='/assets/js/dateForm.js'></script>
 
 <?php include('components/footer.php'); ?>
 

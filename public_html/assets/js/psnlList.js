@@ -6,6 +6,10 @@ var mytbl = new hr_tbl({
         key : psnlKey.value, //api 호출할 보안 개인인증키
         where: {
             nothing : '', //filter의 값 변동이 생기면 여기에 즉시 추가 값을 더하고 xhr을 호출한다.
+            ORG_NM : document.getElementById("ORG_NM").value,
+            PSNL_NM : document.getElementById("PSNL_NM").value,
+            BAPT_NM : document.getElementById("BAPT_NM").value,
+            PHONE_NUM : document.getElementById("PHONE_NUM").value,            
         },
         order: {
             column : '0',
@@ -20,14 +24,9 @@ var mytbl = new hr_tbl({
         ,{title: "소속조직", data: "ORG_NM", className: ""}
         ,{title: "성명", data: "PSNL_NM", className: ""}
         ,{title: "세례명", data: "BAPT_NM", className: ""}
-        ,{title: "직책", data: "POSITION", className: ""}
-        ,{title: "고용형태", data: "WORK_TYPE", className: ""}
-        ,{title: "입사일", data: "JOIN_DT", className: ""}
-        ,{title: "퇴사일", data: "QUIT_DT", className: ""}
+        //,{title: "직책", data: "POSITION", className: ""}
+        //,{title: "고용형태", data: "WORK_TYPE", className: ""}
         ,{title: "연락처", data: "PHONE_NUM", className: ""}
-        ,{title: "이메일", data: "PSNL_EMAIL", className: ""}
-        ,{title: "축일", data: "FEAST", className: ""}
-        ,{title: "생년월일", data: "PSNL_BIRTH", className: ""}
         ,{title: "주민번호", data: "PSNL_NUM", className: ""}
     ],
 });
@@ -75,27 +74,9 @@ function trDataXHR(idx){
                             input.value=res[0].BAPT_NM;
                             break;                  
                         case 5 :
-                            input.value=res[0].POSITION
-                            break;
-                        case 6 :
-                            input.value=res[0].WORK_TYPE
-                            break;
-                        case 7 :
-                            input.value=res[0].JOIN_DT
-                            break;
-                        case 8 :
-                            input.value=res[0].QUIT_DT
-                            break;
-                        case 9 :
                             input.value=res[0].PHONE_NUM
                             break;
-                        case 10 :
-                            input.value=res[0].PSNL_EMAIL
-                            break;
-                        case 11 :
-                            input.value=res[0].FEAST
-                            break;
-                        case 12 :
+                        case 6 :
                             input.value=res[0].PSNL_NUM
                             break;
                     }
@@ -121,14 +102,8 @@ modalEdtBtn.addEventListener("click",()=>{
                 writeUrl+="&PSNL_NM="+input.value
             }
             else if(key==4){writeUrl+="&BAPT_NM="+input.value}
-            else if(key==5){writeUrl+="&POSITION="+input.value}
-            else if(key==6){writeUrl+="&WORK_TYPE="+input.value}
-            else if(key==7){writeUrl+="&JOIN_DT="+input.value}
-            else if(key==8){writeUrl+="&QUIT_DT="+input.value}
-            else if(key==9){writeUrl+="&PHONE_NUM="+input.value}
-            else if(key==10){writeUrl+="&PSNL_EMAIL="+input.value}
-            else if(key==11){writeUrl+="&FEAST="+input.value}
-            else if(key==12){writeUrl+="&PSNL_NUM="+input.value}
+            else if(key==5){writeUrl+="&PHONE_NUM="+input.value}
+            else if(key==6){writeUrl+="&PSNL_NUM="+input.value}
         });
     }catch(e){
         console.log("필수값 체크"); return false;

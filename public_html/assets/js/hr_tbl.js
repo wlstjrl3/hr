@@ -17,6 +17,7 @@ class hr_tbl{
         xhr.open("GET", resValue); xhr.send(); //XHR을 즉시 호출한다.
         xhr.onload = () => {
             if (xhr.status === 200) { //XHR 응답이 존재한다면
+                //debugger;
                 var tableData = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
                 let totalCnt = JSON.parse(xhr.response)['totalCnt'];
                 let filterCnt = JSON.parse(xhr.response)['filterCnt'];
@@ -44,7 +45,9 @@ class hr_tbl{
                         if(key%2 == 0){str+=` class="even">`;}else{str+=` class="odd">`;}
                         str+= `<td class="openCol"><a class="colBtn">＋</a></td>`;
                         this.hrDt.columns.forEach((cl,key)=>{
-                            str+= `<td class="`+cl.className+`" data-label="`+cl.title+`"><p class="sharp">`+row[cl.data]+`</p></td>`;
+                            str+= `<td class="`+cl.className+`" data-label="`+cl.title+`"><p class="sharp">`;
+                            if(!row[cl.data]){}else{str+=row[cl.data];}
+                            str+=`</p></td>`;
                         });
                         str+=`</tr>`;
                     });

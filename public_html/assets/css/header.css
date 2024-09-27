@@ -79,10 +79,31 @@ transition:0.2s;width:12px;filter:invert(1);margin-top:0px;
 
 }
 @media(min-width:720px){
-  
+
 }
 @media(min-width:960px){
-  
+    /*데스크탑 사이즈에서는 측면네비게이션이 상단에 배치되도록 코드 추가*/
+    .side-nav {
+        left: 50%;
+        transform:translate(-50%,0);
+        height: auto;
+        border-radius:8px;        
+        width: 100%;
+        max-width:1080px;
+        position: fixed;
+        z-index: 1;
+        top: 5px; /*상단 여백*/
+        background-color: #369;
+    }
+    .sideNavBlock > li{
+        float:left;
+    }    
+    .nav{
+        display: none;
+    }
+    .side-nav hr{
+        display: none;
+    }
 }
 @media(min-width:1280px){
 

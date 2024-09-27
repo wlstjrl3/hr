@@ -3,7 +3,7 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>가족 정보 </b>
+            <b>입퇴사 발령 정보 </b>
             <button></button>
         </div>
         <div class="modalBody">
@@ -13,34 +13,46 @@
                 <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
             </div>            
             <div class="modalGrp">
-                <div class="modalHd">가족성명</div>
-                <div class="modalBd"><input autocomplete='off'></div>
+                <div class="modalHd">시행조직</div>
+                <div class="modalBd">
+                    <input id="orgCd" style="width:calc(50% - 30px);background:#EEE" readonly autocomplete='off' placeholder="조직코드">
+                    <input id="orgNm" style="width:calc(50% - 30px);" autocomplete='off' placeholder="조직명">
+                    <button id="orgSerchPop" style="width:30px;padding:4px 0;">검색</button>
+                </div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">가족관계</div>
+                <div class="modalHd">재직구분</div>
                 <div class="modalBd"><select>
-                    <option>자녀</option><option>배우자</option>
-                    <option>부모</option><option>형제</option><option>조부모</option>
+                    <option>계약직</option>
+                    <option>정규직</option>
+                    <option>정규기능</option>
                 </select></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">생년월일</div>
-                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+                <div class="modalHd">직책</div>
+                <div class="modalBd"><select>
+                    <option>가사사용인</option>
+                    <option>경비직</option>
+                    <option>관리원</option>
+                    <option>관리장</option>
+                    <option>사무원</option>
+                    <option>사무장</option>
+                </select></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">상세정보</div>
+                <div class="modalHd">인사구분</div>
+                <div class="modalBd"><select>
+                    <option value="1">입사</option>
+                    <option value="2">퇴사</option>
+                    <option value="3">전보</option>
+                </select></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">인사상세</div>
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">가족수당</div>
-                <div class="modalBd"><input type="number" autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">수당시작일</div>
-                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">수당종료일</div>
+                <div class="modalHd">발령일</div>
                 <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
             </div>
             <div style="clear:both;"></div>
@@ -55,7 +67,7 @@
 <div class="container">
 
     <h4 class="cl3 pddS">
-        가족정보 관리
+        입퇴사 발령 관리
     </h4>
 
     <div class="searchArea">
@@ -76,39 +88,28 @@
             </div>    
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>가족성명</b></span></div>
-            <div class="colBd"><input id="FML_NM" class="filter"></div>
+            <div class="colHd2L clBg5 cl2"><span><b>인사발령<br>시행조직</b></span></div>
+            <div class="colBd"><input id="ORG_CD" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>가족관계</b></span></div>
-            <div class="colBd"><select id="FML_RELATION" class="filter">
-                <option value="">전체</option><option>조부모</option><option>부모</option>
-                <option>배우자</option><option>형제</option><option>자녀</option>
+            <div class="colHd clBg5 cl2"><span><b>인사구분</b></span></div>
+            <div class="colBd"><select id="TRS_TYPE" class="filter">
+                <option value="">전체</option>
+                <option value="1">입사</option>
+                <option value="2">퇴사</option>
+                <option value="3">전보</option>
             </select></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>생년월일</b></span></div>
-            <div class="colBd"><input id="FML_BIRTH" class="filter dateBox"></div>
-        </div>
-        <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>상세정보</b></span></div>
-            <div class="colBd"><input id="FML_DTL" class="filter"></div>
+            <div class="colBd"><input id="TRS_DTL" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd2L clBg5 cl2"><span><b>가족수당<br>금액범위</b></span></div>
-            <div class="colBd"><input class="dualDateBox filter" id="FML_PAY_From"><span>~</span><input class="dualDateBox filter" id="FML_PAY_To"></div>
+            <div class="colHd clBg5 cl2"><span><b>발령일</b></span></div>
+            <div class="colBd"><input class="dualDateBox dateBox filter" id="TRS_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="TRS_DT_To"></div>
         </div>
+        <div class="clearB"></div>
     </div>
-    <div class="colGrp">
-        <div class="colHd2L clBg5 cl2"><span><b>수당지급<br>시작일</b></span></div>
-        <div class="colBd"><input class="dualDateBox dateBox filter" id="FML_STT_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="FML_STT_DT_To"></div>
-    </div>
-    <div class="colGrp">
-        <div class="colHd2L clBg5 cl2"><span><b>수당지급<br>종료일</b></span></div>
-        <div class="colBd"><input class="dualDateBox dateBox filter" id="FML_END_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="FML_END_DT_To"></div>
-    </div>    
-    <div class="clearB"></div>
-
     <br>
     <div class="tableOutFrm">
         <div class="pddS floatL">
@@ -136,7 +137,7 @@
 <script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='/assets/js/modal.js'></script>
 <script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/fmlList.js'></script>
+<script type='text/javascript' src='/assets/js/trsList.js'></script>
 <script type='text/javascript' src='/assets/js/dateForm.js'></script>
 
 <?php include('components/footer.php'); ?>

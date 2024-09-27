@@ -36,9 +36,16 @@
         mysqli_close($conn);
     }else if($_REQUEST['CRUD']=='R'){
         //기본 쿼리
-        $sql = "SELECT A.*,B.PSNL_NM,B.POSITION,C.ORG_NM FROM BONDANG_HR.PSNL_LICENSE A
+        $sql = "SELECT A.*,B.PSNL_NM,C.ORG_NM,POSITION FROM BONDANG_HR.PSNL_LICENSE A
             LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
-            LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD";
+            LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD
+            LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
+                SELECT TRS_CD FROM PSNL_TRANSFER AS P2
+                WHERE P2.PSNL_CD = A.PSNL_CD
+                ORDER BY P2.REG_DT DESC
+                LIMIT 1
+            )            
+            ";
         //조건문 지정
         $whereSql = " WHERE 1=1 ";
         if(@$_REQUEST['LCS_CD']){
@@ -61,7 +68,7 @@
     }else if($_REQUEST['CRUD']=='D'){
         //기본 쿼리
         $sql = "DELETE FROM BONDANG_HR.PSNL_LICENSE WHERE LCS_CD = '".$_REQUEST['LCS_CD']."'";
-        echo $sql; //오류 점검용 쿼리
+        //echo $sql; //오류 점검용 쿼리
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
     }else{

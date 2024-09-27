@@ -9,6 +9,10 @@
     $sql = "SELECT B.ORG_NM, A.* FROM BONDANG_HR.PSNL_INFO A INNER JOIN BONDANG_HR.ORG_INFO B ON A.ORG_CD = B.ORG_CD ";
     //조건문 지정
     $whereSql = " WHERE 1=1 ";
+
+    if(@$_REQUEST['PSNL_CD']){
+        $whereSql=$whereSql." AND A.PSNL_CD = '".$_REQUEST['PSNL_CD']."'";
+    }    
     if(@$_REQUEST['ORG_NM']){
         $whereSql=$whereSql." AND ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'"; //조직 정보의 B테이블에서 가져온다.
     }
@@ -18,32 +22,8 @@
     if(@$_REQUEST['BAPT_NM']){
         $whereSql=$whereSql." AND BAPT_NM LIKE '%".$_REQUEST['BAPT_NM']."%'";
     }
-    if(@$_REQUEST['POSITION']){
-        $whereSql=$whereSql." AND POSITION LIKE '%".$_REQUEST['POSITION']."%'";
-    }
-    if(@$_REQUEST['WORK_TYPE']){
-        $whereSql=$whereSql." AND WORK_TYPE LIKE '%".$_REQUEST['WORK_TYPE']."%'";
-    }
-    if(@$_REQUEST['JOIN_DT_From']){
-        $whereSql=$whereSql." AND JOIN_DT >= '".$_REQUEST['JOIN_DT_From']." 00:00:00'";
-    }
-    if(@$_REQUEST['JOIN_DT_To']){
-        $whereSql=$whereSql." AND JOIN_DT <= '".$_REQUEST['JOIN_DT_To']." 23:59:59'";
-    }
-    if(@$_REQUEST['QUIT_DT_From']){
-        $whereSql=$whereSql." AND QUIT_DT >= '".$_REQUEST['QUIT_DT_From']." 00:00:00'";
-    }
-    if(@$_REQUEST['QUIT_DT_To']){
-        $whereSql=$whereSql." AND QUIT_DT <= '".$_REQUEST['QUIT_DT_To']." 23:59:59'";
-    }
     if(@$_REQUEST['PHONE_NUM']){
         $whereSql=$whereSql." AND PHONE_NUM LIKE '%".$_REQUEST['PHONE_NUM']."%'";
-    }
-    if(@$_REQUEST['PSNL_EMAIL']){
-        $whereSql=$whereSql." AND PSNL_EMAIL LIKE '%".$_REQUEST['PSNL_EMAIL']."%'";
-    }
-    if(@$_REQUEST['FEAST']){
-        $whereSql=$whereSql." AND FEAST LIKE '%".$_REQUEST['FEAST']."%'";
     }
     if(@$_REQUEST['PSNL_BIRTH_From']){ //PSNL_NUM을 날짜형식으로 변경하여 비교해야함.
         $whereSql=$whereSql." AND PSNL_NUM >= '".$_REQUEST['PSNL_BIRTH']." 00:00:00'";

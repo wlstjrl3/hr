@@ -63,7 +63,7 @@
         <div class="colGrp">
             <div class="colHd2L clBg5 cl2"><span><b>개인코드<br>/ 조직명</b></span></div>
             <div class="colBd">
-                <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;">
+                <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;" value="<?php echo @$_REQUEST['PSNL_CD'];?>"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;" value="<?php echo @$_REQUEST['ORG_NM'];?>">
             </div>
         </div>        
         <div class="colGrp">
@@ -71,8 +71,8 @@
                 <span><b>직책<br>/ 직원성명</b></span><br>
             </div>
             <div class="colBd" style="">
-                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;">
-                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명">
+                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;" value="<?php echo @$_REQUEST['POSITION'];?>">
+                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM'];?>">
                 <button id="psnlSerchPop" style="padding:3px;">검색</button>
             </div>    
         </div>

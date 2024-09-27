@@ -56,7 +56,7 @@ window.onload = function() {
                 opener.myTblRefresh();            
                 window.close();
             });
-        });
+        }); //다음페이지로 넘긴후에 클릭이 되지 않음!?!?!?
     }, 800);
 };
 

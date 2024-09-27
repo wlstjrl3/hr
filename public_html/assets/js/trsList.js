@@ -3,7 +3,7 @@ document.getElementById("PSNL_NM").focus();
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
     xhr:{
-        url:'/sys/lcsList.php',
+        url:'/sys/trsList.php',
         columXHR: '',
         key : psnlKey.value, //api 호출할 보안 개인인증키
         where: {
@@ -19,18 +19,16 @@ var mytbl = new hr_tbl({
     },
     columns: [
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
-        {title: "idx", data: "LCS_CD", className: "hidden"}
+        {title: "idx", data: "TRS_CD", className: "hidden"}
         ,{title: "조직", data: "ORG_NM", className: ""}
         ,{title: "직원명", data: "PSNL_NM", className: ""}
         ,{title: "직책", data: "POSITION", className: ""}
-        ,{title: "자격번호", data: "LCS_NUM", className: ""}
-        ,{title: "자격명칭", data: "LCS_NM", className: ""}
-        ,{title: "자격등급", data: "LCS_LEVEL", className: ""}
-        ,{title: "자격취득일", data: "LCS_GET_DT", className: ""}
-        ,{title: "상세정보", data: "LCS_DTL", className: ""}
-        ,{title: "자격수당", data: "LCS_PAY", className: ""}
-        ,{title: "수당시작일", data: "LCS_STT_DT", className: ""}
-        ,{title: "수당종료일", data: "LCS_END_DT", className: ""}
+        ,{title: "시행조직", data: "OLD_ORG_NM", className: ""}
+        ,{title: "재직구분", data: "WORK_TYPE", className: ""}
+        ,{title: "직책", data: "POSITION", className: ""}
+        ,{title: "인사구분", data: "TRS_TYPE_KOR", className: ""}
+        ,{title: "상세정보", data: "TRS_DTL", className: ""}
+        ,{title: "발령일", data: "TRS_DT", className: ""}
     ],
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
@@ -56,8 +54,8 @@ newCol.addEventListener("click",()=>{
 //행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx){ 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sys/lcsConfig.php?key="+psnlKey.value+"&LCS_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log("/sys/lcsConfig.php?key="+psnlKey.value+"&LCS_CD="+idx+"&CRUD=R");
+    xhr.open("GET", "/sys/trsConfig.php?key="+psnlKey.value+"&TRS_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/trsConfig.php?key="+psnlKey.value+"&TRS_CD="+idx+"&CRUD=R");
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
@@ -69,38 +67,40 @@ function trDataXHR(idx){
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input,key)=>{
                     switch(key){
                         case 0 :
-                            input.value=res[0].LCS_CD
+                            input.value=res[0].TRS_CD
                             break;
                         case 1 :
-                            input.value=res[0].LCS_NUM;
+                            input.value=res[0].ORG_CD;
                             break;
                         case 2 :
-                            input.value=res[0].LCS_NM;
+                            input.value=res[0].OLD_ORG_NM;
                             break;
                         case 3 :
-                            input.value=res[0].LCS_LEVEL;
+                            input.value=res[0].TRS_DTL;
                             break;
                         case 4 :
-                            input.value=res[0].LCS_GET_DT;
+                            input.value=res[0].TRS_DT;
+                            break;                  
+                    }
+                });
+                document.querySelector(".modalBody").querySelectorAll("select").forEach((sel,key)=>{
+                    switch(key){
+                        case 0 :
+                            sel.value=res[0].WORK_TYPE; //재직구분
                             break;
-                        case 5 :
-                            input.value=res[0].LCS_DTL;
+                        case 1 :
+                            sel.value=res[0].POSITION; //직책
                             break;
-                        case 6 :
-                            input.value=res[0].LCS_PAY;
-                            break;
-                        case 7 :
-                            input.value=res[0].LCS_STT_DT;
-                            break;
-                        case 8 :
-                            input.value=res[0].LCS_END_DT;
+                        case 2 :
+                            sel.value=res[0].TRS_TYPE; //인사구분
                             break;
                     }
                 });
+
                 document.querySelector(".modalBody").querySelector("b").innerHTML=res[0].ORG_NM+" "+res[0].POSITION+" "+res[0].PSNL_NM;
             }
         }else{
-            console.log("lcsConfigXhr 정보 로드 에러");
+            console.log("trsConfigXhr 정보 로드 에러");
         }
     }
 }
@@ -110,40 +110,36 @@ modalEdtBtn.addEventListener("click",()=>{
     let writeUrl='';
     try{
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-            if(key==0){writeUrl+="&LCS_CD="+input.value}
-            else if(key==1){writeUrl+="&LCS_NUM="+input.value}
-            else if(key==2){
-                if(input.value.length<2){alert("자격명칭은 필수값입니다.");throw new Error("stop loop");}
-                writeUrl+="&LCS_NM="+input.value
+            if(key==0){writeUrl+="&TRS_CD="+input.value}
+            else if(key==1){
+                if(input.value.length<2){alert("시행조직은 필수값입니다.");throw new Error("stop loop");}
+                writeUrl+="&ORG_CD="+input.value;
             }
-            else if(key==3){writeUrl+="&LCS_LEVEL="+input.value}
+            else if(key==3){writeUrl+="&TRS_DTL="+input.value;}
             else if(key==4){
-                if(input.value.length<2){alert("자격취득일은 필수 값입니다");throw new Error("stop loop");}
-                writeUrl+="&LCS_GET_DT="+input.value
+                if(input.value.length<2){alert("발령일은 필수값입니다");throw new Error("stop loop");}
+                writeUrl+="&TRS_DT="+input.value;
             }
-            else if(key==5){writeUrl+="&LCS_DTL="+input.value}
-            else if(key==6){writeUrl+="&LCS_PAY="+input.value}
-            else if(key==7){writeUrl+="&LCS_STT_DT="+input.value}
-            else if(key==8){writeUrl+="&LCS_END_DT="+input.value}
         });
     }catch(e){
         console.log("필수값 체크"); return false;
     }
+    document.querySelector(".modalForm").querySelectorAll("select").forEach((sel,key)=>{
+        if(key==0){writeUrl+="&WORK_TYPE="+sel.value;}
+        else if(key==1){writeUrl+="&POSITION="+sel.value;}
+        else if(key==2){writeUrl+="&TRS_TYPE="+sel.value;}
+    });
     writeUrl+="&PSNL_CD="+document.getElementById("PSNL_CD").value;
-    console.log("/sys/lcsConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
-    xhr.open("GET", "/sys/lcsConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/trsConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
+    xhr.open("GET", "/sys/trsConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
-            if(res==""){
-                console.log("lcsConfig 정보 기록 완료");
-                mytbl.show('myTbl'); //테이블의 아이디
-                modalClose();
-            }else{
-                alert("오류발생! 아래 코드를 개발자에게 전달해주세요.\n\n"+res);
-            }
+            console.log("trsConfig 정보 기록 완료");
+            mytbl.show('myTbl'); //테이블의 아이디
+            modalClose();
         }else{
-            alert(xhr.statusText+" 정보 기록 에러!!!");
+            console.log("trsConfig 정보 기록 에러!!!");
         }
     }    
 });
@@ -155,18 +151,18 @@ modalDelBtn.addEventListener("click",()=>{
     let xhr = new XMLHttpRequest();
     let deleteUrl='';
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-        if(key==0){deleteUrl+="&LCS_CD="+input.value}
+        if(key==0){deleteUrl+="&TRS_CD="+input.value}
     });
-    console.log("/sys/lcsConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
-    xhr.open("GET", "/sys/lcsConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
+    console.log("/sys/trsConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
+    xhr.open("GET", "/sys/trsConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
-            console.log("lcsConfig 정보 삭제 완료");
+            console.log("trsConfig 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
         }else{
-            console.log("lcsConfig 정보 제거 에러!!!");
+            console.log("trsConfig 정보 제거 에러!!!");
         }
     }    
 });
@@ -185,6 +181,15 @@ document.querySelectorAll(".dateBox").forEach(dtBox => {
         event = event || window.event;
         var _val = this.value.trim();
         this.value = autoHypenDate(_val) ;
+    }
+});
+//조직 검색 팝업 띄우기
+document.getElementById("orgSerchPop").addEventListener('click',()=>{
+    window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
+});
+document.getElementById("orgNm").addEventListener("keyup", (evt)=>{
+    if (evt.keyCode == 13) {
+        window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
     }
 });
 //직원코드 검색 팝업 띄우기

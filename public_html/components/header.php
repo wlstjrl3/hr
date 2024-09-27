@@ -34,20 +34,20 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="/psnlList">
-                                └&nbsp;직원 현황
-                            </a>
-                        </li>
-                        <!--li>
-                            <a href="/psnlDtl">
-                                └&nbsp;[개]직원 인사기본
+                            <a href="/psnlTotal">
+                                └&nbsp;직원 종합정보 조회
                             </a>
                         </li>
                         <li>
-                            <a href="/">
-                                └&nbsp;[개]소속별 직원 근무현황
+                            <a href="/psnlList">
+                                └&nbsp;직원 기초정보
                             </a>
-                        </li-->
+                        </li>
+                        <li>
+                            <a href="/trsList">
+                                └&nbsp;입퇴사 발령관리
+                            </a>
+                        </li>
                         <li>
                             <a href="/fmlList">
                                 └&nbsp;가족정보 관리
@@ -64,19 +64,14 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/">
-                                <span class="cl6">└&nbsp;상벌/직무평가 관리</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/">
-                                <span class="cl6">└&nbsp;퇴사자 관리</span>
+                            <a href="/opiList">
+                                └&nbsp;상벌/직무평가 관리
                             </a>
                         </li>
                     </ul>
                     <hr>
                 </li>
-                <li class="clBg2">
+                <li>
                     <a class="fs5" href="#">승급 관리
                         <img src="/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
@@ -92,8 +87,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/">
-                                <span class="cl6">└&nbsp;개별 승급</span>
+                            <a href="/grdList">
+                                └&nbsp;개별 급호봉 관리
                             </a>
                         </li>
                     </ul>
@@ -106,7 +101,7 @@
                     <ul>
                         <li>
                             <a href="/salaryList.php">
-                                └&nbsp;연도별 급호봉 테이블
+                                └&nbsp;급호봉 테이블
                             </a>
                         </li>
                         <li>
@@ -127,7 +122,7 @@
                     </ul>
                     <hr>
                 </li>    
-                <li class="clBg2">
+                <li>
                     <a class="fs5" href="#">조직 관리
                         <img src="/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
@@ -146,10 +141,10 @@
                     <hr>
                 </li>                                          
                 <li>
-                    <a class="fs5" href="/user.php">시스템 사용자관리</a>
+                    <a class="fs5" href="/user.php">사용자관리</a>
                     <hr>
                 </li>   
-                <li class="clBg2">
+                <li>
                     <a class="fs5" href="./logout.php">로그아웃</a>
                     <hr>
                 </li>             

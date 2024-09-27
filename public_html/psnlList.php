@@ -3,7 +3,7 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>직원현황 모달창</b>
+            <b>직원기초정보 모달창</b>
             <button></button>
         </div>
         <div class="modalBody">
@@ -28,32 +28,8 @@
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">직책</div>
-                <div class="modalBd"><input autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">고용형태</div>
-                <div class="modalBd"><input autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">입사일</div>
-                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">퇴사일</div>
-                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
-            </div>
-            <div class="modalGrp">
                 <div class="modalHd">연락처</div>
                 <div class="modalBd"><input autocomplete='off' class="phoneNumBox"></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">이메일</div>
-                <div class="modalBd"><input autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">축일</div>
-                <div class="modalBd"><input autocomplete='off' class="shortDateBox"></div>
             </div>
             <div class="modalGrp">
                 <div class="modalHd">주민번호</div>
@@ -62,12 +38,6 @@
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
-            <button id="1" style="padding:5px 9px;">인사정보</button>
-            <button id="2" style="padding:5px 9px;">가족정보</button>
-            <button id="3" style="padding:5px 9px;">자격정보</button>
-            <button id="4" style="padding:5px 9px;">상벌정보</button>
-            <button id="5" style="padding:5px 9px;">보증보험</button>
-            &nbsp; - &nbsp;
             <button id="modalEdtBtn" style="padding:5px 9px;">저장</button>
             <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
         </div>
@@ -77,51 +47,25 @@
 <div class="container">
 
     <h4 class="cl3 pddS">
-        직원 현황
+        직원 기초정보 관리
     </h4>
 
     <div class="searchArea">
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>소속</b></span></div>
-            <div class="colBd"><input id="ORG_NM" class="filter"></div>
+            <div class="colBd"><input id="ORG_NM" class="filter" value="<?php echo @$_REQUEST['ORG_NM'];?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>성명</b></span></div>
-            <div class="colBd"><input id="PSNL_NM" class="filter"></div>
+            <div class="colBd"><input id="PSNL_NM" class="filter" value="<?php echo @$_REQUEST['PSNL_NM'];?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>세례명</b></span></div>
-            <div class="colBd"><input id="BAPT_NM" class="filter"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>직책</b></span></div>
-            <div class="colBd"><input id="POSITION" class="filter"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>고용형태</b></span></div>
-            <div class="colBd"><select id="WORK_TYPE" class="filter">
-                <option value="">전체</option><option>정규직</option><option>계약직</option><option>정규기능</option><option>퇴사</option>
-            </select></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>입사일</b></span></div>
-            <div class="colBd"><input class="dateBox dualDateBox filter" id="JOIN_DT_From"><span>~</span><input class="dateBox dualDateBox filter" id="JOIN_DT_To"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>퇴사일</b></span></div>
-            <div class="colBd"><input class="dateBox dualDateBox filter" id="QUIT_DT_From"><span>~</span><input class="dateBox dualDateBox filter" id="QUIT_DT_To"></div>
+            <div class="colBd"><input id="BAPT_NM" class="filter" value="<?php echo @$_REQUEST['BAPT_NM'];?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>연락처</b></span></div>
-            <div class="colBd"><input id="PHONE_NUM" class="phoneNumBox filter"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>이메일</b></span></div>
-            <div class="colBd"><input id="PSNL_EMAIL" class="filter"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>축일</b></span></div>
-            <div class="colBd"><input id="FEAST" class="filter"></div>
+            <div class="colBd"><input id="PHONE_NUM" class="phoneNumBox filter" value="<?php echo @$_REQUEST['PHONE_NUM'];?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>생년월일</b></span></div>
@@ -130,14 +74,6 @@
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>주민번호</b></span></div>
             <div class="colBd"><input id="PSNL_NUM" class="juminNumBox filter"></div>
-        </div>
-        <div class="">
-            <div><span><b>빠른세팅 도우미</b></span>
-            <button>정년 대상자</button>
-            <button>입사1~5년</button>
-            <button>입사5~10년</button>
-            <button>입사10~15년</button>
-            <button>입사15년 이상</button>
         </div>
     </div>
     <div class="clearB"></div>
