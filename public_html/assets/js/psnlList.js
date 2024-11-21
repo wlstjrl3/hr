@@ -56,6 +56,9 @@ function trDataXHR(idx){
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
             if(res!=null){
+                /* 발령정보 페이지로 이동버튼 */
+                document.getElementById("goTrsListBtn").addEventListener("click",()=>{location.href="/trsList?PSNL_CD="+res[0].PSNL_CD+"&PSNL_NM="+res[0].PSNL_NM+"&ORG_CD="+res[0].ORG_CD+"&ORG_NM="+res[0].ORG_NM});
+
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input,key)=>{
                     switch(key){
                         case 0 :

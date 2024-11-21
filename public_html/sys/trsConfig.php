@@ -7,7 +7,7 @@
     if($_REQUEST['CRUD']=='C'){
         if($_REQUEST['TRS_CD']==""){ //신규 작성
             $sql = "INSERT INTO BONDANG_HR.PSNL_TRANSFER(PSNL_CD,ORG_CD,WORK_TYPE,POSITION,TRS_TYPE,TRS_DTL,TRS_DT,REG_DT) VALUES ('";
-            $sql = $sql.$_REQUEST['PSNL_CD']."','".$_REQUEST['ORG_CD']."','".$_REQUEST['WORK_TYPE']."','".$_REQUEST['POSITION']."','".$_REQUEST['TRS_TYPE']."','".$_REQUEST['TRS_DTL']."','".$_REQUEST['TRS_DT'];
+            $sql = $sql.$_REQUEST['PSNL_CD']."','".$_REQUEST['ORG_CD']."','".$_REQUEST['WORK_TYPE']."','".$_REQUEST['POSITION']."','".$_REQUEST['TRS_TYPE']."','".$_REQUEST['TRS_DTL']."','".$_REQUEST['TRS_DT']."','".$_REQUEST['APP_DT'];
             $sql = $sql."','".date("Y-m-d h:m:s")."')";
             echo $sql; //오류 점검용 쿼리
         }else{ //기존 데이터 UPDATE
@@ -18,7 +18,9 @@
                 ,POSITION='".@$_REQUEST['POSITION']."'
                 ,TRS_TYPE='".@$_REQUEST['TRS_TYPE']."'
                 ,TRS_DTL='".@$_REQUEST['TRS_DTL']."'
-                ,TRS_DT='".@$_REQUEST['TRS_DT']."'";
+                ,TRS_DT='".@$_REQUEST['TRS_DT']."'
+                ,APP_DT='".@$_REQUEST['APP_DT']."'
+                ";
             $sql = $sql."
                 ,REG_DT='".date("Y-m-d h:m:s")."'
                 WHERE TRS_CD = '".$_REQUEST['TRS_CD']."'";

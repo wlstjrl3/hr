@@ -38,6 +38,7 @@
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
+            <button id="goTrsListBtn" style="padding:5px 9px;">발령정보</button>
             <button id="modalEdtBtn" style="padding:5px 9px;">저장</button>
             <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
         </div>

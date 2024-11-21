@@ -10,10 +10,19 @@
             <div class="modalGrp">
                 <div class="modalHd">일련번호</div>
                 <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
-            </div>            
+            </div>
             <div class="modalGrp">
                 <div class="modalHd">기준연도</div>
                 <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">타입</div>
+                <div class="modalBd"><select>
+                    <option value="">선택</option>
+                    <option>정규</option>
+                    <option>기능</option>
+                    <option>계약</option>
+                </select></div>
             </div>
             <div class="modalGrp">
                 <div class="modalHd">급</div>
@@ -50,6 +59,10 @@
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>기준연도</b></span></div>
             <div class="colBd"><input id="SLR_YEAR" class="filter dateBox" maxlength="4"></div>
+        </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>타입</b></span></div>
+            <div class="colBd"><input id="SLR_TYPE"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>급 & 호</b></span></div>

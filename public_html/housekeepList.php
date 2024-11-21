@@ -3,7 +3,7 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>상벌/직무평가 정보 </b>
+            <b>가사사용인 근무 정보 </b>
             <button></button>
         </div>
         <div class="modalBody">
@@ -13,26 +13,16 @@
                 <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
             </div>            
             <div class="modalGrp">
-                <div class="modalHd">평가유형</div>
-                <div class="modalBd"><select>
-                    <option value="1">긍정</option>
-                    <option value="2">부정</option>
-                    <option value="3">포상</option>
-                    <option value="4">징계</option>
-                </select></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">평가일시</div>
+                <div class="modalHd">주 근무일수</div>
                 <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">평가자</div>
-                <div class="modalBd"><input autocomplete='off'></div>
+                <div class="modalHd">주 근무시간</div>
+                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
             </div>
-            <div style="clear:both;"></div>
-            <div class="">
-                <div class="modalHd">평가내용</div>
-                <div class="modalBd"><textarea style="margin:5px;border:1px solid #CCC;padding:10px 15px;width:calc(100% - 25px); height:150px; overflow:auto;" autocomplete='off'></textarea></div>
+            <div class="modalGrp">
+                <div class="modalHd">사제인원수</div>
+                <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div style="clear:both;"></div>
         </div>
@@ -46,7 +36,7 @@
 <div class="container">
 
     <h4 class="cl3 pddS">
-        상벌/직무평가 관리
+        가사사용인 근무 정보
     </h4>
 
     <div class="searchArea">
@@ -67,27 +57,17 @@
             </div>    
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>평가자</b></span></div>
-            <div class="colBd"><input id="OPI_PERSON" class="filter"></div>
+            <div class="colHd clBg5 cl2"><span><b>주근무일수</b></span></div>
+            <div class="colBd"><input id="GRD_GRADE" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>평가일시</b></span></div>
-            <div class="colBd"><input class="dualDateBox dateBox filter" id="OPI_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="OPI_DT_To"></div>
+            <div class="colHd clBg5 cl2"><span><b>주근무시간</b></span></div>
+            <div class="colBd"><input id="GRD_PAY" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>평가내용</b></span></div>
-            <div class="colBd"><input id="OPI_DTL" class="filter"></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>평가유형</b></span></div>
-            <div class="colBd"><select id="OPI_TYPE" class="filter">
-                <option value="">전체</option>
-                <option value="1">긍정</option>
-                <option value="2">부정</option>
-                <option value="3">포상</option>
-                <option value="4">징계</option>
-            </select></div>
-        </div>    
+            <div class="colHd clBg5 cl2"><span><b>사제인원수</b></span></div>
+            <div class="colBd"><input id="GRD_DTL" class="filter"></div>
+        </div> 
         <div class="clearB"></div>
     </div>
     <br>
@@ -113,12 +93,11 @@
 
 <link href="/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
 <link href="/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/opiList.css?ver=0" rel="stylesheet" />
 <link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
 <script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='/assets/js/modal.js'></script>
 <script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/opiList.js'></script>
+<script type='text/javascript' src='/assets/js/housekeepList.js'></script>
 <script type='text/javascript' src='/assets/js/dateForm.js'></script>
 
 <?php include('components/footer.php'); ?>

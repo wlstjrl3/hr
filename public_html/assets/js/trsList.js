@@ -29,6 +29,7 @@ var mytbl = new hr_tbl({
         ,{title: "인사구분", data: "TRS_TYPE_KOR", className: ""}
         ,{title: "상세정보", data: "TRS_DTL", className: ""}
         ,{title: "발령일", data: "TRS_DT", className: ""}
+        ,{title: "임용일", data: "APP_DT", className: ""}
     ],
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
@@ -44,10 +45,15 @@ newCol.addEventListener("click",()=>{
     document.querySelector(".modalBody").querySelector("b").innerHTML=ORG_NM.value+" "+POSITION.value+" "+PSNL_NM.value;
     document.querySelector(".modalForm").style.visibility="visible"; //모달창이 나타나게 한다.
     document.querySelector(".modalForm").style.opacity="1";     //투명도 애니메이션 적용을 위해 opacity가 0에서 1로 변경된다.
+    let query = window.location.search;
+    let param = new URLSearchParams(query); //시행조직 정보를 자동으로 끌어오기 위해 get 파라미터의 값을 확인한다.
+
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
         input.value="";
         if(key==1){
-            input.focus();
+            input.value = param.get('ORG_CD');
+        }else if(key==2){
+            input.value = param.get('ORG_NM');
         }
     });
 });
@@ -60,6 +66,9 @@ function trDataXHR(idx){
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
             if(res!=null){
+                /* 급호봉관리 페이지로 이동버튼 */
+                document.getElementById("goGrdListBtn").addEventListener("click",()=>{location.href="/grdList?PSNL_CD="+res[0].PSNL_CD+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_CD="+res[0].ORG_CD+"&ORG_NM="+res[0].ORG_NM+"&WORK_TYPE="+res[0].WORK_TYPE});
+
                 document.getElementById("PSNL_CD").value=res[0].PSNL_CD;
                 document.getElementById("ORG_NM").value=res[0].ORG_NM;
                 document.getElementById("POSITION").value=res[0].POSITION;
@@ -80,7 +89,10 @@ function trDataXHR(idx){
                             break;
                         case 4 :
                             input.value=res[0].TRS_DT;
-                            break;                  
+                            break;
+                        case 5 :
+                            input.value=res[0].APP_DT;
+                            break;         
                     }
                 });
                 document.querySelector(".modalBody").querySelectorAll("select").forEach((sel,key)=>{
@@ -120,6 +132,7 @@ modalEdtBtn.addEventListener("click",()=>{
                 if(input.value.length<2){alert("발령일은 필수값입니다");throw new Error("stop loop");}
                 writeUrl+="&TRS_DT="+input.value;
             }
+            else if(key==5){writeUrl+="&APP_DT="+input.value;}
         });
     }catch(e){
         console.log("필수값 체크"); return false;

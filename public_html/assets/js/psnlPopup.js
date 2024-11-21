@@ -5,6 +5,7 @@ document.querySelector('#PSNL_NM').value = parentValue;
 
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
+    tblType:"psnlPopup",
     xhr:{
         url:'/sys/psnlPopSearch.php',
         columXHR: '',
@@ -30,7 +31,7 @@ var mytbl = new hr_tbl({
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
 
-//행을 클릭했을때 이벤트 추가(.hr_tbl 이 바인딩 된 후에 적용되어야 하기에 타임아웃 지연 로딩)
+//검색된 데이터가 하나라면 즉시 바인딩 한다.(로딩 시간이 걸리기에 지연로딩 처리)
 window.onload = function() {
     document.getElementById("PSNL_NM").focus();
     setTimeout(() => {
@@ -40,24 +41,11 @@ window.onload = function() {
             opener.document.getElementById('ORG_NM').value = tmp[0].children[2].innerText;
             opener.document.getElementById('PSNL_NM').value = tmp[0].children[3].innerText;
             opener.document.getElementById('POSITION').value = tmp[0].children[5].innerText;
-            //opener.document.getElementById('psnlSerchPop').focus();
             opener.document.getElementById('psnlSerchPop').parentElement.parentElement.nextElementSibling.querySelector("input").focus();
             opener.myTblRefresh();
             window.close();
         }
-        document.querySelector(".hr_tbl").querySelectorAll('tr').forEach(tr => { //아니라면 각 행에 클릭 이벤트를 추가한다.
-            tr.addEventListener('click', (target)=>{
-                opener.document.getElementById('PSNL_CD').value = target.currentTarget.children[1].innerText;
-                opener.document.getElementById('ORG_NM').value = target.currentTarget.children[2].innerText;
-                opener.document.getElementById('PSNL_NM').value = target.currentTarget.children[3].innerText;
-                opener.document.getElementById('POSITION').value = target.currentTarget.children[5].innerText;
-                //opener.document.getElementById('psnlSerchPop').focus();
-                opener.document.getElementById('psnlSerchPop').parentElement.parentElement.nextElementSibling.querySelector("input").focus();    
-                opener.myTblRefresh();            
-                window.close();
-            });
-        }); //다음페이지로 넘긴후에 클릭이 되지 않음!?!?!?
-    }, 800);
+    }, 400);
 };
 
 //검색 필터링을 위한 코드

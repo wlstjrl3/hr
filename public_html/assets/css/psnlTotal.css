@@ -1,3 +1,18 @@
+.showColBg{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    z-index:1;
+    left:0;
+    top:0;
+    visibility:hidden;
+}
+
+.modalWindow{
+    width:100%;
+    overflow:auto;
+}
 .modalBody div{
     border-radius: 6px;
     background-color: #EEE;
@@ -23,4 +38,4 @@
 #psnlTbl th{width:10%;}
 #psnlTbl td{width:15%;}
 
-#opiTbl th:nth-child(1,2,3){width:10%;}
+#opiTbl th{width:10%;}

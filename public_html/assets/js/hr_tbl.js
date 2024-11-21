@@ -119,8 +119,7 @@ class hr_tbl{
                 tblPagination.innerHTML = pageStr;
                 document.querySelectorAll(".pageMoveBtn").forEach(pgMvBtn=>{
                     pgMvBtn.addEventListener('click',()=>{
-                    console.log("페이지 이동 이벤트!!!"); //여기부터 작업할 차례임.
-                    //2024-05-07 여기 작업중
+                    console.log("팝업 페이지 이동 이벤트");
                     if(pgMvBtn.text=="▶"){
                         this.hrDt.xhr.page=this.hrDt.xhr.page+1;
                         if(this.hrDt.xhr.page>totalPg-1){this.hrDt.xhr.page=totalPg-1;} //최대페이지보다 높지않도록
@@ -164,7 +163,36 @@ class hr_tbl{
                                 mytbl.hrDt.xhr.order.direction="desc"  //내림차순 정렬
                             }
                             mytbl.show(tbNm);                                           //테이블의 정보갱신
-                        }else{                                                          //+버튼이 아닌 행을 클릭하여 모달창을 연다면
+                        }else if(this.hrDt.tblType=="psnlPopup"){   //개인검색 팝업창에서의 행클릭 이벤트
+                            opener.document.getElementById('PSNL_CD').value = target.currentTarget.children[1].innerText;
+                            opener.document.getElementById('ORG_NM').value = target.currentTarget.children[2].innerText;
+                            opener.document.getElementById('PSNL_NM').value = target.currentTarget.children[3].innerText;
+                            opener.document.getElementById('POSITION').value = target.currentTarget.children[5].innerText;
+                            opener.document.getElementById('psnlSerchPop').parentElement.parentElement.nextElementSibling.querySelector("input").focus();    
+                            opener.myTblRefresh();            
+                            window.close(); 
+                        }else if(this.hrDt.tblType=="orgPopup"){   //조직검색 팝업창에서의 행클릭 이벤트
+                            opener.document.getElementById('orgCd').value = target.currentTarget.children[1].innerText
+                            opener.document.getElementById('orgNm').value = target.currentTarget.children[2].innerText;
+                            opener.document.getElementById('orgSerchPop').focus();
+                            window.close();
+                        }else if(this.hrDt.tblType=="pageLink"){   //페이지 이동처리 이벤트
+                            let param = "";
+                            tr.querySelectorAll("td").forEach(td=>{
+                                if(td.dataset.label=="본당명"){
+                                    param+="ORG_NM="+td.textContent+"&";
+                                }else if(td.dataset.label=="성명"){
+                                    param+="PSNL_NM="+td.textContent+"&";
+                                }else if(td.dataset.label=="직책"){
+                                    param+="POSITION="+td.textContent+"&";
+                                }else if(td.dataset.label=="개인번호"||td.dataset.label=="개인코드"){
+                                    param+="PSNL_CD="+td.textContent+"&";
+                                }else if(td.dataset.label=="본당코드"){
+                                    param+="ORG_CD="+td.textContent+"&";
+                                }
+                            });
+                            location.href=this.hrDt.pageLinkHref+param;
+                        }else{                                                          //팝업창도 아니고 +버튼이 아닌 행을 클릭하여 모달창을 연다면
                             let modalForm = document.querySelector(".modalForm")
                             modalForm.style.visibility="visible"; //모달창이 나타나게 한다.
                             modalForm.style.opacity="1";     //투명도 애니메이션 적용을 위해 opacity가 0에서 1로 변경된다.

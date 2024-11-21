@@ -6,13 +6,14 @@
     
     if($_REQUEST['CRUD']=='C'){
         if($_REQUEST['SLR_CD']==""){ //신규 작성
-            $sql = "INSERT INTO BONDANG_HR.SALARY_TB(SLR_YEAR, SLR_GRADE, SLR_PAY, NORMAL_PAY, LEGAL_PAY, REG_DT) VALUES ('";
-            $sql = $sql.$_REQUEST['SLR_YEAR']."','".$_REQUEST['SLR_GRADE']."','".$_REQUEST['SLR_PAY']."','".$_REQUEST['NORMAL_PAY']."','".$_REQUEST['LEGAL_PAY'];
+            $sql = "INSERT INTO BONDANG_HR.SALARY_TB(SLR_YEAR, SLR_TYPE, SLR_GRADE, SLR_PAY, NORMAL_PAY, LEGAL_PAY, REG_DT) VALUES ('";
+            $sql = $sql.$_REQUEST['SLR_YEAR']."','".$_REQUEST['SLR_TYPE']."','".$_REQUEST['SLR_GRADE']."','".$_REQUEST['SLR_PAY']."','".$_REQUEST['NORMAL_PAY']."','".$_REQUEST['LEGAL_PAY'];
             $sql = $sql."','".date("Y-m-d h:m:s")."')";
-            echo $sql; //오류 점검용 쿼리
+            //echo $sql; //오류 점검용 쿼리
         }else{ //기존 데이터 UPDATE
             $sql = "UPDATE BONDANG_HR.SALARY_TB SET 
                 SLR_YEAR='".$_REQUEST['SLR_YEAR']."'
+                ,SLR_TYPE='".$_REQUEST['SLR_TYPE']."'
                 ,SLR_GRADE='".$_REQUEST['SLR_GRADE']."'
                 ,SLR_PAY='".$_REQUEST['SLR_PAY']."'
                 ,NORMAL_PAY='".$_REQUEST['NORMAL_PAY']."'
@@ -47,7 +48,7 @@
     }else if($_REQUEST['CRUD']=='D'){
         //기본 쿼리
         $sql = "DELETE FROM BONDANG_HR.SALARY_TB WHERE SLR_CD = '".$_REQUEST['SLR_CD']."'";
-        echo $sql; //오류 점검용 쿼리
+        //echo $sql; //오류 점검용 쿼리
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
     }else{

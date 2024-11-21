@@ -54,11 +54,6 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/lcsList">
-                                └&nbsp;자격/면허 관리
-                            </a>
-                        </li>
-                        <li>
                             <a href="/insList">
                                 └&nbsp;보증보험 정보 관리
                             </a>
@@ -77,8 +72,8 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="/">
-                                <span class="cl6">└&nbsp;승급 대상자 현황</span>
+                            <a href="/advList">
+                                └&nbsp;승급 대상자 현황
                             </a>
                         </li>
                         <li>
@@ -105,45 +100,47 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/">
-                                <span class="cl6">└&nbsp;근무일수/시간</span>
+                            <a href="/housekeepList.php">
+                                └&nbsp;가사사용 정보
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/adjList.php">
+                                └&nbsp;조정수당 관리
                             </a>
                         </li>
                         <li>
                             <a href="/">
-                                <span class="cl6">└&nbsp;조정수당 관리</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/">
-                                <span class="cl6">└&nbsp;급여 정보</span>
+                                <span class="cl6">└&nbsp;월별 급여 정보</span>
                             </a>
                         </li>
                     </ul>
                     <hr>
                 </li>    
                 <li>
-                    <a class="fs5" href="#">조직 관리
+                    <a class="fs5" href="#">기초정보 관리
                         <img src="/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
                     <ul>
                         <li>
                             <a href="/orgList">
-                                └&nbsp;조직 현황
+                                └&nbsp;본당/성지 관리
                             </a>
                         </li>
-                        <!--li>
-                            <a href="/">
-                                └&nbsp;조직정보 트리
+                        <li>
+                            <a href="/user.php">
+                                └&nbsp;사용자 관리
                             </a>
-                        </li-->
+                        </li>
+                        <li>
+                            <a href="/">
+                                <span class="cl6">└&nbsp;통계정보</span>
+                                <!--(남여/나이대/직종/평균임금/평균근속)직종별 남여분포, 나이대별 평균임금, 성별에 따른 평균근속 등 조합 조회 그래프 표시기능-->
+                            </a>
+                        </li>
                     </ul>
                     <hr>
-                </li>                                          
-                <li>
-                    <a class="fs5" href="/user.php">사용자관리</a>
-                    <hr>
-                </li>   
+                </li>
                 <li>
                     <a class="fs5" href="./logout.php">로그아웃</a>
                     <hr>

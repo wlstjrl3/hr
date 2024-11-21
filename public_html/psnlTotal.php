@@ -3,7 +3,7 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">직원 종합정보 조회</div>
-        <div class="modalBody" style="background:#FFF;">
+        <div class="modalBody">
             <table id="psnlTbl">
                 <tr>
                     <th><span>소속</span></th><td><span id="mdBdOrgNm">소속임</span></td>
@@ -25,7 +25,7 @@
                 </tr>
             </table>
             <table id="fmlTbl"></table>
-            <table id="lcsTbl"></table>
+            <table id="adjTbl"></table>
             <table id="opiTbl"></table>
         </div>
         <div class="modalFooter">
@@ -33,7 +33,7 @@
             <button id="goTrsListBtn" style="padding:5px 9px;">발령정보</button>
             <button id="goGrdListBtn" style="padding:5px 9px;">급호봉관리</button>
             <button id="goFmlListBtn" style="padding:5px 9px;">가족정보</button>
-            <button id="goLcsListBtn" style="padding:5px 9px;">자격/면허</button>
+            <button id="goAdjListBtn" style="padding:5px 9px;">조정수당</button>
             <button id="goInsListBtn" style="padding:5px 9px;">보증보험</button>
             <button id="goOpiListBtn" style="padding:5px 9px;">상벌정보</button>
         </div>
@@ -87,13 +87,17 @@
             <div class="colHd clBg5 cl2"><span><b>주민번호</b></span></div>
             <div class="colBd"><input id="PSNL_NUM" class="juminNumBox filter"></div>
         </div>
-        <div class="">
-            <div><span><b>빠른세팅 도우미</b></span>
-            <button>정년 대상자</button>
-            <button>입사1~5년</button>
-            <button>입사5~10년</button>
-            <button>입사10~15년</button>
-            <button>입사15년 이상</button>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>입/퇴사일</b></span></div>
+            <div class="colBd"><input class="dateBox dualDateBox filter" id="TRS_DT_From"><span>~</span><input class="dateBox dualDateBox filter" id="TRS_DT_To"></div>
+        </div>        
+        <div class="colGrp clBg4">
+            <div class="txtCenter" style="padding:5px 0 6px 0;">
+                <a class="pddSS clBg2 clW rndCorner pointer quikSetBtn" id="setRetire">정년 대상</a>
+                <a class="pddSS clBg2 clW rndCorner pointer quikSetBtn" id="set10Yr">근속10년</a>
+                <a class="pddSS clBg2 clW rndCorner pointer quikSetBtn" id="set20Yr">근속20년</a>
+                <a class="pddSS clBg2 clW rndCorner pointer quikSetBtn" id="set30Yr">근속30년</a>
+            </div>
         </div>
     </div>
     <div class="clearB"></div>
@@ -101,6 +105,7 @@
     <br>
     <div class="tableOutFrm">
         <div class="pddS floatL">
+            <div class="showColBg"></div>
             <a id="showCol" class="pddS clBg3 clW rndCorner pointer">표시 항목 변경</a>
         </div><div id="showColList"></div>
         <div class="pddS floatL">
@@ -138,6 +143,7 @@
 <script type='text/javascript' src='/assets/js/dateForm.js'></script>
 <script type='text/javascript' src='/assets/js/phoneForm.js'></script>
 <script type='text/javascript' src='/assets/js/juminForm.js'></script>
+<script type='text/javascript' src='/assets/js/dateFormat.js'></script>
 
 <?php include('components/footer.php'); ?>
 

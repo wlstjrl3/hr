@@ -18,6 +18,7 @@ var mytbl = new hr_tbl({
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
         {title: "idx", data: "SLR_CD", className: "hidden"}
         ,{title: "기준연도", data: "SLR_YEAR", className: ""}
+        ,{title: "타입", data: "SLR_TYPE", className: ""}
         ,{title: "급", data: "SLR_GRADE", className: ""}
         ,{title: "호", data: "SLR_PAY", className: ""}
         ,{title: "기본급", data: "NORMAL_PAY", className: ""}
@@ -88,19 +89,21 @@ modalEdtBtn.addEventListener("click",()=>{
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
             if(key==0){writeUrl+="&SLR_CD="+input.value}
             else if(key==1){
-                if(input.value.length<4){alert("기준연도는 필수값입니다.");throw new Error("stop loop");}
+                if(input.value<1900 | input.value>2200){alert("기준연도 값을 확인해주세요.");throw new Error("stop loop");}
                 writeUrl+="&SLR_YEAR="+input.value}
             else if(key==2){
-                if(input.value.length<1){alert("급은 필수 값입니다");throw new Error("stop loop");}
+                if(input.value<4 | input.value>10){alert("급의 입력범위를 벗어났습니다.");throw new Error("stop loop");}
                 writeUrl+="&SLR_GRADE="+input.value
             }
             else if(key==3){
-                if(input.value.length<1){alert("호는 필수 값입니다");throw new Error("stop loop");}
+                if(input.value<1 | input.value>50){alert("호의 입력범위를 벗어났습니다");throw new Error("stop loop");}
                 writeUrl+="&SLR_PAY="+input.value
             }
             else if(key==4){writeUrl+="&NORMAL_PAY="+input.value}
             else if(key==5){writeUrl+="&LEGAL_PAY="+input.value}
         });
+        if(document.querySelector(".modalForm").querySelector("select").value==""){alert("타입은 필수 값입니다.");throw new Error("stop");}
+        writeUrl+="&SLR_TYPE="+document.querySelector(".modalForm").querySelector("select").value;
     }catch(e){
         console.log("필수값 체크"); return false;
     }

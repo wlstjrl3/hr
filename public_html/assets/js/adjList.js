@@ -3,7 +3,7 @@ document.getElementById("PSNL_NM").focus();
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
     xhr:{
-        url:'/sys/fmlList.php',
+        url:'/sys/adjList.php',
         columXHR: '',
         key : psnlKey.value, //api 호출할 보안 개인인증키
         where: {
@@ -19,17 +19,19 @@ var mytbl = new hr_tbl({
     },
     columns: [
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
-        {title: "idx", data: "FML_CD", className: "hidden"}
+        {title: "idx", data: "ADJ_CD", className: "hidden"}
         ,{title: "조직", data: "ORG_NM", className: ""}
         ,{title: "직원명", data: "PSNL_NM", className: ""}
-        ,{title: "직책", data: "POSITION", className: ""}        
-        ,{title: "가족성명", data: "FML_NM", className: ""}
-        ,{title: "가족관계", data: "FML_RELATION", className: ""}
-        ,{title: "생년월일", data: "FML_BIRTH", className: ""}
-        ,{title: "상세정보", data: "FML_DTL", className: ""}
-        ,{title: "가족수당", data: "FML_PAY", className: ""}
-        ,{title: "수당시작일", data: "FML_STT_DT", className: ""}
-        ,{title: "수당종료일", data: "FML_END_DT", className: ""}
+        ,{title: "수당종류", data: "ADJ_TYPE", className: ""}
+        ,{title: "명칭", data: "ADJ_NM", className: ""}
+        ,{title: "명칭", data: "ADJ_NM", className: ""}
+        ,{title: "번호", data: "ADJ_NUM", className: ""}
+        ,{title: "등급", data: "ADJ_LEVEL", className: ""}
+        ,{title: "취득일", data: "ADJ_GET_DT", className: ""}
+        ,{title: "상세정보", data: "ADJ_DTL", className: ""}
+        ,{title: "수당금액", data: "ADJ_PAY", className: ""}
+        ,{title: "수당시작일", data: "ADJ_STT_DT", className: ""}
+        ,{title: "수당종료일", data: "ADJ_END_DT", className: ""}
     ],
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
@@ -55,8 +57,8 @@ newCol.addEventListener("click",()=>{
 //행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx){ 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sys/fmlConfig.php?key="+psnlKey.value+"&FML_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log("/sys/fmlConfig.php?key="+psnlKey.value+"&FML_CD="+idx+"&CRUD=R");
+    xhr.open("GET", "/sys/adjConfig.php?key="+psnlKey.value+"&ADJ_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/adjConfig.php?key="+psnlKey.value+"&ADJ_CD="+idx+"&CRUD=R");
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
@@ -68,33 +70,39 @@ function trDataXHR(idx){
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input,key)=>{
                     switch(key){
                         case 0 :
-                            input.value=res[0].FML_CD
+                            input.value=res[0].ADJ_CD
                             break;
                         case 1 :
-                            input.value=res[0].FML_NM;
+                            input.value=res[0].ADJ_NM;
                             break;
                         case 2 :
-                            input.value=res[0].FML_BIRTH;
+                            input.value=res[0].ADJ_NUM;
                             break;
                         case 3 :
-                            input.value=res[0].FML_DTL;
+                            input.value=res[0].ADJ_LEVEL;
                             break;
                         case 4 :
-                            input.value=res[0].FML_PAY;
+                            input.value=res[0].ADJ_GET_DT;
                             break;
                         case 5 :
-                            input.value=res[0].FML_STT_DT;
+                            input.value=res[0].ADJ_DTL;
                             break;
                         case 6 :
-                            input.value=res[0].FML_END_DT;
+                            input.value=res[0].ADJ_PAY;
+                            break;
+                        case 7 :
+                            input.value=res[0].ADJ_STT_DT;
+                            break;
+                        case 8 :
+                            input.value=res[0].ADJ_END_DT;
                             break;
                     }
                 });
-                document.querySelector(".modalBody").querySelector("select").value=res[0].FML_RELATION; //대면 비대면은 셀렉트박스에서 구분
+                document.querySelector(".modalBody").querySelector("select").value=res[0].ADJ_TYPE;
                 document.querySelector(".modalBody").querySelector("b").innerHTML=res[0].ORG_NM+" "+res[0].POSITION+" "+res[0].PSNL_NM;
             }
         }else{
-            console.log("fmlConfigXhr 정보 로드 에러");
+            console.log("adjConfigXhr 정보 로드 에러");
         }
     }
 }
@@ -104,32 +112,34 @@ modalEdtBtn.addEventListener("click",()=>{
     let writeUrl='';
     try{
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-            if(key==0){writeUrl+="&FML_CD="+input.value}
+            if(key==0){writeUrl+="&ADJ_CD="+input.value}
             else if(key==1){
-                if(input.value.length<2){alert("가족성명은 필수값입니다.");throw new Error("stop loop");}
-                writeUrl+="&FML_NM="+input.value
+                if(input.value.length<2){alert("수당명칭은 필수값입니다.");throw new Error("stop loop");}
+                writeUrl+="&ADJ_NM="+input.value
+            }            
+            else if(key==2){writeUrl+="&ADJ_NUM="+input.value}
+            else if(key==3){writeUrl+="&ADJ_LEVEL="+input.value}
+            else if(key==4){writeUrl+="&ADJ_GET_DT="+input.value}
+            else if(key==5){writeUrl+="&ADJ_DTL="+input.value}
+            else if(key==6){writeUrl+="&ADJ_PAY="+input.value}
+            else if(key==7){
+                if(input.value.length<2){alert("시작일은 필수 값입니다");throw new Error("stop loop");}
+                writeUrl+="&ADJ_STT_DT="+input.value
             }
-            else if(key==2){
-                if(input.value.length<2){alert("가족생년월일은 필수 값입니다");throw new Error("stop loop");}
-                writeUrl+="&FML_BIRTH="+input.value
-            }
-            else if(key==3){writeUrl+="&FML_DTL="+input.value}
-            else if(key==4){writeUrl+="&FML_PAY="+input.value}
-            else if(key==5){writeUrl+="&FML_STT_DT="+input.value}
-            else if(key==6){writeUrl+="&FML_END_DT="+input.value}
+            else if(key==8){writeUrl+="&ADJ_END_DT="+input.value}
         });
     }catch(e){
         console.log("필수값 체크"); return false;
     }
-    writeUrl+="&FML_RELATION="+document.querySelector(".modalBody").querySelector("select").value;
+    writeUrl+="&ADJ_TYPE="+document.querySelector(".modalForm").querySelector("select").value;
     writeUrl+="&PSNL_CD="+document.getElementById("PSNL_CD").value;
-    console.log("/sys/fmlConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
-    xhr.open("GET", "/sys/fmlConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/adjConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
+    xhr.open("GET", "/sys/adjConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
             if(res==""){
-                console.log("fmlConfig 정보 기록 완료");
+                console.log("adjConfig 정보 기록 완료");
                 mytbl.show('myTbl'); //테이블의 아이디
                 modalClose();
             }else{
@@ -148,18 +158,18 @@ modalDelBtn.addEventListener("click",()=>{
     let xhr = new XMLHttpRequest();
     let deleteUrl='';
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-        if(key==0){deleteUrl+="&FML_CD="+input.value}
+        if(key==0){deleteUrl+="&ADJ_CD="+input.value}
     });
-    console.log("/sys/fmlConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
-    xhr.open("GET", "/sys/fmlConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
+    console.log("/sys/adjConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
+    xhr.open("GET", "/sys/adjConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
-            console.log("fmlConfig 정보 삭제 완료");
+            console.log("adjConfig 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
         }else{
-            console.log("fmlConfig 정보 제거 에러!!!");
+            console.log("adjConfig 정보 제거 에러!!!");
         }
     }    
 });

@@ -23,6 +23,7 @@ var mytbl = new hr_tbl({
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
         {title: "idx", data: "PSNL_CD", className: "hidden"}
         ,{title: "소속조직", data: "ORG_NM", className: ""}
+        ,{title: "신자수", data: "PERSON_CNT", className: ""}
         ,{title: "성명", data: "PSNL_NM", className: ""}
         ,{title: "세례명", data: "BAPT_NM", className: ""}
         ,{title: "직책", data: "POSITION", className: ""}
@@ -39,6 +40,7 @@ var mytbl = new hr_tbl({
         ,{title: "기본급", data: "NORMAL_PAY", className: ""}
         ,{title: "법정수당", data: "LEGAL_PAY", className: ""}
         ,{title: "조정수당", data: "ADJUST_PAY", className: ""}
+        ,{title: "가족수당", data: "FAMILY_PAY", className: ""}
         ,{title: "예상급여", data: "EXPECT_PAY", className: ""}
     ],
 });
@@ -60,7 +62,7 @@ function trDataXHR(idx){
     document.getElementById("mdBdWorkType").innerHTML="";
     document.getElementById("mdBdGrdPay").innerHTML="";
     document.getElementById("fmlTbl").innerHTML="";
-    document.getElementById("lcsTbl").innerHTML="";
+    document.getElementById("adjTbl").innerHTML="";
     document.getElementById("opiTbl").innerHTML="";
 
     let xhr1 = new XMLHttpRequest();
@@ -85,13 +87,13 @@ function trDataXHR(idx){
         document.getElementById("mdBdAdvDt").innerHTML=res[0].ADVANCE_DT;
         document.getElementById("mdBdAdvRng").innerHTML=res[0].ADVANCE_RNG;
         //각 상세보기 페이지 이동 버튼
-        document.getElementById("goPsnlListBtn").addEventListener("click",()=>{location.href="/psnlList?PSNL_NM="+res[0].PSNL_NM+"&BAPT_NM="+res[0].BAPT_NM+"&ORG_NM="+res[0].ORG_NM});
-        document.getElementById("goTrsListBtn").addEventListener("click",()=>{location.href="/trsList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM});
-        document.getElementById("goGrdListBtn").addEventListener("click",()=>{location.href="/grdList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM});
-        document.getElementById("goFmlListBtn").addEventListener("click",()=>{location.href="/fmlList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM});
-        document.getElementById("goLcsListBtn").addEventListener("click",()=>{location.href="/lcsList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM});
-        document.getElementById("goInsListBtn").addEventListener("click",()=>{location.href="/insList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM});
-        document.getElementById("goOpiListBtn").addEventListener("click",()=>{location.href="/opiList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM});
+        document.getElementById("goPsnlListBtn").addEventListener("click",()=>{location.href="/psnlList?PSNL_NM="+res[0].PSNL_NM+"&BAPT_NM="+res[0].BAPT_NM+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
+        document.getElementById("goTrsListBtn").addEventListener("click",()=>{location.href="/trsList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
+        document.getElementById("goGrdListBtn").addEventListener("click",()=>{location.href="/grdList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
+        document.getElementById("goFmlListBtn").addEventListener("click",()=>{location.href="/fmlList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
+        document.getElementById("goAdjListBtn").addEventListener("click",()=>{location.href="/adjList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
+        document.getElementById("goInsListBtn").addEventListener("click",()=>{location.href="/insList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
+        document.getElementById("goOpiListBtn").addEventListener("click",()=>{location.href="/opiList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
 
         xhr4.open("GET", "/sys/fmlList.php?key="+psnlKey.value+"&PSNL_CD="+idx+"&CRUD=R"); xhr4.send();
     }}}
@@ -117,30 +119,30 @@ function trDataXHR(idx){
             }
             document.getElementById("fmlTbl").innerHTML=tmpStr;
         }
-        xhr5.open("GET", "/sys/lcsList.php?key="+psnlKey.value+"&PSNL_CD="+idx+"&CRUD=R"); xhr5.send();
+        xhr5.open("GET", "/sys/adjList.php?key="+psnlKey.value+"&PSNL_CD="+idx+"&CRUD=R"); xhr5.send();
     }}
     xhr5.onload = () => {if (xhr5.status === 200) {var res = JSON.parse(xhr5.response)['data'];
         if(res!=null){
             if(res!=null){
                 tmpStr=`
                 <tr>
-                    <th><span>자격명칭</span></th>
-                    <th><span>자격등급</span></th>
-                    <th><span>자격번호</span></th>
-                    <th><span>취득일</span></th>
+                    <th><span>수당타입</span></th>
+                    <th><span>명칭</span></th>
+                    <th><span>등급</span></th>
+                    <th><span>수당금액</span></th>
                 </tr>
                 `;
                 for($i=0;$i<res.length;$i++){
                     tmpStr+=`
                         <tr>
-                            <td><span>`+res[$i].LCS_NM+`</span></td>
-                            <td><span>`+res[$i].LCS_LEVEL+`</span></td>
-                            <td><span>`+res[$i].LCS_NUM+`</span></td>
-                            <td><span>`+res[$i].LCS_GET_DT+`</span></td>
+                            <td><span>`+res[$i].ADJ_TYPE+`</span></td>
+                            <td><span>`+res[$i].ADJ_NM+`</span></td>
+                            <td><span>`+res[$i].ADJ_LEVEL+`</span></td>
+                            <td><span>`+res[$i].ADJ_PAY+`</span></td>
                         </tr>
                     `;
                 }
-                document.getElementById("lcsTbl").innerHTML=tmpStr;
+                document.getElementById("adjTbl").innerHTML=tmpStr;
             }
         }
         xhr6.open("GET", "/sys/opiList.php?key="+psnlKey.value+"&PSNL_CD="+idx+"&CRUD=R"); xhr6.send();        
@@ -190,7 +192,6 @@ document.querySelectorAll(".filter").forEach((f,key)=>{
         mytbl.show("myTbl");
     });
 });
-
 //날짜 형식 자동 하이픈 추가를 위한 코드
 document.querySelectorAll(".dateBox").forEach(dtBox => {
     dtBox.onkeyup = function(event){
@@ -223,14 +224,40 @@ document.querySelectorAll(".phoneNumBox").forEach(phBox => {
     }
 });
 
+//빠른 세팅 버튼 구성 > dateFormat.js 파일 참조
+//const today = new Date; //오늘
+document.querySelectorAll(".quikSetBtn").forEach((q,key)=>{
+    q.addEventListener("click",() => {
+        if(q.id=="setRetire"){
+            document.getElementById("PSNL_BIRTH_From").value=(new Date).getFullYear()-60+"-01-01";
+            document.getElementById("PSNL_BIRTH_To").value=(new Date).getFullYear()-60+"-12-31";
+        }else if(q.id=="set10Yr"){
+            document.getElementById("TRS_DT_From").value=dateFormat(dateCalc(dateCalc(new Date,"m",0),"y",-10));
+            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",2),"y",-10));
+        }else if(q.id=="set20Yr"){
+            document.getElementById("TRS_DT_From").value=dateFormat(dateCalc(dateCalc(new Date,"m",0),"y",-20));
+            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",2),"y",-20));
+        }else if(q.id=="set30Yr"){
+            document.getElementById("TRS_DT_From").value=dateFormat(dateCalc(dateCalc(new Date,"m",0),"y",-30));
+            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",2),"y",-30));
+        }
+        document.querySelectorAll(".filter").forEach((f,key)=>{
+            mytbl.hrDt.xhr.where[f.id]=f.value;
+        });
+        mytbl.hrDt.xhr.page=0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
+        mytbl.show("myTbl");
+    });
+});
+
 //표시 항목 변경 팝업 구성
 document.getElementById("showCol").addEventListener("click",()=>{
-    if(showColList.style.display=="block"){
-        showColList.style.display="none";
-    }else{
-        showColList.style.display="block";
-    }
-})
+    showColList.style.display="block";
+    document.querySelector(".showColBg").style.visibility="visible";
+});
+document.querySelector(".showColBg").addEventListener("click",()=>{
+    showColList.style.display="none";
+    document.querySelector(".showColBg").style.visibility="hidden";
+});
 showColList = document.getElementById("showColList");
 for($i=0;$i<Object.keys(mytbl.hrDt.columns).length;$i++){
     let tmpChk;

@@ -11,7 +11,7 @@ var mytbl = new hr_tbl({
             PSNM_NM : document.getElementById("PSNL_NM").value,
         },
         order: {
-            column : '0',
+            column : '4',
             direction : 'desc',
         },
         page : 0, //표시되는 페이지에서 1이 빠진 값이다 즉 page:0 = 1페이지
@@ -46,6 +46,12 @@ newCol.addEventListener("click",()=>{
         input.value="";
         if(key==1){
             input.focus();
+        }
+        qrParams = new URLSearchParams(window.location.search);
+        if(qrParams.get('WORK_TYPE')=='계약직'&&key==3){
+            input.disabled = true;
+        }else if(key==3){
+            input.disabled = false;
         }
     });
 });
@@ -104,7 +110,13 @@ modalEdtBtn.addEventListener("click",()=>{
                 writeUrl+="&GRD_GRADE="+input.value
             }
             else if(key==3){
-                if(input.value.length<1){alert("호는 필수값입니다");throw new Error("stop loop");}
+                if(input.value.length<1){
+                    if(confirm("대상이 계약직 입니까?")){
+                        input.value=0;
+                    }else{
+                        alert("호는 필수값입니다");throw new Error("stop loop");
+                    }
+                }
                 writeUrl+="&GRD_PAY="+input.value
             }            
             else if(key==4){writeUrl+="&GRD_DTL="+input.value}

@@ -17,7 +17,7 @@
                 <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">급</div>
+                <div class="modalHd">급(레벨)</div>
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">

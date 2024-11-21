@@ -28,13 +28,12 @@
 <div id="loginBg" class="clBg2">
     <div id="loginFrm">
         <div id="loginTitle">
-            <h3 class="fontWSlim clW">천주교 수원교구</h3>
-            <h3 class="fontWSlim clW">제1대리구 본당직원</h3>
-            <h2 class="fontWExtr cl1">인적 자원</h2>
-            <h3 class="fontWSlim clW">관리 시스템</h3>
+            <h3 class="fontWExtr cl1">천주교 수원교구 제1대리구</h3>
+            <h3 class="fontWSlim clW">인사관리 프로그램</h3>
             <br>
-            <h2 class="fontWExtr cl1">Human Resource</h2>
-            <h3 class="fontWSlim clW">Management System</h3>
+            <h2 class="fontWExtr cl1">Diocese of Suwon<br>First Vicariate</h2>
+            <h3 class="fontWSlim clW">Employee of Parish</h3>
+            <h3 class="fontWSlim clW">Administration Program</h3>
         </div>
         <div id="loginBody">
             <br><br>

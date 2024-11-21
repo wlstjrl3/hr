@@ -5,6 +5,7 @@ document.querySelector('#ORG_NM').value = parentValue;
 
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
+    tblType:"orgPopup",
     xhr:{
         url:'/sys/orgPopSearch.php',
         columXHR: '',
@@ -27,7 +28,7 @@ var mytbl = new hr_tbl({
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
 
-//행을 클릭했을때 이벤트 추가(.hr_tbl 이 바인딩 된 후에 적용되어야 하기에 타임아웃 지연 로딩)
+//검색된 데이터가 하나라면 즉시 바인딩 한다.(로딩 시간이 걸리기에 지연로딩 처리)
 window.onload = function() {
     document.getElementById("ORG_NM").focus();
     setTimeout(() => {
@@ -38,15 +39,7 @@ window.onload = function() {
             opener.document.getElementById('orgSerchPop').focus();
             window.close();
         }
-        document.querySelector(".hr_tbl").querySelectorAll('tr').forEach(tr => { //아니라면 각 행에 클릭 이벤트를 추가한다.
-            tr.addEventListener('click', (target)=>{
-                opener.document.getElementById('orgCd').value = target.currentTarget.children[1].innerText
-                opener.document.getElementById('orgNm').value = target.currentTarget.children[2].innerText;
-                opener.document.getElementById('orgSerchPop').focus();
-                window.close();
-            });
-        });
-    }, 800);
+    }, 400);
 };
 
 //검색 필터링을 위한 코드
