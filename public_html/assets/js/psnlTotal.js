@@ -23,7 +23,6 @@ var mytbl = new hr_tbl({
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
         {title: "idx", data: "PSNL_CD", className: "hidden"}
         ,{title: "소속조직", data: "ORG_NM", className: ""}
-        ,{title: "신자수", data: "PERSON_CNT", className: ""}
         ,{title: "성명", data: "PSNL_NM", className: ""}
         ,{title: "세례명", data: "BAPT_NM", className: ""}
         ,{title: "직책", data: "POSITION", className: ""}
@@ -32,21 +31,22 @@ var mytbl = new hr_tbl({
         ,{title: "주민번호", data: "PSNL_NUM", className: ""}
         ,{title: "재직구분", data: "TRS_TYPE", className: ""}
         ,{title: "입/퇴사일", data: "TRS_DT", className: ""}
-        ,{title: "경과(년)", data: "TRS_ELAPSE", className: ""}
+        ,{title: "경과(근속)", data: "TRS_ELAPSE", className: ""}
         ,{title: "승급일", data: "ADVANCE_DT", className: ""}
         ,{title: "분기", data: "ADVANCE_RNG", className: ""}
-        ,{title: "급", data: "GRD_GRADE", className: ""}
+        ,{title: "급(Lv)", data: "GRD_GRADE", className: ""}
         ,{title: "호", data: "GRD_PAY", className: ""}
         ,{title: "기본급", data: "NORMAL_PAY", className: ""}
         ,{title: "법정수당", data: "LEGAL_PAY", className: ""}
-        ,{title: "조정수당", data: "ADJUST_PAY", className: ""}
+        ,{title: "신자수", data: "PERSON_CNT", className: ""}
+        ,{title: "직책수당", data: "ADJUST_PAY1", className: ""}
         ,{title: "가족수당", data: "FAMILY_PAY", className: ""}
+        ,{title: "자격수당", data: "ADJUST_PAY2", className: ""}
+        ,{title: "장애인수당", data: "ADJUST_PAY3", className: ""}
+        ,{title: "조정수당", data: "ADJUST_PAY4", className: ""}
         ,{title: "예상급여", data: "EXPECT_PAY", className: ""}
     ],
 });
-mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
-mytbl.xportBind();
-
 
 //행을 클릭했을때 xhr로 다시 끌어올 데이터
 function trDataXHR(idx){
@@ -100,21 +100,23 @@ function trDataXHR(idx){
     xhr4.onload = () => {if (xhr4.status === 200) {var res = JSON.parse(xhr4.response)['data'];
         if(res!=null){
             tmpStr=`
-            <tr>
-                <th><span>가족성명</span></th>
-                <th><span>관계</span></th>
-                <th><span>생년월일</span></th>
-                <th><span>상세정보</span></th>
-            </tr>
+            <ul class="clBg5">
+                <li class="th"><span>가족성명</span></li>
+                <li class="th"><span>관계</span></li>
+                <li class="th"><span>생년월일</span></li>
+                <li class="th"><span>상세정보</span></li>
+                <li class="clearB"></li>
+            </ul>
             `;
             for($i=0;$i<res.length;$i++){
                 tmpStr+=`
-                    <tr>
-                        <td><span>`+res[$i].FML_NM+`</span></td>
-                        <td><span>`+res[$i].FML_RELATION+`</span></td>
-                        <td><span>`+res[$i].FML_BIRTH+`</span></td>
-                        <td><span>`+res[$i].FML_DTL+`</span></td>
-                    </tr>
+                    <ul class="clBgW">
+                        <li class="td"><span>`+res[$i].FML_NM+`</span></li>
+                        <li class="td"><span>`+res[$i].FML_RELATION+`</span></li>
+                        <li class="td"><span>`+res[$i].FML_BIRTH+`</span></li>
+                        <li class="td"><span>`+res[$i].FML_DTL+`</span></li>
+                        <li class="clearB"></li>
+                    </ul>
                 `;
             }
             document.getElementById("fmlTbl").innerHTML=tmpStr;
@@ -125,21 +127,23 @@ function trDataXHR(idx){
         if(res!=null){
             if(res!=null){
                 tmpStr=`
-                <tr>
-                    <th><span>수당타입</span></th>
-                    <th><span>명칭</span></th>
-                    <th><span>등급</span></th>
-                    <th><span>수당금액</span></th>
-                </tr>
+                <ul class="clBg5">
+                    <li class="th"><span>수당타입</span></li>
+                    <li class="th"><span>명칭</span></li>
+                    <li class="th"><span>등급</span></li>
+                    <li class="th"><span>수당금액</span></li>
+                    <li class="clearB"></li>
+                </ul>
                 `;
                 for($i=0;$i<res.length;$i++){
                     tmpStr+=`
-                        <tr>
-                            <td><span>`+res[$i].ADJ_TYPE+`</span></td>
-                            <td><span>`+res[$i].ADJ_NM+`</span></td>
-                            <td><span>`+res[$i].ADJ_LEVEL+`</span></td>
-                            <td><span>`+res[$i].ADJ_PAY+`</span></td>
-                        </tr>
+                        <ul class="clBgW">
+                            <li class="td"><span>`+res[$i].ADJ_TYPE+`</span></li>
+                            <li class="td"><span>`+res[$i].ADJ_NM+`</span></li>
+                            <li class="td"><span>`+res[$i].ADJ_LEVEL+`</span></li>
+                            <li class="td"><span>`+res[$i].ADJ_PAY+`</span></li>
+                            <li class="clearB"></li>
+                        </ul>
                     `;
                 }
                 document.getElementById("adjTbl").innerHTML=tmpStr;
@@ -151,17 +155,18 @@ function trDataXHR(idx){
         if(res!=null){
             if(res!=null){
                 tmpStr=`
-                <tr>
-                    <th><span>상벌평가</span></th></td>
-                    <th><span>평가일</span></th></td>
-                    <th><span>평가자</span></th></td>
-                    <th><span>평가내용</span></th></td>
-                </tr>
+                <ul class="clBg5">
+                    <li class="th"><span>타입</span></li></li>
+                    <li class="th"><span>날짜</span></li></li>
+                    <li class="th"><span>평가자</span></li></li>
+                    <li class="th"><span>내용</span></li></li>
+                    <li class="clearB"></li>
+                </ul>
                 `;
                 for($i=0;$i<res.length;$i++){
                     tmpStr+=`
-                        <tr>
-                            <td><span>`;
+                        <ul class="clBgW">
+                            <li class="td"><span>`;
                     if(res[$i].OPI_TYPE==1){
                         tmpStr+="긍정";
                     }else if(res[$i].OPI_TYPE==2){
@@ -171,11 +176,12 @@ function trDataXHR(idx){
                     }else if(res[$i].OPI_TYPE==4){
                         tmpStr+="징계";
                     }
-                    tmpStr+=`</span></td>
-                            <td><span>`+res[$i].OPI_DT+`</span></td>
-                            <td><span>`+res[$i].OPI_PERSON+`</span></td>
-                            <td><span>`+res[$i].OPI_DTL+`</span></td>
-                        </tr>
+                    tmpStr+=`</span></li>
+                            <li class="td"><span>`+res[$i].OPI_DT+`</span></li>
+                            <li class="td"><span>`+res[$i].OPI_PERSON+`</span></li>
+                            <li class="td"><span>`+res[$i].OPI_DTL+`</span></li>
+                            <li class="clearB"></li>
+                        </ul>
                     `;
                 }
                 document.getElementById("opiTbl").innerHTML=tmpStr;
@@ -293,3 +299,14 @@ document.querySelectorAll(".showColToggle").forEach((st,key)=>{
         }
     });
 });
+
+//뒤로가기로 돌아왔을때 이전 검색 정보 필터
+window.onload = function() {
+    setTimeout(function() { //뒤로가기에 값이 모두 바인딩 될때까지 딜레이가 존재하여 timeout을 추가함.
+        document.querySelectorAll(".filter").forEach((f,key)=>{
+            mytbl.hrDt.xhr.where[f.id]=f.value;
+        });
+        mytbl.show('myTbl');
+        mytbl.xportBind();
+    }, 50);
+}

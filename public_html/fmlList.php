@@ -32,7 +32,7 @@
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">가족수당</div>
+                <div class="modalHd">가족수당(금액)</div>
                 <div class="modalBd"><input type="number" autocomplete='off'></div>
             </div>
             <div class="modalGrp">

@@ -64,6 +64,9 @@ function trDataXHR(idx){
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
             if(res!=null){
+                /* 급호봉관리 페이지로 이동버튼 */
+                document.getElementById("goAdjListBtn").addEventListener("click",()=>{location.href="/adjList?PSNL_CD="+res[0].PSNL_CD+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_CD="+res[0].ORG_CD+"&ORG_NM="+res[0].ORG_NM+"&WORK_TYPE="+res[0].WORK_TYPE});
+
                 document.getElementById("PSNL_CD").value=res[0].PSNL_CD;
                 document.getElementById("ORG_NM").value=res[0].ORG_NM;
                 document.getElementById("POSITION").value=res[0].POSITION;

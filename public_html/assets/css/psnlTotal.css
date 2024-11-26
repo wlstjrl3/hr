@@ -35,7 +35,70 @@
 .modalBody th span{
     font-weight: 700;
 }
-#psnlTbl th{width:10%;}
-#psnlTbl td{width:15%;}
+.modalBody ul{
+    clear:both;
+}
+.modalBody .th, .modalBody .td{
+    float:left;
+    text-align: center;
+    padding:5px 0;
+}
+.modalBody .th span{
+    font-weight: 900;
+}
+#psnlTbl li{
+    border-bottom:1px solid #999;
+}
+#psnlTbl li:nth-child(odd){
+    width:18%;
+}
+#psnlTbl li:nth-child(even){
+    width:32%;
+}
 
-#opiTbl th{width:10%;}
+#fmlTbl li{
+    width:25%;
+}
+#adjTbl li{
+    width:25%;
+}
+#opiTbl li:nth-child(1){
+    width:15%;height:100%;
+}
+#opiTbl li:nth-child(2){
+    width:15%;height:100%;
+}
+#opiTbl li:nth-child(3){
+    width:15%;height:100%;
+}
+#opiTbl li:nth-child(4){
+    width:55%;
+}
+#opiTbl ul, #fmlTbl ul, #adjTbl ul{
+    border-bottom: 1px solid #999;
+}
+@media(min-width:480px){
+
+}
+@media(min-width:720px){
+    #psnlTbl li:nth-child(odd){
+        width:13%;
+    }
+    #psnlTbl li:nth-child(even){
+        width:20%;
+    }
+}
+@media(min-width:960px){
+
+}
+@media(min-width:1280px){
+    #psnlTbl li:nth-child(odd){
+        width:9%;
+    }
+    #psnlTbl li:nth-child(even){
+        width:16%;
+    }
+}
+@media(min-width:1600px){
+
+}

@@ -110,8 +110,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/">
-                                <span class="cl6">└&nbsp;월별 급여 정보</span>
+                            <a href="/monthPayList.php">
+                                └&nbsp;월별 급여 정보
                             </a>
                         </li>
                     </ul>

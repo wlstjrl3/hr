@@ -4,38 +4,34 @@
     <div class="modalWindow">
         <div class="modalHeader">직원 종합정보 조회</div>
         <div class="modalBody">
-            <table id="psnlTbl">
-                <tr>
-                    <th><span>소속</span></th><td><span id="mdBdOrgNm">소속임</span></td>
-                    <th><span>직책</span></th><td><span id="mdBdPosition">직책임</span></td>
-                    <th><span>성명</span></th><td><span id="mdBdPsnlNm">이름임</span></td>
-                    <th><span>세례명</span></th><td><span id="mdBdBaptNm">세례임</span></td>
-                </tr>
-                <tr>
-                    <th><span>인사구분</span></th><td><span id="mdBdTrsType">인사임</span></td>
-                    <th><span>발령일</span></th><td><span id="mdBdTrsDt">1000-01-01</span></td>
-                    <th><span>채용구분</span></th><td><span id="mdBdWorkType">채용임</span></td>
-                    <th><span>급호봉</span></th><td><span id="mdBdGrdPay">N급 N호</span></td>
-                </tr>
-                <tr>
-                    <th><span>승급일</span></th><td><span id="mdBdAdvDt">1000-01-01</span></td>
-                    <th><span>승급분기</span></th><td><span id="mdBdAdvRng">분기임</span></td>
-                    <th><span>주민번호</span></th><td><span id="mdBdPsnlNum">000000-0000000</span></td>
-                    <th><span>연락처</span></th><td><span id="mdBdPhoneNum">010-0000-0000</span></td>
-                </tr>
-            </table>
-            <table id="fmlTbl"></table>
-            <table id="adjTbl"></table>
-            <table id="opiTbl"></table>
+            <div id="psnlTbl">
+                <ul>
+                    <li class="th clBg5"><span>소속</span></li><li class="td clBgW"><span id="mdBdOrgNm">소속임</span></li>
+                    <li class="th clBg5"><span>직책</span></li><li class="td clBgW"><span id="mdBdPosition">직책임</span></li>
+                    <li class="th clBg5"><span>성명</span></li><li class="td clBgW"><span id="mdBdPsnlNm">이름임</span></li>
+                    <li class="th clBg5"><span>세례명</span></li><li class="td clBgW"><span id="mdBdBaptNm">세례임</span></li>
+                    <li class="th clBg5"><span>인사구분</span></li><li class="td clBgW"><span id="mdBdTrsType">인사임</span></li>
+                    <li class="th clBg5"><span>발령일</span></li><li class="td clBgW"><span id="mdBdTrsDt">1000-01-01</span></li>
+                    <li class="th clBg5"><span>채용구분</span></li><li class="td clBgW"><span id="mdBdWorkType">채용임</span></li>
+                    <li class="th clBg5"><span>급호봉</span></li><li class="td clBgW"><span id="mdBdGrdPay">N급 N호</span></li>
+                    <li class="th clBg5"><span>승급일</span></li><li class="td clBgW"><span id="mdBdAdvDt">1000-01-01</span></li>
+                    <li class="th clBg5"><span>승급분기</span></li><li class="td clBgW"><span id="mdBdAdvRng">분기임</span></li>
+                    <li class="th clBg5"><span>주민번호</span></li><li class="td clBgW"><span id="mdBdPsnlNum">000000-0000000</span></li>
+                    <li class="th clBg5"><span>연락처</span></li><li class="td clBgW"><span id="mdBdPhoneNum">010-0000-0000</span></li>
+                </ul>
+            </div>
+            <div id="fmlTbl"></div>
+            <div id="adjTbl"></div>
+            <div id="opiTbl"></div>
         </div>
         <div class="modalFooter">
-            <button id="goPsnlListBtn" style="padding:5px 9px;">기초정보</button>
-            <button id="goTrsListBtn" style="padding:5px 9px;">발령정보</button>
-            <button id="goGrdListBtn" style="padding:5px 9px;">급호봉관리</button>
-            <button id="goFmlListBtn" style="padding:5px 9px;">가족정보</button>
-            <button id="goAdjListBtn" style="padding:5px 9px;">조정수당</button>
-            <button id="goInsListBtn" style="padding:5px 9px;">보증보험</button>
-            <button id="goOpiListBtn" style="padding:5px 9px;">상벌정보</button>
+            <button id="goPsnlListBtn" style="margin:0 0 5px 0;padding:5px 9px;">기초정보</button>
+            <button id="goTrsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">발령정보</button>
+            <button id="goGrdListBtn" style="margin:0 0 5px 0;padding:5px 9px;">급호봉관리</button>
+            <button id="goFmlListBtn" style="margin:0 0 5px 0;padding:5px 9px;">가족정보</button>
+            <button id="goAdjListBtn" style="margin:0 0 5px 0;padding:5px 9px;">조정수당</button>
+            <button id="goInsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">보증보험</button>
+            <button id="goOpiListBtn" style="margin:0 0 5px 0;padding:5px 9px;">상벌정보</button>
         </div>
     </div>
 </div>

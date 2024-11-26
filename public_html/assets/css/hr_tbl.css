@@ -12,6 +12,9 @@
     visibility: hidden;
     position: absolute;
 }
+.hr_tbl th {
+    display: none;
+}    
 .hr_tbl tr {
     border-bottom: 1px solid #777;
     height:35px; /*auto 로 지정시 전체 내용이 보여짐*/
@@ -59,7 +62,13 @@
 .pagination a:hover{
     background-color: rgba(0,100,140,.1);
 }
+.hr_tbl .mHide{
+    display: none;
+}
 @media(min-width:480px){
+    .hr_tbl .mHide{
+        display: table-cell;
+    }
     .xScroll{
         clear:both;
         overflow-x: scroll;
@@ -84,9 +93,11 @@
         display: table-row;
         overflow: auto;
     }
+    .hr_tbl th, .hr_tbl td {
+        display: table-cell;
+    }
     .hr_tbl td {
         border-bottom: none;
-        display: table-cell; /*일반 테이블 셀로*/
         float:none;
         width:auto;
     }

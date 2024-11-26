@@ -19,8 +19,12 @@
                 ,TRS_TYPE='".@$_REQUEST['TRS_TYPE']."'
                 ,TRS_DTL='".@$_REQUEST['TRS_DTL']."'
                 ,TRS_DT='".@$_REQUEST['TRS_DT']."'
+                ";
+            if(@$_REQUEST['APP_DT']){
+                $sql = $sql."
                 ,APP_DT='".@$_REQUEST['APP_DT']."'
                 ";
+            }
             $sql = $sql."
                 ,REG_DT='".date("Y-m-d h:m:s")."'
                 WHERE TRS_CD = '".$_REQUEST['TRS_CD']."'";
