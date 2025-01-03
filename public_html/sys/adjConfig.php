@@ -28,9 +28,9 @@
                 ,ADJ_NUM='".$_REQUEST['ADJ_NUM']."'
                 ,ADJ_DTL='".@$_REQUEST['ADJ_DTL']."'";
                 if(@$_REQUEST['ADJ_PAY']){$sql=$sql.",ADJ_PAY='".@$_REQUEST['ADJ_PAY']."'";}
-                if(@$_REQUEST['ADJ_GET_DT']){$sql=$sql.",ADJ_STT_DT='".@$_REQUEST['ADJ_GET_DT']."'";}
-                if(@$_REQUEST['ADJ_STT_DT']){$sql=$sql.",ADJ_STT_DT='".@$_REQUEST['ADJ_STT_DT']."'";}
-                if(@$_REQUEST['ADJ_END_DT']){$sql=$sql.",ADJ_END_DT='".@$_REQUEST['ADJ_END_DT']."'";}
+                if(@$_REQUEST['ADJ_GET_DT']){$sql=$sql.",ADJ_GET_DT='".@$_REQUEST['ADJ_GET_DT']."'";}else{$sql=$sql.",ADJ_GET_DT=NULL";}
+                if(@$_REQUEST['ADJ_STT_DT']){$sql=$sql.",ADJ_STT_DT='".@$_REQUEST['ADJ_STT_DT']."'";}else{$sql=$sql.",ADJ_STT_DT=NULL";}
+                if(@$_REQUEST['ADJ_END_DT']){$sql=$sql.",ADJ_END_DT='".@$_REQUEST['ADJ_END_DT']."'";}else{$sql=$sql.",ADJ_END_DT=NULL";}
             $sql = $sql."
                 ,REG_DT='".date("Y-m-d h:m:s")."'
                 WHERE ADJ_CD = '".$_REQUEST['ADJ_CD']."'";
@@ -41,13 +41,13 @@
         //기본 쿼리
         $sql = "SELECT A.*,B.PSNL_NM,C.ORG_NM,POSITION FROM BONDANG_HR.PSNL_ADJUST A
             LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
-            LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD
             LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
                 SELECT TRS_CD FROM PSNL_TRANSFER AS P2
                 WHERE P2.PSNL_CD = A.PSNL_CD
                 ORDER BY P2.REG_DT DESC
                 LIMIT 1
             )            
+            LEFT OUTER JOIN ORG_INFO C ON P.ORG_CD = C.ORG_CD
             ";
         //조건문 지정
         $whereSql = " WHERE 1=1 ";

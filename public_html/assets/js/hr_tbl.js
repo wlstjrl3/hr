@@ -110,16 +110,15 @@ class hr_tbl{
                         <span>총 `+totalCnt+`개 행중 `+filterCnt+`개 필터링</span>
                     </div>
                     <div class="pddS floatR">
-                            <span>페이지 지정</span>
-                            <input class="txtCenter pddSS rndCorner clBrC" style="width:90px;">
-                        <a id="xport" class="pddS clBg3 clW rndCorner pointer">이동</a>
+                        <span>페이지 지정</span>
+                        <input id="pageDirectNum" class="txtCenter pddSS rndCorner clBrC" style="width:90px;">
+                        <a class="pddS clBg3 clW rndCorner pointer">이동</a>
                     </div>
                     <div class="clearB"></div>
                 `;
                 tblPagination.innerHTML = pageStr;
                 document.querySelectorAll(".pageMoveBtn").forEach(pgMvBtn=>{
                     pgMvBtn.addEventListener('click',()=>{
-                    console.log("팝업 페이지 이동 이벤트");
                     if(pgMvBtn.text=="▶"){
                         this.hrDt.xhr.page=this.hrDt.xhr.page+1;
                         if(this.hrDt.xhr.page>totalPg-1){this.hrDt.xhr.page=totalPg-1;} //최대페이지보다 높지않도록
@@ -129,10 +128,12 @@ class hr_tbl{
                     }else{
                         this.hrDt.xhr.page = Number(pgMvBtn.text)-1;
                     }
-
-                    
                     mytbl.show(tbNm);                                                   //테이블의 정보갱신
                     });
+                });
+                document.getElementById("pageDirectNum").addEventListener('change',()=>{
+                    this.hrDt.xhr.page = Number(pageDirectNum.value)-1;
+                    mytbl.show(tbNm);                                                   //테이블의 정보갱신
                 });
 //테이블의 행 클릭 이벤트//
                 table.querySelectorAll("tr").forEach(tr=>{                              //테이블의 모든 행을 tr이라고 지정한다.

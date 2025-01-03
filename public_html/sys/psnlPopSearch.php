@@ -4,16 +4,24 @@
     include "../dbconn/dbconn.php";
     //if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
     //갯수 카운트 쿼리
-    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_INFO A LEFT OUTER JOIN ORG_INFO B ON A.ORG_CD = B.ORG_CD";
+    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_INFO A
+            LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
+            SELECT TRS_CD FROM PSNL_TRANSFER AS P2
+            WHERE P2.PSNL_CD = A.PSNL_CD
+            ORDER BY P2.REG_DT DESC
+            LIMIT 1
+        )
+        LEFT OUTER JOIN ORG_INFO B ON P.ORG_CD = B.ORG_CD
+    ";
     //기본 쿼리
     $sql = "SELECT A.PSNL_CD,A.PSNL_NM,A.BAPT_NM,B.ORG_NM,P.POSITION FROM BONDANG_HR.PSNL_INFO A 
-        LEFT OUTER JOIN ORG_INFO B ON A.ORG_CD = B.ORG_CD
         LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
             SELECT TRS_CD FROM PSNL_TRANSFER AS P2
             WHERE P2.PSNL_CD = A.PSNL_CD
             ORDER BY P2.REG_DT DESC
             LIMIT 1
         )
+        LEFT OUTER JOIN ORG_INFO B ON P.ORG_CD = B.ORG_CD        
     ";
     //조건문 지정
     $whereSql = " WHERE 1=1 ";
@@ -25,7 +33,7 @@
         $whereSql=$whereSql." AND BAPT_NM LIKE '%".$_REQUEST['BAPT_NM']."%'";
     }    
     if(@$_REQUEST['ORG_NM']){
-        $whereSql=$whereSql." AND ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'";
+        $whereSql=$whereSql." AND B.ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'";
     }
     //정렬 기준 지정
     $orderSql = "";

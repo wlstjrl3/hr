@@ -1,0 +1,32 @@
+#mpayTbl li{
+    float:left;
+    width:100px;
+    text-align:center;
+    padding:8px 0;
+}
+#mpayTbl li:nth-child(n+2):nth-child(-n+3){
+    width:50px;
+}
+#mpayTbl ul{
+    clear:both;
+    border-bottom: 1px solid #DDD;
+    height:36px;
+    background: rgba(255,255,255,.03);
+}
+#mpayTbl ul:nth-child(even){
+    background: rgba(0,0,0,.03);
+}
+
+#mpayTbl ul:nth-child(8){
+    border-top:1.5px solid #BBB;
+}
+.xScroll{
+    clear:both;
+    overflow-x: auto;
+}
+.width1500{
+    width:1500px;
+}
+.width1850{
+    width:1850px;
+}

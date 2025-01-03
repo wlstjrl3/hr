@@ -3,25 +3,32 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>가사사용인 근무 정보 </b>
+            <b>년도별 신자수 모달창</b>
             <button></button>
         </div>
         <div class="modalBody">
-            <p>직원정보 : <b>조직 직책 성명</b></p>
             <div class="modalGrp">
                 <div class="modalHd">일련번호</div>
                 <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">조직</div>
+                <div class="modalBd">
+                    <input id="orgCd" style="width:calc(50% - 30px);background:#EEE" readonly autocomplete='off' placeholder="조직코드">
+                    <input id="orgNm" style="width:calc(50% - 30px);" autocomplete='off' placeholder="조직명">
+                    <button id="orgSerchPop" style="width:30px;padding:4px 0;">검색</button>
+                </div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">기준일</div>
+                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
             </div>            
             <div class="modalGrp">
-                <div class="modalHd">주 근무일수</div>
-                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+                <div class="modalHd">신자수</div>
+                <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">주 근무시간</div>
-                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
-            </div>
-            <div class="modalGrp">
-                <div class="modalHd">사제인원수</div>
+                <div class="modalHd">기타사항</div>
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div style="clear:both;"></div>
@@ -36,45 +43,39 @@
 <div class="container">
 
     <h4 class="cl3 pddS">
-        가사사용인 근무 정보
+        년도별 신자수 테이블
     </h4>
 
     <div class="searchArea">
         <div class="colGrp">
-            <div class="colHd2L clBg5 cl2"><span><b>개인코드<br>/ 조직명</b></span></div>
-            <div class="colBd">
-                <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;" value="<?php echo @$_REQUEST['PSNL_CD'];?>"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;" value="<?php echo @$_REQUEST['ORG_NM'];?>">
-            </div>
-        </div>        
-        <div class="colGrp">
-            <div class="colHd2L clBg5 cl2">
-                <span><b>직책<br>/ 직원성명</b></span><br>
-            </div>
-            <div class="colBd" style="">
-                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;" value="<?php echo @$_REQUEST['POSITION'];?>">
-                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM'];?>">
-                <button id="psnlSerchPop" style="padding:3px;">검색</button>
-            </div>    
+            <div class="colHd clBg5 cl2"><span><b>조직명</b></span></div>
+            <div class="colBd"><input id="ORG_NM" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>주근무일수</b></span></div>
-            <div class="colBd"><input id="GRD_GRADE" class="filter"></div>
+            <div class="colHd clBg5 cl2"><span><b>기준일</b></span></div>
+            <div class="colBd"><input class="dualDateBox dateBox filter" id="OH_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="OH_DT_To"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>주근무시간</b></span></div>
-            <div class="colBd"><input id="GRD_PAY" class="filter"></div>
+            <div class="colHd clBg5 cl2"><span><b>신자수</b></span></div>
+            <div class="colBd"><input class="dualDateBox filter" id="PERSON_CNT_From"><span>~</span><input class="dualDateBox filter" id="PERSON_CNT_To"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>사제인원수</b></span></div>
-            <div class="colBd"><input id="GRD_DTL" class="filter"></div>
-        </div> 
-        <div class="clearB"></div>
+            <div class="colHd clBg5 cl2"><span><b>기타사항</b></span></div>
+            <div class="colBd"><input id="ETC" class="filter"></div>
+        </div>
     </div>
+    <div class="clearB"></div>
+
     <br>
     <div class="tableOutFrm">
         <div class="pddS floatL">
             <a id="newCol" class="pddS clBg3 clW rndCorner pointer">신규</a>
             <a id="xport" class="pddS clBg3 clW rndCorner pointer">엑셀 다운로드</a>
+            <label class="floatR crud_button pddS clBg3 clW rndCorner pointer" for="file">엑셀 업로드</label>
+            <input class="floatR upload-name" value="" placeholder="첨부파일">
+            <input class="hidden" type="file" id="file">
+            
+            <a id="batchDel" class="pddS clBg3 clW rndCorner pointer">일괄삭제</a>
         </div>
         <div class="pddS floatR">
             <span>페이지당</span>
@@ -96,8 +97,9 @@
 <link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
 <script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='/assets/js/modal.js'></script>
+<script type='text/javascript' src='/assets/js/excelDtForm.js'></script>
 <script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/housekeepList.js'></script>
+<script type='text/javascript' src='/assets/js/ohisList.js'></script>
 <script type='text/javascript' src='/assets/js/dateForm.js'></script>
 
 <?php include('components/footer.php'); ?>

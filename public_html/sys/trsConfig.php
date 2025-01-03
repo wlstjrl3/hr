@@ -6,9 +6,16 @@
     
     if($_REQUEST['CRUD']=='C'){
         if($_REQUEST['TRS_CD']==""){ //신규 작성
-            $sql = "INSERT INTO BONDANG_HR.PSNL_TRANSFER(PSNL_CD,ORG_CD,WORK_TYPE,POSITION,TRS_TYPE,TRS_DTL,TRS_DT,REG_DT) VALUES ('";
-            $sql = $sql.$_REQUEST['PSNL_CD']."','".$_REQUEST['ORG_CD']."','".$_REQUEST['WORK_TYPE']."','".$_REQUEST['POSITION']."','".$_REQUEST['TRS_TYPE']."','".$_REQUEST['TRS_DTL']."','".$_REQUEST['TRS_DT']."','".$_REQUEST['APP_DT'];
-            $sql = $sql."','".date("Y-m-d h:m:s")."')";
+            $sql = "INSERT INTO BONDANG_HR.PSNL_TRANSFER(PSNL_CD,ORG_CD,WORK_TYPE,POSITION,TRS_TYPE,TRS_DTL,TRS_DT,REG_DT";
+            if(@$_REQUEST['APP_DT']){
+                $sql = $sql.",APP_DT";
+            }
+            $sql = $sql.") VALUES ('";
+            $sql = $sql.$_REQUEST['PSNL_CD']."','".$_REQUEST['ORG_CD']."','".$_REQUEST['WORK_TYPE']."','".$_REQUEST['POSITION']."','".$_REQUEST['TRS_TYPE']."','".$_REQUEST['TRS_DTL']."','".$_REQUEST['TRS_DT']."','".date("Y-m-d h:m:s")."'";
+            if(@$_REQUEST['APP_DT']){
+                $sql = $sql.",'".$_REQUEST['APP_DT']."'";
+            }
+            $sql = $sql.")";
             echo $sql; //오류 점검용 쿼리
         }else{ //기존 데이터 UPDATE
             $sql = "UPDATE BONDANG_HR.PSNL_TRANSFER SET 
@@ -33,10 +40,10 @@
         mysqli_close($conn);
     }else if($_REQUEST['CRUD']=='R'){
         //기본 쿼리
-        $sql = "SELECT A.*,B.PSNL_NM,C.ORG_NM,D.ORG_NM AS OLD_ORG_NM FROM BONDANG_HR.PSNL_TRANSFER A
+        $sql = "SELECT A.*,B.PSNL_NM,D.ORG_NM FROM BONDANG_HR.PSNL_TRANSFER A
             LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
-            LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD
-            LEFT OUTER JOIN ORG_INFO D ON A.ORG_CD = D.ORG_CD";
+            LEFT OUTER JOIN ORG_INFO D ON A.ORG_CD = D.ORG_CD
+        ";
         //조건문 지정
         $whereSql = " WHERE 1=1 ";
         if(@$_REQUEST['TRS_CD']){

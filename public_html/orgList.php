@@ -27,10 +27,6 @@ include "./dbconn/dbconn.php";
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">신자수</div>
-                <div class="modalBd"><input type="number" autocomplete='off'></div>
-            </div>
-            <div class="modalGrp">
                 <div class="modalHd">조직타입</div>
                 <div class="modalBd"><select>
                     <option value="11">본당</option>
@@ -88,11 +84,7 @@ include "./dbconn/dbconn.php";
                 <option value="11">본당</option>
                 <option value="9">지구</option>
             </select></div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>신자수</b></span></div>
-            <div class="colBd"><input class="dualDateBox filter" id="PERSON_CNT_From"><span>~</span><input class="dualDateBox filter" id="PERSON_CNT_To"></div>
-        </div>        
+        </div>     
     </div>
     <div class="clearB"></div>
 

@@ -19,7 +19,6 @@ var mytbl = new hr_tbl({
         {title: "idx", data: "ORG_CD", className: "hidden"}
         ,{title: "조직명", data: "ORG_NM", className: ""}
         ,{title: "상위조직", data: "UPR_ORG_NM", className: ""}
-        ,{title: "신자수", data: "PERSON_CNT", className: ""}
         ,{title: "조직타입", data: "ORG_TYPE", className: ""}
         ,{title: "갱신일자", data: "REFRESH_DT", className: ""}
     ],
@@ -64,9 +63,6 @@ function trDataXHR(idx){
                         case 3 :
                             input.value=res[0].ORG_NM;
                             break;
-                        case 4 :
-                            input.value=res[0].PERSON_CNT;
-                            break;
                     }
                 });
                 document.querySelector(".modalBody").querySelector("select").value=res[0].ORG_TYPE; //대면 비대면은 셀렉트박스에서 구분
@@ -90,7 +86,6 @@ modalEdtBtn.addEventListener("click",()=>{
                 if(input.value.length<2){alert("조직명은 필수 값입니다");throw new Error("stop loop");}
                 writeUrl+="&ORG_NM="+input.value
             }
-            else if(key==4){writeUrl+="&PERSON_CNT="+input.value}
         });
     }catch(e){
         console.log("필수값 체크"); return false;

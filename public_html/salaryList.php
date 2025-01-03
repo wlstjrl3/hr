@@ -19,9 +19,10 @@
                 <div class="modalHd">타입</div>
                 <div class="modalBd"><select>
                     <option value="">선택</option>
-                    <option>정규</option>
-                    <option>기능</option>
-                    <option>계약</option>
+                    <option>정규직</option>
+                    <option>기능직</option>
+                    <option>계약직</option>
+                    <option>최저시급</option>
                 </select></div>
             </div>
             <div class="modalGrp">
@@ -37,7 +38,7 @@
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">법정수당</div>
+                <div class="modalHd">법정수당<small>|최저임금</small></div>
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
             <div style="clear:both;"></div>
@@ -62,7 +63,7 @@
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>타입</b></span></div>
-            <div class="colBd"><input id="SLR_TYPE"></div>
+            <div class="colBd"><input id="SLR_TYPE" class="filter"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>급 & 호</b></span></div>
@@ -87,6 +88,8 @@
             <label class="floatR crud_button pddS clBg3 clW rndCorner pointer" for="file">엑셀 업로드</label>
             <input class="floatR upload-name" value="" placeholder="첨부파일">
             <input class="hidden" type="file" id="file">
+            
+            <a id="batchDel" class="pddS clBg3 clW rndCorner pointer">일괄삭제</a>
         </div>
         <div class="pddS floatR">
             <span>페이지당</span>

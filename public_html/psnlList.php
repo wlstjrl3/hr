@@ -10,14 +10,6 @@
             <div class="modalGrp">
                 <div class="modalHd">일련번호</div>
                 <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
-            </div>            
-            <div class="modalGrp">
-                <div class="modalHd">소속조직</div>
-                <div class="modalBd">
-                    <input id="orgCd" style="width:calc(50% - 30px);background:#EEE" readonly autocomplete='off' placeholder="조직코드">
-                    <input id="orgNm" style="width:calc(50% - 30px);" autocomplete='off' placeholder="조직명">
-                    <button id="orgSerchPop" style="width:30px;padding:4px 0;">검색</button>
-                </div>
             </div>
             <div class="modalGrp">
                 <div class="modalHd">성명</div>

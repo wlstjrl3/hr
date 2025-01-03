@@ -4,9 +4,24 @@
     include "../dbconn/dbconn.php";
     if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
     //갯수 카운트 쿼리
-    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_INFO A INNER JOIN BONDANG_HR.ORG_INFO B ON A.ORG_CD = B.ORG_CD ";
+    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_INFO A 
+    LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = (
+        SELECT TRS_CD FROM PSNL_TRANSFER AS C2
+            WHERE C2.PSNL_CD = A.PSNL_CD
+            ORDER BY TRS_DT DESC
+            LIMIT 1
+    )
+    INNER JOIN BONDANG_HR.ORG_INFO B ON C.ORG_CD = B.ORG_CD ";
     //기본 쿼리
-    $sql = "SELECT B.ORG_NM, A.* FROM BONDANG_HR.PSNL_INFO A INNER JOIN BONDANG_HR.ORG_INFO B ON A.ORG_CD = B.ORG_CD ";
+    $sql = "SELECT B.ORG_NM, A.* FROM BONDANG_HR.PSNL_INFO A
+    LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = (
+        SELECT TRS_CD FROM PSNL_TRANSFER AS C2
+            WHERE C2.PSNL_CD = A.PSNL_CD
+            ORDER BY TRS_DT DESC
+            LIMIT 1
+    )
+    LEFT OUTER JOIN BONDANG_HR.ORG_INFO B ON C.ORG_CD = B.ORG_CD 
+    ";
     //조건문 지정
     $whereSql = " WHERE 1=1 ";
 

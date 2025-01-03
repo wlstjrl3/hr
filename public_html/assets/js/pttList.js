@@ -3,14 +3,14 @@ document.getElementById("PSNL_NM").focus();
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
     xhr:{
-        url:'/sys/homekeepList.php',
+        url:'/sys/pttList.php',
         columXHR: '',
         key : psnlKey.value, //api 호출할 보안 개인인증키
         where: {
             PSNL_CD : document.getElementById("PSNL_CD").value,
         },
         order: {
-            column : '1',
+            column : '4',
             direction : 'desc',
         },
         page : 0, //표시되는 페이지에서 1이 빠진 값이다 즉 page:0 = 1페이지
@@ -18,14 +18,19 @@ var mytbl = new hr_tbl({
     },
     columns: [
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
-        {title: "idx", data: "HKP_CD", className: "hidden"}
+        {title: "idx", data: "PTT_CD", className: "hidden"}
         ,{title: "조직", data: "ORG_NM", className: ""}
         ,{title: "직원명", data: "PSNL_NM", className: ""}
         ,{title: "직책", data: "POSITION", className: ""}
-        ,{title: "근무일", data: "HKP_DAY", className: ""}
-        ,{title: "근무시간", data: "HKP_HOUR", className: ""}
-        ,{title: "사제인원수", data: "HKP_PERSON", className: ""}
-        ,{title: "급여총계", data: "HKP_PAY", className: ""}
+        ,{title: "기준년도", data: "PTT_YEAR", className: ""}
+        ,{title: "근무일", data: "PTT_DAY", className: ""}
+        ,{title: "근무시간", data: "PTT_HOUR", className: ""}
+        ,{title: "추가금액", data: "PTT_ADJPAY", className: ""}
+        ,{title: "추가사유", data: "PTT_ADJ", className: ""}
+        ,{title: "기본급여", data: "PTT_TOTALPAY", className: "hidden"}
+        ,{title: "연장근로", data: "PTT_ADDHOUR", className: ""}
+        ,{title: "연장수당", data: "PTT_ADDPAY", className: ""}
+        ,{title: "급여", data: "PTT_TOTALADDPAY", className: ""}
     ],
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
@@ -57,12 +62,13 @@ newCol.addEventListener("click",()=>{
 //행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx){ 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sys/housekeepConfig.php?key="+psnlKey.value+"&HKP_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log("/sys/housekeepConfig.php?key="+psnlKey.value+"&HKP_CD="+idx+"&CRUD=R");
+    xhr.open("GET", "/sys/pttConfig.php?key="+psnlKey.value+"&PTT_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/pttConfig.php?key="+psnlKey.value+"&PTT_CD="+idx+"&CRUD=R");
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
             if(res!=null){
+                document.getElementById("goPsnlTotalBtn").addEventListener("click",()=>{location.href="/psnlTotal?PSNL_NM="+res[0].PSNL_NM+"&TRS_TYPE="});
                 document.getElementById("PSNL_CD").value=res[0].PSNL_CD;
                 document.getElementById("ORG_NM").value=res[0].ORG_NM;
                 document.getElementById("POSITION").value=res[0].POSITION;
@@ -70,23 +76,32 @@ function trDataXHR(idx){
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input,key)=>{
                     switch(key){
                         case 0 :
-                            input.value=res[0].HKP_CD
+                            input.value=res[0].PTT_CD
                             break;
                         case 1 :
-                            input.value=res[0].HKP_DAY;
+                            input.value=res[0].PTT_YEAR;
                             break;
                         case 2 :
-                            input.value=res[0].HKP_HOUR;
+                            input.value=res[0].PTT_DAY;
                             break;
                         case 3 :
-                            input.value=res[0].HKP_PERSON;
+                            input.value=res[0].PTT_HOUR;
+                            break;
+                        case 4 :
+                            input.value=res[0].PTT_ADDHOUR;
+                            break;
+                        case 5 :
+                            input.value=res[0].PTT_ADJ;
+                            break; 
+                        case 6 :
+                            input.value=res[0].PTT_ADJPAY;
                             break;                 
                     }
                 });
                 document.querySelector(".modalBody").querySelector("b").innerHTML=res[0].ORG_NM+" "+res[0].POSITION+" "+res[0].PSNL_NM;
             }
         }else{
-            console.log("housekeepConfigXhr 정보 로드 에러");
+            console.log("pttConfigXhr 정보 로드 에러");
         }
     }
 }
@@ -96,33 +111,44 @@ modalEdtBtn.addEventListener("click",()=>{
     let writeUrl='';
     try{
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-            if(key==0){writeUrl+="&HKP_CD="+input.value}
+            if(key==0){writeUrl+="&PTT_CD="+input.value}
             else if(key==1){
-                if(input.value.length<1){alert("근무일수는 필수값입니다.");throw new Error("stop loop");}
-                writeUrl+="&HKP_DAY="+input.value
-            }
+                if(input.value.length<1){alert("기준년도는 필수값입니다.");throw new Error("stop loop");}
+                writeUrl+="&PTT_YEAR="+input.value
+            }            
             else if(key==2){
-                if(input.value.length<1){alert("근무시간은 필수값입니다");throw new Error("stop loop");}
-                writeUrl+="&HKP_HOUR="+input.value
+                if(input.value.length<1){alert("근무일수는 필수값입니다.");throw new Error("stop loop");}
+                writeUrl+="&PTT_DAY="+input.value
             }
             else if(key==3){
-                writeUrl+="&HKP_PERSON="+input.value
+                if(input.value.length<1){alert("근무시간은 필수값입니다.");throw new Error("stop loop");}
+                if(input.value>80){alert("최대 근무시간을 초과하였습니다.");throw new Error("stop loop");}
+                writeUrl+="&PTT_HOUR="+input.value
+            }
+            else if(key==4){
+                writeUrl+="&PTT_ADDHOUR="+input.value
+            }
+            else if(key==5){
+                writeUrl+="&PTT_ADJ="+input.value
+            }
+            else if(key==6){
+                writeUrl+="&PTT_ADJPAY="+input.value
             }
         });
     }catch(e){
         console.log("필수값 체크"); return false;
     }
     writeUrl+="&PSNL_CD="+document.getElementById("PSNL_CD").value;
-    console.log("/sys/housekeepConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
-    xhr.open("GET", "/sys/housekeepConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/pttConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
+    xhr.open("GET", "/sys/pttConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
-            console.log("housekeepConfig 정보 기록 완료");
+            console.log("pttConfig 정보 기록 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
         }else{
-            console.log("housekeepConfig 정보 기록 에러!!!");
+            console.log("pttConfig 정보 기록 에러!!!");
         }
     }    
 });
@@ -134,18 +160,18 @@ modalDelBtn.addEventListener("click",()=>{
     let xhr = new XMLHttpRequest();
     let deleteUrl='';
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-        if(key==0){deleteUrl+="&HKP_CD="+input.value}
+        if(key==0){deleteUrl+="&PTT_CD="+input.value}
     });
-    console.log("/sys/housekeepConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
-    xhr.open("GET", "/sys/housekeepConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
+    console.log("/sys/pttConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
+    xhr.open("GET", "/sys/pttConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
-            console.log("housekeepConfig 정보 삭제 완료");
+            console.log("pttConfig 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
         }else{
-            console.log("housekeepConfig 정보 제거 에러!!!");
+            console.log("pttConfig 정보 제거 에러!!!");
         }
     }    
 });

@@ -27,13 +27,13 @@
         //기본 쿼리
         $sql = "SELECT A.*,B.PSNL_NM,C.ORG_NM,POSITION FROM BONDANG_HR.GRADE_HISTORY A
             LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
-            LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD
             LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
                 SELECT TRS_CD FROM PSNL_TRANSFER AS P2
                 WHERE P2.PSNL_CD = A.PSNL_CD
                 ORDER BY P2.REG_DT DESC
                 LIMIT 1
-            )            
+            )
+            LEFT OUTER JOIN ORG_INFO C ON P.ORG_CD = C.ORG_CD          
         ";
         //조건문 지정
         $whereSql = " WHERE 1=1 ";

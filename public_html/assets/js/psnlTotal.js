@@ -27,18 +27,19 @@ var mytbl = new hr_tbl({
         ,{title: "세례명", data: "BAPT_NM", className: ""}
         ,{title: "직책", data: "POSITION", className: ""}
         ,{title: "고용형태", data: "WORK_TYPE", className: ""}
-        ,{title: "연락처", data: "PHONE_NUM", className: ""}
-        ,{title: "주민번호", data: "PSNL_NUM", className: ""}
-        ,{title: "재직구분", data: "TRS_TYPE", className: ""}
+        ,{title: "연락처", data: "PHONE_NUM", className: "hidden"}
+        ,{title: "주민번호", data: "PSNL_NUM", className: "hidden"}
+        ,{title: "재직구분", data: "TRS_TYPE", className: "hidden"}
         ,{title: "입/퇴사일", data: "TRS_DT", className: ""}
+        ,{title: "임용일", data: "APP_DT", className: "hidden"}
         ,{title: "경과(근속)", data: "TRS_ELAPSE", className: ""}
         ,{title: "승급일", data: "ADVANCE_DT", className: ""}
-        ,{title: "분기", data: "ADVANCE_RNG", className: ""}
+        ,{title: "분기", data: "ADVANCE_RNG", className: "hidden"}
         ,{title: "급(Lv)", data: "GRD_GRADE", className: ""}
         ,{title: "호", data: "GRD_PAY", className: ""}
         ,{title: "기본급", data: "NORMAL_PAY", className: ""}
         ,{title: "법정수당", data: "LEGAL_PAY", className: ""}
-        ,{title: "신자수", data: "PERSON_CNT", className: ""}
+        ,{title: "신자수", data: "PERSON_CNT", className: "hidden"}
         ,{title: "직책수당", data: "ADJUST_PAY1", className: ""}
         ,{title: "가족수당", data: "FAMILY_PAY", className: ""}
         ,{title: "자격수당", data: "ADJUST_PAY2", className: ""}
@@ -74,6 +75,20 @@ function trDataXHR(idx){
     xhr1.open("GET", "/sys/psnlTotal.php?key="+psnlKey.value+"&PSNL_CD="+idx+"&CRUD=R"); xhr1.send();
     console.log("/sys/psnlTotal.php?key="+psnlKey.value+"&PSNL_CD="+idx+"&CRUD=R");
     xhr1.onload = () => {if (xhr1.status === 200) {var res = JSON.parse(xhr1.response)['data'];if(res!=null){
+
+        if(res[0].POSITION=="가사사용인"){
+            document.querySelectorAll(".modalFooter button").forEach(ftBtn => {
+                ftBtn.style.display="none";
+            });
+            document.getElementById("goPsnlListBtn").style.display="inline-block";//기초정보
+            document.getElementById("goTrsListBtn").style.display="inline-block";//발령정보
+            document.getElementById("goPttListBtn").style.display="inline-block";//최저시급정보
+        }else{
+            document.querySelectorAll(".modalFooter button").forEach(ftBtn => {
+                ftBtn.style.display="inline-block";
+            });
+            document.getElementById("goPttListBtn").style.display="none";
+        }
         document.getElementById("mdBdOrgNm").innerHTML=res[0].ORG_NM;
         document.getElementById("mdBdPsnlNm").innerHTML=res[0].PSNL_NM;
         document.getElementById("mdBdBaptNm").innerHTML=res[0].BAPT_NM;
@@ -94,6 +109,8 @@ function trDataXHR(idx){
         document.getElementById("goAdjListBtn").addEventListener("click",()=>{location.href="/adjList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
         document.getElementById("goInsListBtn").addEventListener("click",()=>{location.href="/insList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
         document.getElementById("goOpiListBtn").addEventListener("click",()=>{location.href="/opiList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
+        document.getElementById("goMPayListBtn").addEventListener("click",()=>{location.href="/mpayList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD+"&MPAY_YEAR="+res[0].ADVANCE_DT.substr(0,4)});
+        document.getElementById("goPttListBtn").addEventListener("click",()=>{location.href="/pttList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
 
         xhr4.open("GET", "/sys/fmlList.php?key="+psnlKey.value+"&PSNL_CD="+idx+"&CRUD=R"); xhr4.send();
     }}}
@@ -234,18 +251,22 @@ document.querySelectorAll(".phoneNumBox").forEach(phBox => {
 //const today = new Date; //오늘
 document.querySelectorAll(".quikSetBtn").forEach((q,key)=>{
     q.addEventListener("click",() => {
+        document.getElementById("PSNL_BIRTH_From").value="";
+        document.getElementById("PSNL_BIRTH_To").value="";
+        document.getElementById("TRS_DT_From").value="";
+        document.getElementById("TRS_DT_To").value="";
         if(q.id=="setRetire"){
             document.getElementById("PSNL_BIRTH_From").value=(new Date).getFullYear()-60+"-01-01";
             document.getElementById("PSNL_BIRTH_To").value=(new Date).getFullYear()-60+"-12-31";
         }else if(q.id=="set10Yr"){
             document.getElementById("TRS_DT_From").value=dateFormat(dateCalc(dateCalc(new Date,"m",0),"y",-10));
-            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",2),"y",-10));
+            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",6),"y",-10));
         }else if(q.id=="set20Yr"){
             document.getElementById("TRS_DT_From").value=dateFormat(dateCalc(dateCalc(new Date,"m",0),"y",-20));
-            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",2),"y",-20));
+            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",6),"y",-20));
         }else if(q.id=="set30Yr"){
             document.getElementById("TRS_DT_From").value=dateFormat(dateCalc(dateCalc(new Date,"m",0),"y",-30));
-            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",2),"y",-30));
+            document.getElementById("TRS_DT_To").value=dateFormat(dateCalc(dateCalc(new Date,"m",6),"y",-30));
         }
         document.querySelectorAll(".filter").forEach((f,key)=>{
             mytbl.hrDt.xhr.where[f.id]=f.value;
@@ -302,6 +323,13 @@ document.querySelectorAll(".showColToggle").forEach((st,key)=>{
 
 //뒤로가기로 돌아왔을때 이전 검색 정보 필터
 window.onload = function() {
+    //파라미터 중 셀렉트 파타미터값이 존재한다면 기초 세팅한다.
+    const url = window.location.href; // 현재 URL을 가져온다.
+    const params = new URLSearchParams(new URL(url).search); // URLSearchParams 객체 생성
+    document.getElementById("WORK_TYPE").value = params.get("WORK_TYPE");
+    document.getElementById("TRS_TYPE").value = params.get("TRS_TYPE");
+    //debugger;
+    //파라미터 기초세팅 종료
     setTimeout(function() { //뒤로가기에 값이 모두 바인딩 될때까지 딜레이가 존재하여 timeout을 추가함.
         document.querySelectorAll(".filter").forEach((f,key)=>{
             mytbl.hrDt.xhr.where[f.id]=f.value;

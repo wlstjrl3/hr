@@ -13,11 +13,11 @@
         }else{ //기존 데이터 UPDATE
             $sql = "UPDATE BONDANG_HR.PSNL_INSURANCE SET 
                 PSNL_CD='".$_REQUEST['PSNL_CD']."'
-                ,INS_AMOUNT='".@$_REQUEST['INS_AMOUNT']."'
-                ,INS_STT_DT='".@$_REQUEST['INS_STT_DT']."'
-                ,INS_END_DT='".@$_REQUEST['INS_END_DT']."'
-                ,INS_DTL='".@$_REQUEST['INS_DTL']."'";
+                ,INS_AMOUNT='".@$_REQUEST['INS_AMOUNT']."'";
+                if(@$_REQUEST['INS_STT_DT']){$sql=$sql.",INS_STT_DT='".@$_REQUEST['INS_STT_DT']."'";}else{$sql=$sql.",INS_STT_DT=NULL";}
+                if(@$_REQUEST['INS_END_DT']){$sql=$sql.",INS_END_DT='".@$_REQUEST['INS_END_DT']."'";}else{$sql=$sql.",INS_END_DT=NULL";}
             $sql = $sql."
+                ,INS_DTL='".@$_REQUEST['INS_DTL']."'
                 ,REG_DT='".date("Y-m-d h:m:s")."'
                 WHERE INS_CD = '".$_REQUEST['INS_CD']."'";
         }

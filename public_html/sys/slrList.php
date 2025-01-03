@@ -12,6 +12,9 @@
     if(@$_REQUEST['SLR_YEAR']){
         $whereSql=$whereSql." AND SLR_YEAR LIKE '%".$_REQUEST['SLR_YEAR']."%'"; //조직 정보의 B테이블에서 가져온다.
     }
+    if(@$_REQUEST['SLR_TYPE']){
+        $whereSql=$whereSql." AND SLR_TYPE LIKE '%".$_REQUEST['SLR_TYPE']."%'";
+    }
     if(@$_REQUEST['SLR_GRADE']){
         $whereSql=$whereSql." AND SLR_GRADE LIKE '%".$_REQUEST['SLR_GRADE']."%'";
     }

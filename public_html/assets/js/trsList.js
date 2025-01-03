@@ -11,7 +11,7 @@ var mytbl = new hr_tbl({
             PSNM_NM : document.getElementById("PSNL_NM").value,
         },
         order: {
-            column : '0',
+            column : '8',
             direction : 'desc',
         },
         page : 0, //표시되는 페이지에서 1이 빠진 값이다 즉 page:0 = 1페이지
@@ -23,7 +23,6 @@ var mytbl = new hr_tbl({
         ,{title: "조직", data: "ORG_NM", className: ""}
         ,{title: "직원명", data: "PSNL_NM", className: ""}
         ,{title: "직책", data: "POSITION", className: ""}
-        ,{title: "시행조직", data: "OLD_ORG_NM", className: ""}
         ,{title: "재직구분", data: "WORK_TYPE", className: ""}
         ,{title: "직책", data: "POSITION", className: ""}
         ,{title: "인사구분", data: "TRS_TYPE_KOR", className: ""}
@@ -82,7 +81,7 @@ function trDataXHR(idx){
                             input.value=res[0].ORG_CD;
                             break;
                         case 2 :
-                            input.value=res[0].OLD_ORG_NM;
+                            input.value=res[0].ORG_NM;
                             break;
                         case 3 :
                             input.value=res[0].TRS_DTL;

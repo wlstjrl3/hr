@@ -26,7 +26,7 @@
                     <option>계약직</option>
                     <option>무기계약직</option>
                     <option>정규직</option>
-                    <option>정규기능</option>
+                    <option>기능직</option>
                 </select></div>
             </div>
             <div class="modalGrp">
@@ -95,7 +95,7 @@
         </div>
         <div class="colGrp">
             <div class="colHd2L clBg5 cl2"><span><b>인사발령<br>시행조직</b></span></div>
-            <div class="colBd"><input id="ORG_CD" class="filter"></div>
+            <div class="colBd"><input id="ORG_NM" class="filter"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>인사구분</b></span></div>

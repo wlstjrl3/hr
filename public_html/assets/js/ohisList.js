@@ -1,7 +1,7 @@
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
     xhr:{
-        url:'/sys/slrList.php',
+        url:'/sys/ohisList.php',
         columXHR: '',
         key : psnlKey.value, //api 호출할 보안 개인인증키
         where: {
@@ -16,13 +16,12 @@ var mytbl = new hr_tbl({
     },
     columns: [
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
-        {title: "idx", data: "SLR_CD", className: "hidden"}
-        ,{title: "기준연도", data: "SLR_YEAR", className: ""}
-        ,{title: "타입", data: "SLR_TYPE", className: ""}
-        ,{title: "급", data: "SLR_GRADE", className: ""}
-        ,{title: "호", data: "SLR_PAY", className: ""}
-        ,{title: "기본급", data: "NORMAL_PAY", className: ""}
-        ,{title: "법정수당", data: "LEGAL_PAY", className: ""}
+        {title: "idx", data: "OH_CD", className: "hidden"}
+        ,{title: "본당코드", data: "ORG_CD", className: "hidden"}
+        ,{title: "기준날짜", data: "OH_DT", className: ""}
+        ,{title: "본당명", data: "ORG_NM", className: ""}
+        ,{title: "신자수", data: "PERSON_CNT", className: ""}
+        ,{title: "기타", data: "ETC", className: ""}
         ,{title: "등록일", data: "REG_DT", className: ""}
     ],
 });
@@ -32,13 +31,12 @@ mytbl.xportBind();
 //이 아래로는 페이지 개별 모달창 이벤트를 지정
 //신규버튼을 눌렀을때
 newCol.addEventListener("click",()=>{
-    document.querySelector(".modalForm").querySelector("select").value="";
     document.querySelector(".modalForm").style.visibility="visible"; //모달창이 나타나게 한다.
     document.querySelector(".modalForm").style.opacity="1";     //투명도 애니메이션 적용을 위해 opacity가 0에서 1로 변경된다.
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
         input.value="";
         if(key>1){
-            if(key==1){
+            if(key==2){
                 input.focus();
             }
             input.readOnly = false;
@@ -49,8 +47,8 @@ newCol.addEventListener("click",()=>{
 //행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx){ 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sys/slrConfig.php?key="+psnlKey.value+"&SLR_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log("/sys/slrConfig.php?key="+psnlKey.value+"&SLR_CD="+idx+"&CRUD=R");
+    xhr.open("GET", "/sys/ohisConfig.php?key="+psnlKey.value+"&OH_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/ohisConfig.php?key="+psnlKey.value+"&OH_CD="+idx+"&CRUD=R");
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
@@ -58,44 +56,28 @@ function trDataXHR(idx){
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input,key)=>{
                     switch(key){
                         case 0 :
-                            input.value=res[0].SLR_CD
+                            input.value=res[0].OH_CD
                             break;
                         case 1 :
-                            input.value=res[0].SLR_YEAR;
+                            input.value=res[0].ORG_CD;
                             break;
                         case 2 :
-                            input.value=res[0].SLR_GRADE;
+                            input.value=res[0].ORG_NM;
                             break;
                         case 3 :
-                            input.value=res[0].SLR_PAY;
+                            input.value=res[0].OH_DT;
                             break;
                         case 4 :
-                            input.value=res[0].NORMAL_PAY;
+                            input.value=res[0].PERSON_CNT;
                             break;
                         case 5 :
-                            input.value=res[0].LEGAL_PAY;
+                            input.value=res[0].ETC;
                             break;
                     }
                 });
-                document.querySelector(".modalForm").querySelector("select").value=res[0].SLR_TYPE;
-                document.querySelector(".modalForm").querySelectorAll("input").forEach((tmpEle,key)=>{
-                    tmpEle.disabled = false;
-                    if(key>1){
-                        tmpEle.style.backgroundColor = '#FFF';
-                    }
-                });
-                if(res[0].SLR_TYPE=='최저시급'){
-                    document.querySelector(".modalForm").querySelectorAll("input").forEach((tmpEle,key)=>{
-                        if(key>1&&key<5){
-                            tmpEle.value=0;
-                            tmpEle.disabled = true;
-                            tmpEle.style.backgroundColor = '#EEE';
-                        }
-                    });
-                }
             }
         }else{
-            console.log("slrConfigXhr 정보 로드 에러");
+            console.log("ohisConfigXhr 정보 로드 에러");
         }
     }
 }
@@ -103,36 +85,29 @@ function trDataXHR(idx){
 modalEdtBtn.addEventListener("click",()=>{
     let xhr = new XMLHttpRequest();
     let writeUrl='';
-    let slrType = document.querySelector(".modalForm").querySelector("select").value;
     try{
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-            if(key==0){writeUrl+="&SLR_CD="+input.value}
+            if(key==0){writeUrl+="&OH_CD="+input.value}
             else if(key==1){
-                if(input.value<1900 | input.value>2200){alert("기준연도 값을 확인해주세요.");throw new Error("stop loop");}
-                writeUrl+="&SLR_YEAR="+input.value}
-            else if(key==2){
-                if(slrType!='최저시급' && (input.value<4 | input.value>150)){alert("급의 입력범위를 벗어났습니다.");throw new Error("stop loop");}
-                writeUrl+="&SLR_GRADE="+input.value
+                if(input.length<3){alert("조직정보는 필수값입니다.");throw new Error("stop loop");}
+                writeUrl+="&ORG_CD="+input.value
             }
             else if(key==3){
-                if(slrType!='최저시급' && (input.value<0 | input.value>50)){alert("호의 입력범위를 벗어났습니다");throw new Error("stop loop");}
-                writeUrl+="&SLR_PAY="+input.value
-            }
-            else if(key==4){writeUrl+="&NORMAL_PAY="+input.value}
-            else if(key==5){writeUrl+="&LEGAL_PAY="+input.value}
+                if(input.length<9){alert("기준일은 필수값입니다.");throw new Error("stop loop");}
+                writeUrl+="&OH_DT="+input.value}
+            else if(key==4){writeUrl+="&PERSON_CNT="+input.value}
+            else if(key==5){writeUrl+="&ETC="+input.value}
         });
-        if(slrType==""){alert("타입은 필수 값입니다.");throw new Error("stop");}
-        writeUrl+="&SLR_TYPE="+slrType;
     }catch(e){
         console.log("필수값 체크"); return false;
     }
-    console.log("/sys/slrConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
-    xhr.open("GET", "/sys/slrConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/ohisConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
+    xhr.open("GET", "/sys/ohisConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
             if(res==""){
-                console.log("slrConfig 정보 기록 완료");
+                console.log("ohisConfig 정보 기록 완료");
                 mytbl.show('myTbl'); //테이블의 아이디
                 modalClose();
             }else{
@@ -151,18 +126,18 @@ modalDelBtn.addEventListener("click",()=>{
     let xhr = new XMLHttpRequest();
     let deleteUrl='';
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-        if(key==0){deleteUrl+="&SLR_CD="+input.value}
+        if(key==0){deleteUrl+="&OH_CD="+input.value}
     });
-    console.log("/sys/slrConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
-    xhr.open("GET", "/sys/slrConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
+    console.log("/sys/ohisConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
+    xhr.open("GET", "/sys/ohisConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
-            console.log("slr 정보 삭제 완료");
+            console.log("ohis 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
         }else{
-            console.log("slr 정보 제거 에러!!!");
+            console.log("ohis 정보 제거 에러!!!");
         }
     }    
 });
@@ -175,14 +150,14 @@ batchDel.addEventListener("click",()=>{
         // 정규식으로 확인
         if (regex.test(dateInput)) {
             let xhr = new XMLHttpRequest();
-            xhr.open("GET", "/sys/slrConfig.php?key="+psnlKey.value+"&CRUD=BD&REG_DT="+dateInput); xhr.send(); //XHR을 즉시 호출한다.
+            xhr.open("GET", "/sys/ohisConfig.php?key="+psnlKey.value+"&CRUD=BD&REG_DT="+dateInput); xhr.send(); //XHR을 즉시 호출한다.
             xhr.onload = () => {
                 if (xhr.status === 200) { //XHR 응답이 존재한다면
                     alert(xhr.responseText);
                     mytbl.show('myTbl'); //테이블의 아이디
                     modalClose();
                 }else{
-                    alert("slr 정보 제거 에러!!!");
+                    alert("ohis 정보 제거 에러!!!");
                 }
             }
         } else {
@@ -205,8 +180,9 @@ document.querySelector("#file").addEventListener('change',target=>{
             let workBook = XLSX.read(data, { type: 'binary' });
             workBook.SheetNames.forEach(function (sheetName) {
                 let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
-                if(rows[0]['SLR_YEAR']){
-                    if (!confirm("기준연도:"+rows[0]['SLR_YEAR']+"["+rows[0]['SLR_GRADE']+"급/"+rows[0]['SLR_PAY']+"호]"+rows[0]['NORMAL_PAY']+"원 외 "+(rows.length-1)+"건 의 정보를 일괄등록 하시겠습니까?")) {
+                if(rows[0]['OH_DT']){
+                    if(rows[0]['OH_DT'].length!=10){rows[0]['OH_DT']=excelDateToJSDate(rows[0]['OH_DT']);}//엑셀에서 날짜가 숫자로 변환되어버린 경우 재보정
+                    if (!confirm(rows[0]['OH_DT']+"기준일의 "+rows[0]['ORG_NM']+" 성당 / 신자수"+rows[0]['PERSON_CNT']+"명 외 "+(rows.length-1)+"건 의 정보를 일괄등록 하시겠습니까?")) {
                         // 취소(아니오) 버튼 클릭 시 이벤트
                         return false;
                     }                     
@@ -215,12 +191,12 @@ document.querySelector("#file").addEventListener('change',target=>{
                     return false;
                 }
                 var xhr = new XMLHttpRequest();//XMLHttpRequest 객체 생성
-                xhr.open('POST', '/sys/slrBatchInsert.php?key='+psnlKey.value, true);//요청을 보낼 방식, 주소, 비동기여부 설정                
+                xhr.open('POST', '/sys/ohisBatchInsert.php?key='+psnlKey.value, true);//요청을 보낼 방식, 주소, 비동기여부 설정                
                 xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8');//HTTP 요청 헤더 설정
                 xhr.send(JSON.stringify(rows));  //JSON,stringify를 이용하여 json으로 변환해야만 php상에서 엑셀 텍스트가 json으로 인식됨
                 xhr.onload = () => {//통신후 작업
                     if (xhr.status == 200) {//통신 성공
-                        //console.log(xhr.response); 
+                        console.log(xhr.response); 
                         mytbl.show("myTbl");
                     }else{
                         console.log("통신 실패 type1");//통신 실패
@@ -253,22 +229,12 @@ document.querySelectorAll(".dateBox").forEach(dtBox => {
         this.value = autoHypenDate(_val) ;
     }
 });
-
-//최저시급 선택시 급,호,기본급 입력 방지처리
-document.querySelector(".modalForm").querySelector("select").addEventListener('change',(e)=>{
-    document.querySelector(".modalForm").querySelectorAll("input").forEach((tmpEle,key)=>{
-        tmpEle.disabled = false;
-        if(key>1){
-            tmpEle.style.backgroundColor = '#FFF';
-        }
-    });
-    if(e.target.value=="최저시급"){
-        document.querySelector(".modalForm").querySelectorAll("input").forEach((tmpEle,key)=>{
-            if(key>1&&key<5){
-                tmpEle.value=0;
-                tmpEle.disabled = true;
-                tmpEle.style.backgroundColor = '#EEE';
-            }
-        });
+//조직 검색 팝업 띄우기
+document.getElementById("orgSerchPop").addEventListener('click',()=>{
+    window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
+});
+document.getElementById("orgNm").addEventListener("keyup", (evt)=>{
+    if (evt.keyCode == 13) {
+        window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
     }
 });

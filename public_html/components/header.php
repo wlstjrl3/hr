@@ -34,7 +34,7 @@
                     </a>
                     <ul>
                         <li>
-                            <a href="/psnlTotal">
+                            <a href="/psnlTotal?TRS_TYPE=1">
                                 └&nbsp;직원 종합정보 조회
                             </a>
                         </li>
@@ -100,8 +100,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/housekeepList.php">
-                                └&nbsp;가사사용 정보
+                            <a href="/pttList.php">
+                                └&nbsp;최저임금 대상관리
                             </a>
                         </li>
                         <li>
@@ -110,8 +110,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/monthPayList.php">
-                                └&nbsp;월별 급여 정보
+                            <a href="/mpayList.php">
+                                └&nbsp;월별 개인급여
                             </a>
                         </li>
                     </ul>
@@ -128,7 +128,12 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/user.php">
+                            <a href="/ohisList">
+                                └&nbsp;년도별 신자수
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/user">
                                 └&nbsp;사용자 관리
                             </a>
                         </li>

@@ -5,31 +5,29 @@
     if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
     
     if($_REQUEST['CRUD']=='C'){
-        if($_REQUEST['SLR_CD']==""){ //신규 작성
-            $sql = "INSERT INTO BONDANG_HR.SALARY_TB(SLR_YEAR, SLR_TYPE, SLR_GRADE, SLR_PAY, NORMAL_PAY, LEGAL_PAY, REG_DT) VALUES ('";
-            $sql = $sql.$_REQUEST['SLR_YEAR']."','".$_REQUEST['SLR_TYPE']."','".$_REQUEST['SLR_GRADE']."','".$_REQUEST['SLR_PAY']."','".$_REQUEST['NORMAL_PAY']."','".$_REQUEST['LEGAL_PAY'];
+        if($_REQUEST['OH_CD']==""){ //신규 작성
+            $sql = "INSERT INTO BONDANG_HR.ORG_HISTORY(OH_DT, ORG_CD, PERSON_CNT, ETC, REG_DT) VALUES ('";
+            $sql = $sql.$_REQUEST['OH_DT']."','".$_REQUEST['ORG_CD']."','".$_REQUEST['PERSON_CNT']."','".$_REQUEST['ETC'];
             $sql = $sql."','".date("Y-m-d h:m:s")."')";
             //echo $sql; //오류 점검용 쿼리
         }else{ //기존 데이터 UPDATE
-            $sql = "UPDATE BONDANG_HR.SALARY_TB SET 
-                SLR_YEAR='".$_REQUEST['SLR_YEAR']."'
-                ,SLR_TYPE='".$_REQUEST['SLR_TYPE']."'
-                ,SLR_GRADE='".$_REQUEST['SLR_GRADE']."'
-                ,SLR_PAY='".$_REQUEST['SLR_PAY']."'
-                ,NORMAL_PAY='".$_REQUEST['NORMAL_PAY']."'
-                ,LEGAL_PAY='".$_REQUEST['LEGAL_PAY']."'
+            $sql = "UPDATE BONDANG_HR.ORG_HISTORY SET 
+                OH_DT='".$_REQUEST['OH_DT']."'
+                ,ORG_CD='".$_REQUEST['ORG_CD']."'
+                ,PERSON_CNT='".$_REQUEST['PERSON_CNT']."'
+                ,ETC='".$_REQUEST['ETC']."'
                 ,REG_DT='".date("Y-m-d h:m:s")."'
-                WHERE SLR_CD = '".$_REQUEST['SLR_CD']."'";
+                WHERE OH_CD = '".$_REQUEST['OH_CD']."'";
         }
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
     }else if($_REQUEST['CRUD']=='R'){
         //기본 쿼리
-        $sql = "SELECT * FROM BONDANG_HR.SALARY_TB";
+        $sql = "SELECT B.ORG_NM,A.* FROM BONDANG_HR.ORG_HISTORY A LEFT OUTER JOIN ORG_INFO B ON A.ORG_CD = B.ORG_CD";
         //조건문 지정
         $whereSql = " WHERE 1=1 ";
-        if(@$_REQUEST['SLR_CD']){
-            $whereSql=$whereSql." AND SLR_CD = '".$_REQUEST['SLR_CD']."'";
+        if(@$_REQUEST['OH_CD']){
+            $whereSql=$whereSql." AND OH_CD = '".$_REQUEST['OH_CD']."'";
         }
         //리미트 지정
         $limitSql = " LIMIT 1";
@@ -47,13 +45,13 @@
         echo json_encode($datas, JSON_UNESCAPED_UNICODE);
     }else if($_REQUEST['CRUD']=='D'){
         //기본 쿼리
-        $sql = "DELETE FROM BONDANG_HR.SALARY_TB WHERE SLR_CD = '".$_REQUEST['SLR_CD']."'";
+        $sql = "DELETE FROM BONDANG_HR.ORG_HISTORY WHERE OH_CD = '".$_REQUEST['OH_CD']."'";
         //echo $sql; //오류 점검용 쿼리
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
     }else if($_REQUEST['CRUD']=='BD' && strlen($_REQUEST['REG_DT']) == 10){ //일괄 제거 코드를 추가한다.
         //기본 쿼리
-        $sql = "DELETE FROM BONDANG_HR.SALARY_TB WHERE REG_DT LIKE '".$_REQUEST['REG_DT']." %'";
+        $sql = "DELETE FROM BONDANG_HR.ORG_HISTORY WHERE REG_DT LIKE '".$_REQUEST['REG_DT']." %'";
         //echo $sql; //오류 점검용 쿼리
         $result = mysqli_query($conn,$sql);
         if ($result) {

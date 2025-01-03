@@ -71,13 +71,13 @@
     }
     .xScroll{
         clear:both;
-        overflow-x: scroll;
+        overflow-x: auto;
     }
     .width1500{
         width:1500px;
     }
-    .width2000{
-        width:2000px;
+    .width1850{
+        width:1850px;
     }
     .width2500{
         width:2500px;

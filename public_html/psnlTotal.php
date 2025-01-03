@@ -16,8 +16,8 @@
                     <li class="th clBg5"><span>급호봉</span></li><li class="td clBgW"><span id="mdBdGrdPay">N급 N호</span></li>
                     <li class="th clBg5"><span>승급일</span></li><li class="td clBgW"><span id="mdBdAdvDt">1000-01-01</span></li>
                     <li class="th clBg5"><span>승급분기</span></li><li class="td clBgW"><span id="mdBdAdvRng">분기임</span></li>
-                    <li class="th clBg5"><span>주민번호</span></li><li class="td clBgW"><span id="mdBdPsnlNum">000000-0000000</span></li>
-                    <li class="th clBg5"><span>연락처</span></li><li class="td clBgW"><span id="mdBdPhoneNum">010-0000-0000</span></li>
+                    <li class="th clBg5"><span>주민번호</span></li><li class="td clBgW"><span id="mdBdPsnlNum" class="fs8">000000-0000000</span></li>
+                    <li class="th clBg5"><span>연락처</span></li><li class="td clBgW"><span id="mdBdPhoneNum" class="fs8">010-0000-0000</span></li>
                 </ul>
             </div>
             <div id="fmlTbl"></div>
@@ -32,6 +32,8 @@
             <button id="goAdjListBtn" style="margin:0 0 5px 0;padding:5px 9px;">조정수당</button>
             <button id="goInsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">보증보험</button>
             <button id="goOpiListBtn" style="margin:0 0 5px 0;padding:5px 9px;">상벌정보</button>
+            <button id="goMPayListBtn" style="margin:0 0 5px 0;padding:5px 9px;">월별급여상세</button>
+            <button id="goPttListBtn" style="margin:0 0 5px 0;padding:5px 9px;">최저시급정보</button>
         </div>
     </div>
 </div>
@@ -62,7 +64,7 @@
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>고용형태</b></span></div>
             <div class="colBd"><select id="WORK_TYPE" class="filter">
-                <option value="">전체</option><option>정규</option><option>계약</option><option>정규기능</option>
+                <option value="">전체</option><option>정규</option><option>계약</option><option>기능</option>
             </select></div>
         </div>
         <div class="colGrp">
@@ -120,7 +122,7 @@
             <span>개씩 보기</span>
         </div>
         <div class="xScroll">        
-            <table id="myTbl" class="width2000"></table>
+            <table id="myTbl" class="width1850"></table>
         </div>
         <div id="tblPagination"></div>
     </div>

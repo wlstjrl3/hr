@@ -24,8 +24,6 @@ var mytbl = new hr_tbl({
         ,{title: "소속조직", data: "ORG_NM", className: ""}
         ,{title: "성명", data: "PSNL_NM", className: ""}
         ,{title: "세례명", data: "BAPT_NM", className: ""}
-        //,{title: "직책", data: "POSITION", className: ""}
-        //,{title: "고용형태", data: "WORK_TYPE", className: ""}
         ,{title: "연락처", data: "PHONE_NUM", className: ""}
         ,{title: "주민번호", data: "PSNL_NUM", className: ""}
     ],
@@ -65,21 +63,15 @@ function trDataXHR(idx){
                             input.value=res[0].PSNL_CD
                             break;
                         case 1 :
-                            input.value=res[0].ORG_CD;
-                            break;
-                        case 2 :
-                            input.value=res[0].ORG_NM;
-                            break;
-                        case 3 :
                             input.value=res[0].PSNL_NM;
                             break;  
-                        case 4 :
+                        case 2 :
                             input.value=res[0].BAPT_NM;
                             break;                  
-                        case 5 :
+                        case 3 :
                             input.value=res[0].PHONE_NUM
                             break;
-                        case 6 :
+                        case 4 :
                             input.value=res[0].PSNL_NUM
                             break;
                     }
@@ -98,15 +90,12 @@ modalEdtBtn.addEventListener("click",()=>{
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
             if(key==0){writeUrl+="&PSNL_CD="+input.value}
             else if(key==1){
-                if(input.value.length<3){alert("조직코드는 필수 값입니다");throw new Error("stop loop");}
-                writeUrl+="&ORG_CD="+input.value}
-            else if(key==3){
                 if(input.value.length<2){alert("성명은 필수 값입니다");throw new Error("stop loop");}
                 writeUrl+="&PSNL_NM="+input.value
             }
-            else if(key==4){writeUrl+="&BAPT_NM="+input.value}
-            else if(key==5){writeUrl+="&PHONE_NUM="+input.value}
-            else if(key==6){writeUrl+="&PSNL_NUM="+input.value}
+            else if(key==2){writeUrl+="&BAPT_NM="+input.value}
+            else if(key==3){writeUrl+="&PHONE_NUM="+input.value}
+            else if(key==4){writeUrl+="&PSNL_NUM="+input.value}
         });
     }catch(e){
         console.log("필수값 체크"); return false;
@@ -190,14 +179,5 @@ document.querySelectorAll(".phoneNumBox").forEach(phBox => {
         event = event || window.event;
         var _val = this.value.trim();
         this.value = autoHypenPhone(_val) ;
-    }
-});
-//조직 검색 팝업 띄우기
-document.getElementById("orgSerchPop").addEventListener('click',()=>{
-    window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
-});
-document.getElementById("orgNm").addEventListener("keyup", (evt)=>{
-    if (evt.keyCode == 13) {
-        window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
     }
 });

@@ -3,10 +3,45 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
+            <b>최저임금 대상 정보 </b>
+            <button></button>
         </div>
         <div class="modalBody">
+            <p>직원정보 : <b>조직 직책 성명</b></p>
+            <div class="modalGrp">
+                <div class="modalHd">일련번호</div>
+                <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">기준년도</div>
+                <div class="modalBd"><input autocomplete='off' placeholder="2000"  maxlength="4"></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">주 근무일수</div>
+                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">주 근무시간</div>
+                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">연장근무시간</div>
+                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">추가사유</div>
+                <div class="modalBd"><input autocomplete='off'></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">추가금액</div>
+                <div class="modalBd"><input autocomplete='off'></div>
+            </div>
+            <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
+            <button id="goPsnlTotalBtn" style="padding:5px 9px;">종합정보페이지</button>
+            <button id="modalEdtBtn" style="padding:5px 9px;">저장</button>
+            <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
         </div>
     </div>
 </div>
@@ -14,7 +49,7 @@
 <div class="container">
 
     <h4 class="cl3 pddS">
-        월별 급여 정보
+        최저임금 대상 정보
     </h4>
 
     <div class="searchArea">
@@ -35,22 +70,21 @@
             </div>    
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>인사구분</b></span></div>
-            <div class="colBd"><select id="TRS_TYPE" class="filter">
-                <option value="">전체</option>
-                <option value="1">입사</option>
-                <option value="2">퇴사</option>
-                <option value="3">전보</option>
-            </select></div>
+            <div class="colHd clBg5 cl2"><span><b>기준년도</b></span></div>
+            <div class="colBd"><input id="PTT_YEAR" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>상세정보</b></span></div>
-            <div class="colBd"><input id="TRS_DTL" class="filter"></div>
+            <div class="colHd clBg5 cl2"><span><b>주근무일수</b></span></div>
+            <div class="colBd"><input id="PTT_DAY" class="filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>발령일</b></span></div>
-            <div class="colBd"><input class="dualDateBox dateBox filter" id="TRS_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="TRS_DT_To"></div>
+            <div class="colHd clBg5 cl2"><span><b>주근무시간</b></span></div>
+            <div class="colBd"><input id="PTT_HOUR" class="filter"></div>
         </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>사제인원수</b></span></div>
+            <div class="colBd"><input id="PTT_ADJPAY" class="filter"></div>
+        </div> 
         <div class="clearB"></div>
     </div>
     <br>
@@ -80,7 +114,7 @@
 <script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='/assets/js/modal.js'></script>
 <script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/trsList.js'></script>
+<script type='text/javascript' src='/assets/js/pttList.js'></script>
 <script type='text/javascript' src='/assets/js/dateForm.js'></script>
 
 <?php include('components/footer.php'); ?>

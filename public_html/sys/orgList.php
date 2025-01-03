@@ -9,7 +9,6 @@
     $sql = "SELECT B.ORG_NM AS UPR_ORG_NM
         ,A.ORG_CD
         ,A.ORG_NM
-        ,A.PERSON_CNT
         ,CASE 
         WHEN A.ORG_TYPE='1' THEN '성지' 
         WHEN A.ORG_TYPE='11' THEN '본당' 
@@ -30,12 +29,6 @@
     if(@$_REQUEST['ORG_TYPE']){
         $whereSql=$whereSql." AND A.ORG_TYPE = '".$_REQUEST['ORG_TYPE']."'";
     }
-    if(@$_REQUEST['PERSON_CNT_From']){
-        $whereSql=$whereSql." AND A.PERSON_CNT >= '".$_REQUEST['PERSON_CNT_From']."'";
-    }
-    if(@$_REQUEST['PERSON_CNT_To']){
-        $whereSql=$whereSql." AND A.PERSON_CNT <= '".$_REQUEST['PERSON_CNT_To']."'";
-    }    
     //정렬 기준 지정
     $orderSql = "";
     if(@$_REQUEST['ORDER']){

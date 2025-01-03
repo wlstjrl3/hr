@@ -4,17 +4,16 @@
     include "../dbconn/dbconn.php";
     if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
     //갯수 카운트 쿼리
-    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_TRANSFER A";
+    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_TRANSFER A LEFT OUTER JOIN ORG_INFO C ON A.ORG_CD = C.ORG_CD";
     //기본 쿼리
-    $sql = "SELECT C.ORG_NM,B.PSNL_NM,D.ORG_NM AS OLD_ORG_NM,A.*,
+    $sql = "SELECT C.ORG_NM,B.PSNL_NM,A.*,
     CASE 
     WHEN TRS_TYPE=1 THEN '입사' 
     WHEN TRS_TYPE=2 THEN '퇴사' 
     WHEN TRS_TYPE=3 THEN '전보' END AS TRS_TYPE_KOR
      FROM BONDANG_HR.PSNL_TRANSFER A
     LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
-    LEFT OUTER JOIN ORG_INFO C ON B.ORG_CD = C.ORG_CD
-    LEFT OUTER JOIN ORG_INFO D ON A.ORG_CD = D.ORG_CD";
+    LEFT OUTER JOIN ORG_INFO C ON A.ORG_CD = C.ORG_CD";
     //조건문 지정
     $whereSql = " WHERE 1=1"; //" WHERE PSNL_CD='".@$_REQUEST['PSNL_CD']."'";
     if(@$_REQUEST['PSNL_CD']){

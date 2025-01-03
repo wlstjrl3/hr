@@ -4,7 +4,12 @@
     include "../dbconn/dbconn.php";
     if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
     
+    $authChk = mysqli_query($conn,"SELECT USER_AUTH FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1");
+    $userAuth = mysqli_fetch_assoc($authChk)['USER_AUTH'];
     if($_REQUEST['CRUD']=='C'){
+        if($userAuth!='auth'){
+            echo '권한이 없는 사용자 입니다.';
+        }
         if($_REQUEST['USER_CD']==""){ //신규 작성
             $sql = "INSERT INTO BONDANG_HR.USER_TB(USER_ID,USER_NM,USER_PASS,USER_AUTH,EMAIL,POSITION,ORG_NM,REG_DT,MEMO) VALUES ('";
             $sql = $sql.$_REQUEST['USER_ID']."','".$_REQUEST['USER_NM']."','".MD5($_REQUEST['USER_PASS'])."','".$_REQUEST['USER_AUTH'];
@@ -25,7 +30,7 @@
                 ,ORG_NM='".$_REQUEST['ORG_NM']."'
                 ,MEMO='".$_REQUEST['MEMO']."'
                 WHERE USER_CD = '".$_REQUEST['USER_CD']."'";
-            echo $_REQUEST['USER_ID'];
+            //echo $_REQUEST['USER_ID'];
         }
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
@@ -51,9 +56,12 @@
         );
         echo json_encode($datas, JSON_UNESCAPED_UNICODE);
     }else if($_REQUEST['CRUD']=='D'){
+        if($userAuth!='auth'){
+            echo '권한이 없는 사용자 입니다.';
+        }        
         //기본 쿼리
         $sql = "DELETE FROM BONDANG_HR.USER_TB WHERE USER_CD = '".$_REQUEST['USER_CD']."'";
-        echo $sql; //오류 점검용 쿼리
+        //echo $sql; //오류 점검용 쿼리
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
     }else{
