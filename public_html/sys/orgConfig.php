@@ -5,16 +5,18 @@
     if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
     
     if($_REQUEST['CRUD']=='C'){
-        $sql = "INSERT INTO BONDANG_HR.ORG_INFO(ORG_CD, ORG_NM, UPPR_ORG_CD, ORG_TYPE, REFRESH_DT, REG_DT) VALUES ('";
-        $sql = $sql.$_REQUEST['ORG_CD']."','".$_REQUEST['ORG_NM']."','".$_REQUEST['UPPR_ORG_CD']."','".$_REQUEST['ORG_TYPE'];
+        $sql = "INSERT INTO BONDANG_HR.ORG_INFO(ORG_CD, ORG_NM, UPPR_ORG_CD, ORG_TYPE, ORG_IN_TEL, ORG_OUT_TEL, REFRESH_DT, REG_DT) VALUES ('";
+        $sql = $sql.$_REQUEST['ORG_CD']."','".$_REQUEST['ORG_NM']."','".$_REQUEST['UPPR_ORG_CD']."','".$_REQUEST['ORG_TYPE']."','".$_REQUEST['ORG_IN_TEL']."','".$_REQUEST['ORG_OUT_TEL'];
         $sql = $sql."','".date("Y-m-d h:m:s")."','".date("Y-m-d h:m:s")."')
             ON DUPLICATE KEY UPDATE
                 ORG_NM='".$_REQUEST['ORG_NM']."'
                 ,UPPR_ORG_CD='".$_REQUEST['UPPR_ORG_CD']."'
                 ,ORG_TYPE='".$_REQUEST['ORG_TYPE']."'
+                ,ORG_IN_TEL='".$_REQUEST['ORG_IN_TEL']."'
+                ,ORG_OUT_TEL='".$_REQUEST['ORG_OUT_TEL']."'
                 ,REFRESH_DT='".date("Y-m-d h:m:s")."'";
-        //echo $sql;
-        //die;
+            //echo $sql;
+            //die;
         $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
     }else if($_REQUEST['CRUD']=='R'){

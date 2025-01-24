@@ -7,32 +7,33 @@
     $authChk = mysqli_query($conn,"SELECT USER_AUTH FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1");
     $userAuth = mysqli_fetch_assoc($authChk)['USER_AUTH'];
     if($_REQUEST['CRUD']=='C'){
-        if($userAuth!='auth'){
-            echo '권한이 없는 사용자 입니다.';
-        }
-        if($_REQUEST['USER_CD']==""){ //신규 작성
-            $sql = "INSERT INTO BONDANG_HR.USER_TB(USER_ID,USER_NM,USER_PASS,USER_AUTH,EMAIL,POSITION,ORG_NM,REG_DT,MEMO) VALUES ('";
-            $sql = $sql.$_REQUEST['USER_ID']."','".$_REQUEST['USER_NM']."','".MD5($_REQUEST['USER_PASS'])."','".$_REQUEST['USER_AUTH'];
-            $sql = $sql."','".$_REQUEST['EMAIL']."','".$_REQUEST['POSITION']."','".$_REQUEST['ORG_NM']."','".date("Y-m-d h:m:s")."','".$_REQUEST['MEMO'];
-            $sql = $sql."')";
-            echo $sql; //오류 점검용 쿼리
-        }else{ //기존 데이터 UPDATE
-            $sql = "UPDATE BONDANG_HR.USER_TB SET 
-                USER_ID='".$_REQUEST['USER_ID']."'
-                ,USER_NM='".$_REQUEST['USER_NM']."'";
-            if(strlen(@$_REQUEST['USER_PASS'])>1){ //변경된 패스워드가 전달되었다면
-                $sql = $sql.",USER_PASS='".MD5($_REQUEST['USER_PASS'])."'";
+        if($userAuth!='auth' && $userAuth!='admin'){
+            echo '권한이 없는 사용자 입니다. : '.$userAuth;
+        }else{
+            if($_REQUEST['USER_CD']==""){ //신규 작성
+                $sql = "INSERT INTO BONDANG_HR.USER_TB(USER_ID,USER_NM,USER_PASS,USER_AUTH,EMAIL,POSITION,ORG_NM,REG_DT,MEMO) VALUES ('";
+                $sql = $sql.$_REQUEST['USER_ID']."','".$_REQUEST['USER_NM']."','".MD5($_REQUEST['USER_PASS'])."','".$_REQUEST['USER_AUTH'];
+                $sql = $sql."','".$_REQUEST['EMAIL']."','".$_REQUEST['POSITION']."','".$_REQUEST['ORG_NM']."','".date("Y-m-d h:m:s")."','".$_REQUEST['MEMO'];
+                $sql = $sql."')";
+                echo $sql; //오류 점검용 쿼리
+            }else{ //기존 데이터 UPDATE
+                $sql = "UPDATE BONDANG_HR.USER_TB SET 
+                    USER_ID='".$_REQUEST['USER_ID']."'
+                    ,USER_NM='".$_REQUEST['USER_NM']."'";
+                if(strlen(@$_REQUEST['USER_PASS'])>1){ //변경된 패스워드가 전달되었다면
+                    $sql = $sql.",USER_PASS='".MD5($_REQUEST['USER_PASS'])."'";
+                }
+                $sql = $sql."
+                    ,USER_AUTH='".$_REQUEST['USER_AUTH']."'
+                    ,EMAIL='".$_REQUEST['EMAIL']."'
+                    ,POSITION='".$_REQUEST['POSITION']."'
+                    ,ORG_NM='".$_REQUEST['ORG_NM']."'
+                    ,MEMO='".$_REQUEST['MEMO']."'
+                    WHERE USER_CD = '".$_REQUEST['USER_CD']."'";
+                //echo $_REQUEST['USER_ID'];
             }
-            $sql = $sql."
-                ,USER_AUTH='".$_REQUEST['USER_AUTH']."'
-                ,EMAIL='".$_REQUEST['EMAIL']."'
-                ,POSITION='".$_REQUEST['POSITION']."'
-                ,ORG_NM='".$_REQUEST['ORG_NM']."'
-                ,MEMO='".$_REQUEST['MEMO']."'
-                WHERE USER_CD = '".$_REQUEST['USER_CD']."'";
-            //echo $_REQUEST['USER_ID'];
+            $result = mysqli_query($conn,$sql);
         }
-        $result = mysqli_query($conn,$sql);
         mysqli_close($conn);
     }else if($_REQUEST['CRUD']=='R'){
         //기본 쿼리

@@ -22,10 +22,14 @@ class hr_tbl{
                 let totalCnt = JSON.parse(xhr.response)['totalCnt'];
                 let filterCnt = JSON.parse(xhr.response)['filterCnt'];
                 //let query = JSON.parse(xhr.response)['query'];
+                //debugger;
 //테이블 객체 생성 이벤트//
                 let table = document.querySelector('#'+tbNm) //외부에서 호출할때 적은 테이블 ID로 오브젝트를 준비한다.
                 table.classList.add('hr_tbl'); //해당 오브젝트에 hr_tbl이라는 클래스 명칭을 추가한다.
                 let str=`<thead><tr><th class="openCol">반응</th>` //모바일 반응형에서 접혀있는 Coulmn(열)을 오픈할때 사용할 칸을 준비한다.
+                if(this.hrDt.tblType=="chkTbl"){
+                    str+=`<th class="chkTh" style="width:1px;"><input type="checkbox"></th>`;
+                }                
                 this.hrDt.columns.forEach((cl,key)=>{//외부에서 호출한 컬럼의 갯수만큼 반복
                     str+=`<th class="`+cl.className+`"><p data-order-col="`+key+`" data-col-nm="`+this.hrDt.columns[key].data+`">`+cl.title;
                     if(mytbl.hrDt.xhr.order.column==key){
@@ -44,6 +48,9 @@ class hr_tbl{
                         str+=`<tr data-idx="`+row[this.hrDt.columns[0].data]+`"`; //tr라인에 idx 키값을 지정한다. 모달창에서 개별 CURD 처리하기 위함
                         if(key%2 == 0){str+=` class="even">`;}else{str+=` class="odd">`;}
                         str+= `<td class="openCol"><a class="colBtn">＋</a></td>`;
+                        if(this.hrDt.tblType=="chkTbl"){
+                            str+=`<td class="chkTd"><input type="checkbox"></td>`;
+                        }
                         this.hrDt.columns.forEach((cl,key)=>{
                             str+= `<td class="`+cl.className+`" data-label="`+cl.title+`"><p class="sharp">`;
                             if(!row[cl.data]){}else{str+=row[cl.data];}
@@ -164,6 +171,16 @@ class hr_tbl{
                                 mytbl.hrDt.xhr.order.direction="desc"  //내림차순 정렬
                             }
                             mytbl.show(tbNm);                                           //테이블의 정보갱신
+                        }else if(this.hrDt.tblType=="chkTbl"){   //체크박스를 통한 일괄처리 테이블의 행클릭 이벤트
+                            if(target.currentTarget.parentElement.nodeName=="TBODY"&&target.target.nodeName!="INPUT"){
+                                let chkToggle = target.currentTarget.children[1].children[0];
+                                if(chkToggle.checked==false){chkToggle.checked=true;}else{chkToggle.checked=false;}
+                            }else if(target.currentTarget.parentElement.nodeName=="THEAD"&&target.target.nodeName=="INPUT"){
+                                document.querySelectorAll(".chkTd input").forEach((chk,key)=>{
+                                    chk.checked = target.target.checked;
+                                });
+                            }
+                            //debugger;
                         }else if(this.hrDt.tblType=="psnlPopup"){   //개인검색 팝업창에서의 행클릭 이벤트
                             opener.document.getElementById('PSNL_CD').value = target.currentTarget.children[1].innerText;
                             opener.document.getElementById('ORG_NM').value = target.currentTarget.children[2].innerText;
@@ -216,6 +233,10 @@ class hr_tbl{
                     resValue += "&"+wh+"="+this.hrDt.xhr.where[wh];
                 }
             });
+            if(this.hrDt.xhr.order!=''){ /* 2025-01-14 정렬기준을 포함하도록 코드 추가 */
+                resValue += "&ORDER="+this.hrDt.columns[this.hrDt.xhr.order.column].data+" "+this.hrDt.xhr.order.direction;
+                debugger;
+            }            
             //엑셀다운로드는 페이징과 무관하게 전체 데이터를 가져와야 하므로 limit 데이터를 풀고 별도 코드를 통해 xhr로 가져와야 함!
             //resValue += "&LIMIT="+this.hrDt.xhr.page*this.hrDt.xhr.limit+","+this.hrDt.xhr.limit;
             xhr.open("GET", resValue); xhr.send();

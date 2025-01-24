@@ -31,7 +31,7 @@
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
-            <button id="goAdjListBtn" style="padding:5px 9px;">조정수당관리</button>
+            <button id="goAdjListBtn" style="padding:5px 9px;">제수당관리</button>
             <button id="modalEdtBtn" style="padding:5px 9px;">저장</button>
             <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
         </div>

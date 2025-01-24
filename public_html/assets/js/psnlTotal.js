@@ -44,8 +44,9 @@ var mytbl = new hr_tbl({
         ,{title: "가족수당", data: "FAMILY_PAY", className: ""}
         ,{title: "자격수당", data: "ADJUST_PAY2", className: ""}
         ,{title: "장애인수당", data: "ADJUST_PAY3", className: ""}
-        ,{title: "조정수당", data: "ADJUST_PAY4", className: ""}
+        ,{title: "제수당", data: "ADJUST_PAY4", className: ""}
         ,{title: "예상급여", data: "EXPECT_PAY", className: ""}
+        ,{title: "내선번호", data: "ORG_IN_TEL", className: "hidden"}
     ],
 });
 
@@ -101,6 +102,7 @@ function trDataXHR(idx){
         if(res[0].GRD_GRADE){document.getElementById("mdBdGrdPay").innerHTML=res[0].GRD_GRADE+"급 "+res[0].GRD_PAY+"호";}
         document.getElementById("mdBdAdvDt").innerHTML=res[0].ADVANCE_DT;
         document.getElementById("mdBdAdvRng").innerHTML=res[0].ADVANCE_RNG;
+        document.getElementById("mdBdOrgInTel").innerHTML="본당 내선번호 : "+res[0].ORG_IN_TEL+" / 전화번호 : "+res[0].ORG_OUT_TEL;
         //각 상세보기 페이지 이동 버튼
         document.getElementById("goPsnlListBtn").addEventListener("click",()=>{location.href="/psnlList?PSNL_NM="+res[0].PSNL_NM+"&BAPT_NM="+res[0].BAPT_NM+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});
         document.getElementById("goTrsListBtn").addEventListener("click",()=>{location.href="/trsList?PSNL_CD="+idx+"&PSNL_NM="+res[0].PSNL_NM+"&POSITION="+res[0].POSITION+"&ORG_NM="+res[0].ORG_NM+"&ORG_CD="+res[0].ORG_CD});

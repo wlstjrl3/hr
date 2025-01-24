@@ -13,6 +13,8 @@
         WHEN A.ORG_TYPE='1' THEN '성지' 
         WHEN A.ORG_TYPE='11' THEN '본당' 
         WHEN A.ORG_TYPE='9' THEN '지구' END AS ORG_TYPE
+        ,A.ORG_IN_TEL
+        ,A.ORG_OUT_TEL
         ,A.REFRESH_DT
         FROM BONDANG_HR.ORG_INFO A LEFT OUTER JOIN BONDANG_HR.ORG_INFO B ON A.UPPR_ORG_CD = B.ORG_CD";
     //조건문 지정

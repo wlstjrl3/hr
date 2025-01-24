@@ -30,15 +30,15 @@
         <div class="clearB"></div>
     </div>
     <br>
-    <div class="tableOutFrm xScroll">
-        <div id="mpayTbl" class="fs7" style="width:1000px;">별도 테이블 갱신</div>
+    <div class="tableOutFrm xScroll width100">
+        <div id="mpayTbl" class="fs7 addTblForm" style="min-width:1000px;">직원을 검색한 후 기준년도를 지정해주세요.</div>
     </div>
     <br>
 </div>
 
 <link href="/assets/css/modal.css?ver=0" rel="stylesheet" />
 <link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/mpayList.css?ver=0" rel="stylesheet" />
+<link href="/assets/css/addTblForm.css?ver=0" rel="stylesheet" />
 <script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
 <script type='text/javascript' src='/assets/js/mpayList.js'></script>
 

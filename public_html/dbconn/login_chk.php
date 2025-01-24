@@ -34,7 +34,7 @@
     $_SESSION["USER_AUTH"]=$row['USER_AUTH'];
     echo "<script> 
         console.log('".$row['USER_NM']."님 환영합니다!');
-        document.location.href='/psnlTotal'; 
+        document.location.href='/'; 
     </script>"; 
 ?>
     </BODY>

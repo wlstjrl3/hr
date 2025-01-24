@@ -58,6 +58,9 @@ input:focus, select:focus{
 .clearB{
     clear:both;
 }
+.width100{
+    width: 100%;
+}
 .mrgCenter{
     margin:0 auto;
 }
@@ -156,6 +159,9 @@ input:focus, select:focus{
     .fs8{font-size:12px;}
     .container{
         padding:0px 30px;
+    }
+    .w720_w50{
+        width:50%;
     }
 }
 

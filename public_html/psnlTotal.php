@@ -5,6 +5,7 @@
         <div class="modalHeader">직원 종합정보 조회</div>
         <div class="modalBody">
             <div id="psnlTbl">
+                <span class="fontWBold" id="mdBdOrgInTel">내선 : </span>
                 <ul>
                     <li class="th clBg5"><span>소속</span></li><li class="td clBgW"><span id="mdBdOrgNm">소속임</span></li>
                     <li class="th clBg5"><span>직책</span></li><li class="td clBgW"><span id="mdBdPosition">직책임</span></li>
@@ -29,7 +30,7 @@
             <button id="goTrsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">발령정보</button>
             <button id="goGrdListBtn" style="margin:0 0 5px 0;padding:5px 9px;">급호봉관리</button>
             <button id="goFmlListBtn" style="margin:0 0 5px 0;padding:5px 9px;">가족정보</button>
-            <button id="goAdjListBtn" style="margin:0 0 5px 0;padding:5px 9px;">조정수당</button>
+            <button id="goAdjListBtn" style="margin:0 0 5px 0;padding:5px 9px;">제수당</button>
             <button id="goInsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">보증보험</button>
             <button id="goOpiListBtn" style="margin:0 0 5px 0;padding:5px 9px;">상벌정보</button>
             <button id="goMPayListBtn" style="margin:0 0 5px 0;padding:5px 9px;">월별급여상세</button>

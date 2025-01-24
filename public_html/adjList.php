@@ -3,7 +3,7 @@
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>조정수당 정보 </b>
+            <b>제수당 정보 </b>
             <button></button>
         </div>
         <div class="modalBody">
@@ -66,7 +66,7 @@
 <div class="container">
 
     <h4 class="cl3 pddS">
-        조정수당 관리(직책/장애/자격/조정)
+        제수당 관리(직책/장애/자격/조정)
     </h4>
 
     <div class="searchArea">

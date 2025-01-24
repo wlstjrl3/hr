@@ -20,6 +20,8 @@ var mytbl = new hr_tbl({
         ,{title: "조직명", data: "ORG_NM", className: ""}
         ,{title: "상위조직", data: "UPR_ORG_NM", className: ""}
         ,{title: "조직타입", data: "ORG_TYPE", className: ""}
+        ,{title: "내선번호", data: "ORG_IN_TEL", className: ""}
+        ,{title: "전화번호", data: "ORG_OUT_TEL", className: ""}
         ,{title: "갱신일자", data: "REFRESH_DT", className: ""}
     ],
 });
@@ -63,6 +65,12 @@ function trDataXHR(idx){
                         case 3 :
                             input.value=res[0].ORG_NM;
                             break;
+                        case 4 :
+                            input.value=res[0].ORG_IN_TEL;
+                            break;
+                        case 5 :
+                            input.value=res[0].ORG_OUT_TEL;
+                            break;
                     }
                 });
                 document.querySelector(".modalBody").querySelector("select").value=res[0].ORG_TYPE; //대면 비대면은 셀렉트박스에서 구분
@@ -86,6 +94,8 @@ modalEdtBtn.addEventListener("click",()=>{
                 if(input.value.length<2){alert("조직명은 필수 값입니다");throw new Error("stop loop");}
                 writeUrl+="&ORG_NM="+input.value
             }
+            else if(key==4){writeUrl+="&ORG_IN_TEL="+input.value}
+            else if(key==5){writeUrl+="&ORG_OUT_TEL="+input.value}
         });
     }catch(e){
         console.log("필수값 체크"); return false;

@@ -1,0 +1,47 @@
+.addTblForm li{
+    float:left;
+    text-align:center;
+    padding:8px 0;
+}
+.addTblForm ul{
+    clear:both;
+    border-bottom: 1px solid #DDD;
+    height:36px;
+    background: rgba(255,255,255,.03);
+}
+.addTblForm ul:nth-child(even){
+    background: rgba(0,0,0,.03);
+}
+.xScroll{
+    clear:both;
+    overflow-x: auto;
+}
+
+#mpayTbl ul:nth-child(8){
+    border-top:1.5px solid #BBB;
+}
+#mpayTbl li:nth-child(1){width:10%;}
+#mpayTbl li:nth-child(2){width:5%;}
+#mpayTbl li:nth-child(3){width:5%;}
+#mpayTbl li:nth-child(4){width:10%;}
+#mpayTbl li:nth-child(5){width:10%;}
+#mpayTbl li:nth-child(6){width:10%;}
+#mpayTbl li:nth-child(7){width:10%;}
+#mpayTbl li:nth-child(8){width:10%;}
+#mpayTbl li:nth-child(9){width:10%;}
+#mpayTbl li:nth-child(10){width:10%;}
+#mpayTbl li:nth-child(11){width:10%;}
+
+#rtrTbl li:nth-child(1),#ctnTbl li:nth-child(1){width:10%;}
+#rtrTbl li:nth-child(2),#ctnTbl li:nth-child(2){width:15%;}
+#rtrTbl li:nth-child(3),#ctnTbl li:nth-child(3){width:15%;}
+#rtrTbl li:nth-child(4),#ctnTbl li:nth-child(4){width:10%;}
+#rtrTbl li:nth-child(5),#ctnTbl li:nth-child(5){width:15%;}
+#rtrTbl li:nth-child(6),#ctnTbl li:nth-child(6){width:10%;}
+#rtrTbl li:nth-child(7),#ctnTbl li:nth-child(7){width:10%;}
+#rtrTbl li:nth-child(8),#ctnTbl li:nth-child(8){width:5%;}
+#rtrTbl li:nth-child(9),#ctnTbl li:nth-child(9){width:5%;}
+
+#rtrTbl li:nth-child(1),#ctnTbl li:nth-child(1){
+    font-weight:900;
+}

@@ -34,6 +34,14 @@ include "./dbconn/dbconn.php";
                     <option value="9">지구</option>
                 </select></div>
             </div>
+            <div class="modalGrp">
+                <div class="modalHd">내선번호</div>
+                <div class="modalBd"><input autocomplete='off'></div>
+            </div>
+            <div class="modalGrp">
+                <div class="modalHd">전화번호</div>
+                <div class="modalBd"><input autocomplete='off'></div>
+            </div>
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
