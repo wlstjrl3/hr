@@ -267,7 +267,7 @@ document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {
         mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = document.getElementById("PSNL_BIRTH_To").value;                                                                                                    
         mytbl.show("myTbl");                                                                                                                                                                       
     });                                                                                                                                                                                            
-});   
+});
 
 //빠른 세팅 버튼 구성 > dateFormat.js 파일 참조
 //const today = new Date; //오늘
