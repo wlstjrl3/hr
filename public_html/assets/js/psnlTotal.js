@@ -249,39 +249,44 @@ document.querySelectorAll(".phoneNumBox").forEach(phBox => {
     }
 });
 
-// 나이 필터에 따른 생년월일 자동 설정 (개선)
+// [수정 부분] 나이 필터에 따른 생년월일 자동 설정 및 디바운싱 적용
+let ageTimer; // 타이머 변수 선언
 document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {
-    ageInput.addEventListener("change", () => {
-        const minAgeVal = document.getElementById("AGE_MIN").value;
-        const maxAgeVal = document.getElementById("AGE_MAX").value;
-        const minAge = minAgeVal ? parseInt(minAgeVal) : null;
-        const maxAge = maxAgeVal ? parseInt(maxAgeVal) : null;
-
-        const currentYear = new Date().getFullYear();
+    ageInput.addEventListener("input", () => { // change 대신 input을 사용해 즉각 반응 유도
+        clearTimeout(ageTimer); // 이전 타이머 취소
         
-        let finalBirthFrom = '';
-        let finalBirthTo = '';
+        ageTimer = setTimeout(() => { // 300ms 대기 후 실행
+            const minAgeVal = document.getElementById("AGE_MIN").value;
+            const maxAgeVal = document.getElementById("AGE_MAX").value;
+            const minAge = minAgeVal ? parseInt(minAgeVal) : null;
+            const maxAge = maxAgeVal ? parseInt(maxAgeVal) : null;
+            const currentYear = new Date().getFullYear();
+            
+            let finalBirthFrom = '';
+            let finalBirthTo = '';
 
-        // 나이가 많을수록 생년월일은 작아짐 (From)
-        if (maxAge !== null) {
-            finalBirthFrom = (currentYear - maxAge) + "-01-01";
-        }
+            // 나이가 많을수록 생년월일은 작아짐 (From)
+            if (maxAge !== null) {
+                finalBirthFrom = (currentYear - maxAge) + "-01-01";
+            }
+            // 나이가 적을수록 생년월일은 커짐 (To)
+            if (minAge !== null) {
+                finalBirthTo = (currentYear - minAge) + "-12-31";
+            }
+            
+            // 입력 필드 업데이트 (직접 value 수정)
+            document.getElementById("PSNL_BIRTH_From").value = finalBirthFrom;
+            document.getElementById("PSNL_BIRTH_To").value = finalBirthTo;
 
-        // 나이가 적을수록 생년월일은 커짐 (To)
-        if (minAge !== null) {
-            finalBirthTo = (currentYear - minAge) + "-12-31";
-        }
-        
-        // 입력 필드 업데이트
-        document.getElementById("PSNL_BIRTH_From").value = finalBirthFrom;
-        document.getElementById("PSNL_BIRTH_To").value = finalBirthTo;
-
-        // XHR 요청을 위한 필터 객체 업데이트
-        mytbl.hrDt.xhr.where["PSNL_BIRTH_From"] = finalBirthFrom;
-        mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = finalBirthTo;
-        
-        mytbl.hrDt.xhr.page = 0; // 필터 변경 시 페이지를 첫 페이지로 리셋
-        mytbl.show("myTbl");
+            // XHR 요청을 위한 필터 객체 한꺼번에 업데이트
+            mytbl.hrDt.xhr.where["PSNL_BIRTH_From"] = finalBirthFrom;
+            mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = finalBirthTo;
+            mytbl.hrDt.xhr.where["AGE_MIN"] = minAgeVal;
+            mytbl.hrDt.xhr.where["AGE_MAX"] = maxAgeVal;
+            
+            mytbl.hrDt.xhr.page = 0; 
+            mytbl.show("myTbl");
+        }, 300); 
     });
 });
 
