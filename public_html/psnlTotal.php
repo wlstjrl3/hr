@@ -78,6 +78,12 @@
             <div class="colHd clBg5 cl2"><span><b>연락처</b></span></div>
             <div class="colBd"><input id="PHONE_NUM" class="phoneNumBox filter"></div>
         </div>
+        <div class="colGrp">                                                                                                                                                  
+            <div class="colHd clBg5 cl2"><span><b>나이</b></span></div>                                                                                                       
+            <div class="colBd">                                                                                                                                               
+                <input type="number" id="AGE_MIN" class="filter dualDateBox"><span>~</span><input type="number" id="AGE_MAX" class="filter dualDateBox">
+            </div>                                                                                                                                                            
+        </div>   
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>생년월일</b></span></div>
             <div class="colBd"><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_From"><span>~</span><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_To"></div>
@@ -134,7 +140,7 @@
 <link href="/assets/css/modal.css?ver=0" rel="stylesheet" />
 <link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
 <link href="/assets/css/showColList.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/psnlTotal.css?ver=0" rel="stylesheet" />
+<link href="/assets/css/psnlTotal.css?ver=0.1" rel="stylesheet" />
 <script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='/assets/js/modal.js'></script>
 <script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
