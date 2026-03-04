@@ -134,14 +134,34 @@
     if(@$_REQUEST['PHONE_NUM']){
         $whereSql=$whereSql." AND PHONE_NUM LIKE '%".$_REQUEST['PHONE_NUM']."%'";
     }
-    if(@$_REQUEST['PSNL_BIRTH_From']){ 
-        $whereSql=$whereSql." AND LEFT(PSNL_NUM,6) >= RIGHT(REPLACE('".$_REQUEST['PSNL_BIRTH_From']."', '-', ''),6)";
+    // PSNL_NUM에서 완전한 YYYY-MM-DD 형식의 생년월일을 동적으로 생성
+    // 주민등록번호의 7번째 자리(성별/세기 구분)를 사용하여 연도 세기를 결정
+    $derivedBirthDateSql = "CONCAT(
+        CASE 
+            WHEN SUBSTR(A.PSNL_NUM, 7, 1) IN ('1', '2', '5', '6') THEN '19'
+            WHEN SUBSTR(A.PSNL_NUM, 7, 1) IN ('3', '4', '7', '8') THEN '20'
+            ELSE '19' -- 기본값 또는 오류 처리 (필요에 따라 조정)
+        END,
+        SUBSTR(A.PSNL_NUM, 1, 2), '-',
+        SUBSTR(A.PSNL_NUM, 3, 2), '-',
+        SUBSTR(A.PSNL_NUM, 5, 2)
+    )";
+
+    if(@$_REQUEST['PSNL_BIRTH_From']){
+        $whereSql.=" AND ".$derivedBirthDateSql." >= '".$_REQUEST['PSNL_BIRTH_From']."'";
     }
     if(@$_REQUEST['PSNL_BIRTH_To']){ 
-        $whereSql=$whereSql." AND LEFT(PSNL_NUM,6) <= RIGHT(REPLACE('".$_REQUEST['PSNL_BIRTH_To']."', '-', ''),6)";
+        $whereSql.=" AND ".$derivedBirthDateSql." <= '".$_REQUEST['PSNL_BIRTH_To']."'";
     }
+    if(@$_REQUEST['TRS_DT_From']){ 
+        $whereSql=$whereSql." AND C.TRS_DT >= '".$_REQUEST['TRS_DT_From']." 00:00:00'";
+    }
+    if(@$_REQUEST['TRS_DT_To']){ 
+        $whereSql=$whereSql." AND C.TRS_DT <= '".$_REQUEST['TRS_DT_To']." 23:59:59'";
+    }
+    // PSNL_NUM 자체를 검색하는 필터는 기존 위치 유지 (생년월일 필터와 독립적으로 작동)
     if(@$_REQUEST['PSNL_NUM']){
-        $whereSql=$whereSql." AND PSNL_NUM LIKE '%".$_REQUEST['PSNL_NUM']."%'";
+        $whereSql=$whereSql." AND A.PSNL_NUM LIKE '%".$_REQUEST['PSNL_NUM']."%'";
     }
     if(@$_REQUEST['TRS_DT_From']){ 
         $whereSql=$whereSql." AND C.TRS_DT >= '".$_REQUEST['TRS_DT_From']." 00:00:00'";
