@@ -19,15 +19,15 @@
             )        
         LEFT OUTER JOIN ORG_INFO B ON C.ORG_CD = B.ORG_CD   
         ";
-    //기본 쿼리
+    //기본 쿼리 (전보로 사무장 전환 등의 정보를 반영하기 위하여 기존 C.TRS_TYPE / C.POSITION등의 데이터를 모두 C2로 교체함 20251128 양진석)
     $sql = "SELECT 
         CASE 
-        WHEN C.TRS_TYPE = 1 THEN '재직'
-        WHEN C.TRS_TYPE = 2 THEN '퇴사'
-        WHEN C.TRS_TYPE = 3 THEN '전보'
+        WHEN C2.TRS_TYPE = 1 THEN '재직'
+        WHEN C2.TRS_TYPE = 2 THEN '퇴사'
+        WHEN C2.TRS_TYPE = 3 THEN '전보'
         END AS TRS_TYPE
-        ,C.POSITION,C2.WORK_TYPE
-        ,C.TRS_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
+        ,C2.POSITION,C2.WORK_TYPE
+        ,C2.TRS_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
         ,IFNULL((
             SELECT PERSON_CNT FROM ORG_HISTORY WHERE B.ORG_CD = ORG_HISTORY.ORG_CD
             AND LEFT(OH_DT,4) = (LEFT(D.ADVANCE_DT,4)-1)

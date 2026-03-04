@@ -249,6 +249,26 @@ document.querySelectorAll(".phoneNumBox").forEach(phBox => {
     }
 });
 
+// 나이 필터에 따른 생년월일 자동 설정                                                                                                                                                             
+document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {                                                                                                                              
+    ageInput.addEventListener("change", () => {                                                                                                                                                    
+        const minAge = parseInt(document.getElementById("AGE_MIN").value) || 0;                                                                                                                    
+        const maxAge = parseInt(document.getElementById("AGE_MAX").value) || 0;                                                                                                                    
+        const currentYear = new Date().getFullYear();                                                                                                                                              
+                                                                                                                                                                                                   
+        let birthYearFrom = currentYear - maxAge;                                                                                                                                                  
+        let birthYearTo = currentYear - minAge;                                                                                                                                                    
+                                                                                                                                                                                                   
+        document.getElementById("PSNL_BIRTH_From").value = birthYearFrom + "-01-01";                                                                                                               
+        document.getElementById("PSNL_BIRTH_To").value = birthYearTo + "-12-31";                                                                                                                   
+                                                                                                                                                                                                   
+        //필터링 적용                                                                                                                                                                              
+        mytbl.hrDt.xhr.where["PSNL_BIRTH_From"] = document.getElementById("PSNL_BIRTH_From").value;                                                                                                
+        mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = document.getElementById("PSNL_BIRTH_To").value;                                                                                                    
+        mytbl.show("myTbl");                                                                                                                                                                       
+    });                                                                                                                                                                                            
+});   
+
 //빠른 세팅 버튼 구성 > dateFormat.js 파일 참조
 //const today = new Date; //오늘
 document.querySelectorAll(".quikSetBtn").forEach((q,key)=>{
