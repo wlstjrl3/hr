@@ -22,6 +22,8 @@ function xhrLoad(){
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
+            var tmp = JSON.parse(xhr.response)['sql']; //응답 받은 JSON데이터를 파싱한다.
+            //debugger;
             let htmlTxt = ` <ul>
                                 <li>기준년월</li>
                                 <li>급(Lv)</li>

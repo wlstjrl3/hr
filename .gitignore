@@ -6,3 +6,5 @@ dbconn.php
 
 ## 다음과 같은 폴더는 전체 무시
 test/
+.aider*
+.env

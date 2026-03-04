@@ -8,7 +8,7 @@
     for($i=1;$i<=12;$i++){
         $loopMonth = substr(('0'.$i),-2);
         $sql = $sql."
-SELECT 
+(SELECT 
 	CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-','".$loopMonth."') AS YEAR_MON
     ,A2.WORK_TYPE
     ,A.ADVANCE_DT
@@ -29,9 +29,9 @@ SELECT
 	,B.NORMAL_PAY+B.LEGAL_PAY+IFNULL((SELECT SUM(FML_PAY) FROM PSNL_FAMILY WHERE PSNL_CD = ".@$_REQUEST['PSNL_CD']." AND FML_STT_DT <= CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-','".$loopMonth."','-31') AND (FML_END_DT >= CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-','".$loopMonth."','-01') OR FML_END_DT is null)),0)+IFNULL((SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE PSNL_CD = ".@$_REQUEST['PSNL_CD']." AND ADJ_STT_DT <= CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-','".$loopMonth."','-31') AND (ADJ_END_DT >= CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-','".$loopMonth."','-01') OR ADJ_END_DT is null)),0) AS TOTAL_PAY
     FROM GRADE_HISTORY A
     LEFT OUTER JOIN PSNL_TRANSFER A2 ON TRS_CD = (SELECT TRS_CD FROM PSNL_TRANSFER WHERE PSNL_CD=".@$_REQUEST['PSNL_CD']." AND TRS_DT <= CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-','".$loopMonth."','-31') ORDER BY TRS_DT DESC LIMIT 1)
-    LEFT OUTER JOIN SALARY_TB B ON GRD_GRADE = SLR_GRADE AND GRD_PAY = SLR_PAY AND SLR_YEAR = ".@$_REQUEST['MPAY_YEAR']." AND SLR_TYPE = A2.WORK_TYPE
+    LEFT OUTER JOIN SALARY_TB B ON GRD_GRADE = SLR_GRADE AND GRD_PAY = SLR_PAY AND SLR_YEAR = ".@$_REQUEST['MPAY_YEAR']." AND A2.WORK_TYPE LIKE CONCAT('%',SLR_TYPE)
 WHERE A.PSNL_CD = ".@$_REQUEST['PSNL_CD']."
-	AND A.ADVANCE_DT > CONCAT((".@$_REQUEST['MPAY_YEAR']."-1),'-".$loopMonth."-01') AND A.ADVANCE_DT <= CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-".$loopMonth."-01')
+	AND A.ADVANCE_DT > CONCAT((".@$_REQUEST['MPAY_YEAR']."-1),'-".$loopMonth."-01') AND A.ADVANCE_DT <= CONCAT(".@$_REQUEST['MPAY_YEAR'].",'-".$loopMonth."-01')  LIMIT 1)
         ";
         if($i<12){
             $sql = $sql."
@@ -46,7 +46,8 @@ WHERE A.PSNL_CD = ".@$_REQUEST['PSNL_CD']."
         $data[] = $row;
     }
     $datas = array(
-       "data" => @$data
+       "data" => @$data,
+       "sql" => $sql,
     ); 
 
     echo json_encode($datas, JSON_UNESCAPED_UNICODE);
