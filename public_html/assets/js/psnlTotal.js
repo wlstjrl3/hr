@@ -249,24 +249,44 @@ document.querySelectorAll(".phoneNumBox").forEach(phBox => {
     }
 });
 
-// 나이 필터에 따른 생년월일 자동 설정                                                                                                                                                             
-document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {                                                                                                                              
-    ageInput.addEventListener("change", () => {                                                                                                                                                    
-        const minAge = parseInt(document.getElementById("AGE_MIN").value) || 0;                                                                                                                    
-        const maxAge = parseInt(document.getElementById("AGE_MAX").value) || 0;                                                                                                                    
-        const currentYear = new Date().getFullYear();                                                                                                                                              
-                                                                                                                                                                                                   
-        let birthYearFrom = currentYear - maxAge;                                                                                                                                                  
-        let birthYearTo = currentYear - minAge;                                                                                                                                                    
-                                                                                                                                                                                                   
-        document.getElementById("PSNL_BIRTH_From").value = birthYearFrom + "-01-01";                                                                                                               
-        document.getElementById("PSNL_BIRTH_To").value = birthYearTo + "-12-31";                                                                                                                   
-                                                                                                                                                                                                   
-        //필터링 적용                                                                                                                                                                              
-        mytbl.hrDt.xhr.where["PSNL_BIRTH_From"] = document.getElementById("PSNL_BIRTH_From").value;                                                                                                
-        mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = document.getElementById("PSNL_BIRTH_To").value;                                                                                                    
-        mytbl.show("myTbl");                                                                                                                                                                       
-    });                                                                                                                                                                                            
+// 나이 필터에 따른 생년월일 자동 설정 (개선)
+document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {
+    ageInput.addEventListener("change", () => {
+        const minAgeVal = document.getElementById("AGE_MIN").value;
+        const maxAgeVal = document.getElementById("AGE_MAX").value;
+        const minAge = minAgeVal ? parseInt(minAgeVal) : null; // null을 사용하여 '설정되지 않음'을 명확히 함
+        const maxAge = maxAgeVal ? parseInt(maxAgeVal) : null; // null을 사용하여 '설정되지 않음'을 명확히 함
+
+        const currentYear = new Date().getFullYear();
+        
+        let finalBirthFrom = '';
+        let finalBirthTo = '';
+
+        // 최대 나이에 따른 가장 오래된 생년월일 (PSNL_BIRTH_From) 계산
+        if (maxAge !== null) {
+            finalBirthFrom = (currentYear - maxAge) + "-01-01";
+        } else {
+            finalBirthFrom = ''; // 최대 나이가 설정되지 않았으면 필터 해제
+        }
+
+        // 최소 나이에 따른 가장 최근 생년월일 (PSNL_BIRTH_To) 계산
+        if (minAge !== null) {
+            finalBirthTo = (currentYear - minAge) + "-12-31";
+        } else {
+            finalBirthTo = ''; // 최소 나이가 설정되지 않았으면 필터 해제
+        }
+        
+        // 입력 필드 업데이트
+        document.getElementById("PSNL_BIRTH_From").value = finalBirthFrom;
+        document.getElementById("PSNL_BIRTH_To").value = finalBirthTo;
+
+        // XHR 요청을 위한 필터 객체 업데이트
+        mytbl.hrDt.xhr.where["PSNL_BIRTH_From"] = finalBirthFrom;
+        mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = finalBirthTo;
+        
+        mytbl.hrDt.xhr.page = 0; // 필터 변경 시 페이지를 첫 페이지로 리셋
+        mytbl.show("myTbl");
+    });
 });
 
 //빠른 세팅 버튼 구성 > dateFormat.js 파일 참조
