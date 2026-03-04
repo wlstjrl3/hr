@@ -254,26 +254,22 @@ document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {
     ageInput.addEventListener("change", () => {
         const minAgeVal = document.getElementById("AGE_MIN").value;
         const maxAgeVal = document.getElementById("AGE_MAX").value;
-        const minAge = minAgeVal ? parseInt(minAgeVal) : null; // null을 사용하여 '설정되지 않음'을 명확히 함
-        const maxAge = maxAgeVal ? parseInt(maxAgeVal) : null; // null을 사용하여 '설정되지 않음'을 명확히 함
+        const minAge = minAgeVal ? parseInt(minAgeVal) : null;
+        const maxAge = maxAgeVal ? parseInt(maxAgeVal) : null;
 
         const currentYear = new Date().getFullYear();
         
         let finalBirthFrom = '';
         let finalBirthTo = '';
 
-        // 최대 나이에 따른 가장 오래된 생년월일 (PSNL_BIRTH_From) 계산
+        // 나이가 많을수록 생년월일은 작아짐 (From)
         if (maxAge !== null) {
             finalBirthFrom = (currentYear - maxAge) + "-01-01";
-        } else {
-            finalBirthFrom = ''; // 최대 나이가 설정되지 않았으면 필터 해제
         }
 
-        // 최소 나이에 따른 가장 최근 생년월일 (PSNL_BIRTH_To) 계산
+        // 나이가 적을수록 생년월일은 커짐 (To)
         if (minAge !== null) {
             finalBirthTo = (currentYear - minAge) + "-12-31";
-        } else {
-            finalBirthTo = ''; // 최소 나이가 설정되지 않았으면 필터 해제
         }
         
         // 입력 필드 업데이트
