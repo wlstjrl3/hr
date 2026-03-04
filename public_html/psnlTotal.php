@@ -78,12 +78,12 @@
             <div class="colHd clBg5 cl2"><span><b>연락처</b></span></div>
             <div class="colBd"><input id="PHONE_NUM" class="phoneNumBox filter"></div>
         </div>
-        <div class="colGrp">                                                                                                                                                  
-            <div class="colHd clBg5 cl2"><span><b>나이</b></span></div>                                                                                                       
-            <div class="colBd">                                                                                                                                               
-                <input type="number" id="AGE_MIN" class="filter dualDateBox"><span>~</span><input type="number" id="AGE_MAX" class="filter dualDateBox">
-            </div>                                                                                                                                                            
-        </div>   
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>나이</b></span></div>
+            <div class="colBd">
+                <input type="number" id="AGE_MIN" class="dualDateBox"><span>~</span><input type="number" id="AGE_MAX" class="dualDateBox">
+            </div>
+        </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>생년월일</b></span></div>
             <div class="colBd"><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_From"><span>~</span><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_To"></div>

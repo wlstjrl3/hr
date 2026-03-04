@@ -249,40 +249,37 @@ document.querySelectorAll(".phoneNumBox").forEach(phBox => {
     }
 });
 
-// [수정 부분] 나이 필터에 따른 생년월일 자동 설정 및 디바운싱 적용
-let ageTimer; // 타이머 변수 선언
+// [수정 부분] 나이 필터에 따른 생년월일 자동 설정 (나이와 생년월일 역순 매칭 로직)
+let ageTimer; 
 document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {
-    ageInput.addEventListener("input", () => { // change 대신 input을 사용해 즉각 반응 유도
-        clearTimeout(ageTimer); // 이전 타이머 취소
+    ageInput.addEventListener("input", () => { 
+        clearTimeout(ageTimer); 
         
-        ageTimer = setTimeout(() => { // 300ms 대기 후 실행
-            const minAgeVal = document.getElementById("AGE_MIN").value;
-            const maxAgeVal = document.getElementById("AGE_MAX").value;
-            const minAge = minAgeVal ? parseInt(minAgeVal) : null;
-            const maxAge = maxAgeVal ? parseInt(maxAgeVal) : null;
+        ageTimer = setTimeout(() => { 
+            const minAgeVal = document.getElementById("AGE_MIN").value; // 예: 60세 이상 조회 시 60 입력
+            const maxAgeVal = document.getElementById("AGE_MAX").value; // 예: 33세 이하 조회 시 33 입력
             const currentYear = new Date().getFullYear();
             
             let finalBirthFrom = '';
             let finalBirthTo = '';
 
-            // 나이가 많을수록 생년월일은 작아짐 (From)
-            if (maxAge !== null) {
-                finalBirthFrom = (currentYear - maxAge) + "-01-01";
-            }
-            // 나이가 적을수록 생년월일은 커짐 (To)
-            if (minAge !== null) {
-                finalBirthTo = (currentYear - minAge) + "-12-31";
+            // 나이가 많을수록 생년월일은 작아짐 (과거)
+            // 최대 나이(MAX)가 33이면, 생년월일 From은 (현재년도 - 33)년생부터가 됨.
+            if (maxAgeVal !== "") {
+                finalBirthFrom = (currentYear - parseInt(maxAgeVal)) + "-01-01";
             }
             
-            // 입력 필드 업데이트 (직접 value 수정)
+            // 나이가 적을수록 생년월일은 커짐 (최근)
+            // 최소 나이(MIN)가 60이면, 생년월일 To는 (현재년도 - 60)년생까지가 됨.
+            if (minAgeVal !== "") {
+                finalBirthTo = (currentYear - parseInt(minAgeVal)) + "-12-31";
+            }
+            
             document.getElementById("PSNL_BIRTH_From").value = finalBirthFrom;
             document.getElementById("PSNL_BIRTH_To").value = finalBirthTo;
 
-            // XHR 요청을 위한 필터 객체 한꺼번에 업데이트
             mytbl.hrDt.xhr.where["PSNL_BIRTH_From"] = finalBirthFrom;
             mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = finalBirthTo;
-            mytbl.hrDt.xhr.where["AGE_MIN"] = minAgeVal;
-            mytbl.hrDt.xhr.where["AGE_MAX"] = maxAgeVal;
             
             mytbl.hrDt.xhr.page = 0; 
             mytbl.show("myTbl");
