@@ -46,19 +46,19 @@
     <div class="searchArea">
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>소속</b></span></div>
-            <div class="colBd"><input id="ORG_NM" class="filter" value="<?php echo @$_REQUEST['ORG_NM'];?>"></div>
+            <div class="colBd"><input id="ORG_NM" class="filter" value="<?php echo @$_REQUEST['ORG_NM']; ?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>성명</b></span></div>
-            <div class="colBd"><input id="PSNL_NM" class="filter" value="<?php echo @$_REQUEST['PSNL_NM'];?>"></div>
+            <div class="colBd"><input id="PSNL_NM" class="filter" value="<?php echo @$_REQUEST['PSNL_NM']; ?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>세례명</b></span></div>
-            <div class="colBd"><input id="BAPT_NM" class="filter" value="<?php echo @$_REQUEST['BAPT_NM'];?>"></div>
+            <div class="colBd"><input id="BAPT_NM" class="filter" value="<?php echo @$_REQUEST['BAPT_NM']; ?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>연락처</b></span></div>
-            <div class="colBd"><input id="PHONE_NUM" class="phoneNumBox filter" value="<?php echo @$_REQUEST['PHONE_NUM'];?>"></div>
+            <div class="colBd"><input id="PHONE_NUM" class="phoneNumBox filter" value="<?php echo @$_REQUEST['PHONE_NUM']; ?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>생년월일</b></span></div>
@@ -92,16 +92,16 @@
     <br>
 </div>
 
-<link href="/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
-<script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
-<script type='text/javascript' src='/assets/js/modal.js'></script>
-<script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/psnlList.js'></script>
-<script type='text/javascript' src='/assets/js/dateForm.js'></script>
-<script type='text/javascript' src='/assets/js/phoneForm.js'></script>
-<script type='text/javascript' src='/assets/js/juminForm.js'></script>
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/psnlList.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateForm.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/phoneForm.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/juminForm.js'></script>
 
 <?php include('components/footer.php'); ?>
 

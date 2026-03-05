@@ -1,11 +1,12 @@
 <?php
-    error_reporting( E_ALL );
-    ini_set( "display_errors", 1 );
-    session_start();
-    if(@$_SESSION["USER_PASS"]=='' && $_SERVER['PHP_SELF']!='/login.php' && $_SERVER['PHP_SELF']!='/style.php'){
-        echo "<script>document.location.href='/login.php';</script>";
-        die('관리자로그인 필요');
-    }
+include("./dbconn/dbconn.php");
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+session_start();
+if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.php' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/style.php') {
+    echo "<script>document.location.href='" . DIR_ROOT . "/login.php';</script>";
+    die('관리자로그인 필요');
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -13,17 +14,17 @@
     <meta charset='utf8' />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <link href="/assets/css/common.css?ver=0.001" rel="stylesheet" />
-    <link href="/assets/css/header.css?ver=0.001" rel="stylesheet" />
+    <link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=0.001" rel="stylesheet" />
+    <link href="<?php echo DIR_ROOT; ?>/assets/css/header.css?ver=0.001" rel="stylesheet" />
     <script defer src="https://sinseiki.github.io/noIE.js/noIE.js" ></script><!--익스플로러 사용제한-->    
-    <script type='text/javascript' src='/assets/js/header.js'></script>
+    <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/header.js'></script>
 
     <title>제1대리구 통합사목허브 관리시스템</title>
 </head>
 <body>
 
-<script type='text/javascript' src='/assets/js/login.js'></script>
-<link href="/assets/css/login.css?ver=0.001" rel="stylesheet" />
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/login.js'></script>
+<link href="<?php echo DIR_ROOT; ?>/assets/css/login.css?ver=0.001" rel="stylesheet" />
 
 <div id="loginBg" class="clBg2">
     <div id="loginFrm">
@@ -37,7 +38,7 @@
         </div>
         <div id="loginBody">
             <br><br>
-            <form autocomplete="off" name="form-signin" class="form-signin" method="post" target="_self" action="../dbconn/login_chk.php" onsubmit="return frm_check();">
+            <form autocomplete="off" name="form-signin" class="form-signin" method="post" target="_self" action="<?php echo DIR_ROOT; ?>/dbconn/login_chk.php" onsubmit="return frm_check();">
                 <div><h4>로그인</h4></div>
                 <br>
                 <div><input class="pddS" placeholder="ID" id="admin-id" name="admin-id" min=3 required></div>

@@ -13,10 +13,10 @@
     <br>
 </div>
 
-<link href="/assets/css/index.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/addTblForm.css?ver=0" rel="stylesheet" />
-<script type='text/javascript' src='/assets/js/index.js'></script>
-<script type='text/javascript' src='/assets/js/dateFormat.js'></script>
+<link href="<?php echo DIR_ROOT; ?>/assets/css/index.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/addTblForm.css?ver=0" rel="stylesheet" />
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/index.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateFormat.js'></script>
 
 <?php include('components/footer.php'); ?>
 

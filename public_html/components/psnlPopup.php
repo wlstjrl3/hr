@@ -1,3 +1,4 @@
+<?php include('../dbconn/dbconn.php'); ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -35,11 +36,11 @@
 		<br>
 		<div class="modalForm tblLimit" id="xport" style="hidden"></div>
 		
-		<link href="/assets/css/common.css?ver=0.001" rel="stylesheet" />
-		<link href="/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-		<link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
-		<script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
-		<script type='text/javascript' defer src='/assets/js/psnlPopup.js'></script>
+		<link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=0.001" rel="stylesheet" />
+		<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
+		<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+		<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
+		<script type='text/javascript' defer src='<?php echo DIR_ROOT; ?>/assets/js/psnlPopup.js'></script>
 	</div>
 </body>
 </html>

@@ -2,35 +2,35 @@ document.getElementById("PSNL_NM").focus();
 
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
-    xhr:{
-        url:'/sys/pttList.php',
+    xhr: {
+        url: DIR_ROOT + '/sys/pttList.php',
         columXHR: '',
-        key : psnlKey.value, //api 호출할 보안 개인인증키
+        key: psnlKey.value, //api 호출할 보안 개인인증키
         where: {
-            PSNL_CD : document.getElementById("PSNL_CD").value,
+            PSNL_CD: document.getElementById("PSNL_CD").value,
         },
         order: {
-            column : '4',
-            direction : 'desc',
+            column: '4',
+            direction: 'desc',
         },
-        page : 0, //표시되는 페이지에서 1이 빠진 값이다 즉 page:0 = 1페이지
-        limit : 10, //만약 리미트가 0이라면 리미트 없이 전체 조회하는 것으로 처리 excel down등에서 0 처리해야 함!
+        page: 0, //표시되는 페이지에서 1이 빠진 값이다 즉 page:0 = 1페이지
+        limit: 10, //만약 리미트가 0이라면 리미트 없이 전체 조회하는 것으로 처리 excel down등에서 0 처리해야 함!
     },
     columns: [
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
-        {title: "idx", data: "PTT_CD", className: "hidden"}
-        ,{title: "조직", data: "ORG_NM", className: ""}
-        ,{title: "직원명", data: "PSNL_NM", className: ""}
-        ,{title: "직책", data: "POSITION", className: ""}
-        ,{title: "기준년도", data: "PTT_YEAR", className: ""}
-        ,{title: "근무일", data: "PTT_DAY", className: ""}
-        ,{title: "근무시간", data: "PTT_HOUR", className: ""}
-        ,{title: "추가금액", data: "PTT_ADJPAY", className: ""}
-        ,{title: "추가사유", data: "PTT_ADJ", className: ""}
-        ,{title: "기본급여", data: "PTT_TOTALPAY", className: "hidden"}
-        ,{title: "연장근로", data: "PTT_ADDHOUR", className: ""}
-        ,{title: "연장수당", data: "PTT_ADDPAY", className: ""}
-        ,{title: "급여", data: "PTT_TOTALADDPAY", className: ""}
+        { title: "idx", data: "PTT_CD", className: "hidden" }
+        , { title: "조직", data: "ORG_NM", className: "" }
+        , { title: "직원명", data: "PSNL_NM", className: "" }
+        , { title: "직책", data: "POSITION", className: "" }
+        , { title: "기준년도", data: "PTT_YEAR", className: "" }
+        , { title: "근무일", data: "PTT_DAY", className: "" }
+        , { title: "근무시간", data: "PTT_HOUR", className: "" }
+        , { title: "추가금액", data: "PTT_ADJPAY", className: "" }
+        , { title: "추가사유", data: "PTT_ADJ", className: "" }
+        , { title: "기본급여", data: "PTT_TOTALPAY", className: "hidden" }
+        , { title: "연장근로", data: "PTT_ADDHOUR", className: "" }
+        , { title: "연장수당", data: "PTT_ADDPAY", className: "" }
+        , { title: "급여", data: "PTT_TOTALADDPAY", className: "" }
     ],
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
@@ -38,174 +38,174 @@ mytbl.xportBind();
 
 //이 아래로는 페이지 개별 모달창 이벤트를 지정
 //신규버튼을 눌렀을때
-newCol.addEventListener("click",()=>{
-    if(document.getElementById("PSNL_CD").value.length<1){
+newCol.addEventListener("click", () => {
+    if (document.getElementById("PSNL_CD").value.length < 1) {
         alert("먼저 개인코드를 조회한 후 재시도 하시기 바랍니다.");
         return false;
     }
-    document.querySelector(".modalBody").querySelector("b").innerHTML=ORG_NM.value+" "+POSITION.value+" "+PSNL_NM.value;
-    document.querySelector(".modalForm").style.visibility="visible"; //모달창이 나타나게 한다.
-    document.querySelector(".modalForm").style.opacity="1";     //투명도 애니메이션 적용을 위해 opacity가 0에서 1로 변경된다.
-    document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-        input.value="";
-        if(key==1){
+    document.querySelector(".modalBody").querySelector("b").innerHTML = ORG_NM.value + " " + POSITION.value + " " + PSNL_NM.value;
+    document.querySelector(".modalForm").style.visibility = "visible"; //모달창이 나타나게 한다.
+    document.querySelector(".modalForm").style.opacity = "1";     //투명도 애니메이션 적용을 위해 opacity가 0에서 1로 변경된다.
+    document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
+        input.value = "";
+        if (key == 1) {
             input.focus();
         }
         qrParams = new URLSearchParams(window.location.search);
-        if(qrParams.get('WORK_TYPE')=='계약직'&&key==3){
+        if (qrParams.get('WORK_TYPE') == '계약직' && key == 3) {
             input.disabled = true;
-        }else if(key==3){
+        } else if (key == 3) {
             input.disabled = false;
         }
     });
 });
 //행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
-function trDataXHR(idx){ 
+function trDataXHR(idx) {
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sys/pttConfig.php?key="+psnlKey.value+"&PTT_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log("/sys/pttConfig.php?key="+psnlKey.value+"&PTT_CD="+idx+"&CRUD=R");
+    xhr.open("GET", DIR_ROOT + "/sys/pttConfig.php?key=" + psnlKey.value + "&PTT_CD=" + idx + "&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log(DIR_ROOT + "/sys/pttConfig.php?key=" + psnlKey.value + "&PTT_CD=" + idx + "&CRUD=R");
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
-            if(res!=null){
-                document.getElementById("goPsnlTotalBtn").addEventListener("click",()=>{location.href="/psnlTotal?PSNL_NM="+res[0].PSNL_NM+"&TRS_TYPE="});
-                document.getElementById("PSNL_CD").value=res[0].PSNL_CD;
-                document.getElementById("ORG_NM").value=res[0].ORG_NM;
-                document.getElementById("POSITION").value=res[0].POSITION;
-                document.getElementById("PSNL_NM").value=res[0].PSNL_NM;
-                document.querySelector(".modalBody").querySelectorAll("input").forEach((input,key)=>{
-                    switch(key){
-                        case 0 :
-                            input.value=res[0].PTT_CD
+            if (res != null) {
+                document.getElementById("goPsnlTotalBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/psnlTotal?PSNL_NM=" + res[0].PSNL_NM + "&TRS_TYPE=" });
+                document.getElementById("PSNL_CD").value = res[0].PSNL_CD;
+                document.getElementById("ORG_NM").value = res[0].ORG_NM;
+                document.getElementById("POSITION").value = res[0].POSITION;
+                document.getElementById("PSNL_NM").value = res[0].PSNL_NM;
+                document.querySelector(".modalBody").querySelectorAll("input").forEach((input, key) => {
+                    switch (key) {
+                        case 0:
+                            input.value = res[0].PTT_CD
                             break;
-                        case 1 :
-                            input.value=res[0].PTT_YEAR;
+                        case 1:
+                            input.value = res[0].PTT_YEAR;
                             break;
-                        case 2 :
-                            input.value=res[0].PTT_DAY;
+                        case 2:
+                            input.value = res[0].PTT_DAY;
                             break;
-                        case 3 :
-                            input.value=res[0].PTT_HOUR;
+                        case 3:
+                            input.value = res[0].PTT_HOUR;
                             break;
-                        case 4 :
-                            input.value=res[0].PTT_ADDHOUR;
+                        case 4:
+                            input.value = res[0].PTT_ADDHOUR;
                             break;
-                        case 5 :
-                            input.value=res[0].PTT_ADJ;
-                            break; 
-                        case 6 :
-                            input.value=res[0].PTT_ADJPAY;
-                            break;                 
+                        case 5:
+                            input.value = res[0].PTT_ADJ;
+                            break;
+                        case 6:
+                            input.value = res[0].PTT_ADJPAY;
+                            break;
                     }
                 });
-                document.querySelector(".modalBody").querySelector("b").innerHTML=res[0].ORG_NM+" "+res[0].POSITION+" "+res[0].PSNL_NM;
+                document.querySelector(".modalBody").querySelector("b").innerHTML = res[0].ORG_NM + " " + res[0].POSITION + " " + res[0].PSNL_NM;
             }
-        }else{
+        } else {
             console.log("pttConfigXhr 정보 로드 에러");
         }
     }
 }
 //저장을 클릭했을때 xhr로 데이터를 기록
-modalEdtBtn.addEventListener("click",()=>{
+modalEdtBtn.addEventListener("click", () => {
     let xhr = new XMLHttpRequest();
-    let writeUrl='';
-    try{
-        document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-            if(key==0){writeUrl+="&PTT_CD="+input.value}
-            else if(key==1){
-                if(input.value.length<1){alert("기준년도는 필수값입니다.");throw new Error("stop loop");}
-                writeUrl+="&PTT_YEAR="+input.value
-            }            
-            else if(key==2){
-                if(input.value.length<1){alert("근무일수는 필수값입니다.");throw new Error("stop loop");}
-                writeUrl+="&PTT_DAY="+input.value
+    let writeUrl = '';
+    try {
+        document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
+            if (key == 0) { writeUrl += "&PTT_CD=" + input.value }
+            else if (key == 1) {
+                if (input.value.length < 1) { alert("기준년도는 필수값입니다."); throw new Error("stop loop"); }
+                writeUrl += "&PTT_YEAR=" + input.value
             }
-            else if(key==3){
-                if(input.value.length<1){alert("근무시간은 필수값입니다.");throw new Error("stop loop");}
-                if(input.value>80){alert("최대 근무시간을 초과하였습니다.");throw new Error("stop loop");}
-                writeUrl+="&PTT_HOUR="+input.value
+            else if (key == 2) {
+                if (input.value.length < 1) { alert("근무일수는 필수값입니다."); throw new Error("stop loop"); }
+                writeUrl += "&PTT_DAY=" + input.value
             }
-            else if(key==4){
-                writeUrl+="&PTT_ADDHOUR="+input.value
+            else if (key == 3) {
+                if (input.value.length < 1) { alert("근무시간은 필수값입니다."); throw new Error("stop loop"); }
+                if (input.value > 80) { alert("최대 근무시간을 초과하였습니다."); throw new Error("stop loop"); }
+                writeUrl += "&PTT_HOUR=" + input.value
             }
-            else if(key==5){
-                writeUrl+="&PTT_ADJ="+input.value
+            else if (key == 4) {
+                writeUrl += "&PTT_ADDHOUR=" + input.value
             }
-            else if(key==6){
-                writeUrl+="&PTT_ADJPAY="+input.value
+            else if (key == 5) {
+                writeUrl += "&PTT_ADJ=" + input.value
+            }
+            else if (key == 6) {
+                writeUrl += "&PTT_ADJPAY=" + input.value
             }
         });
-    }catch(e){
+    } catch (e) {
         console.log("필수값 체크"); return false;
     }
-    writeUrl+="&PSNL_CD="+document.getElementById("PSNL_CD").value;
-    console.log("/sys/pttConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
-    xhr.open("GET", "/sys/pttConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    writeUrl += "&PSNL_CD=" + document.getElementById("PSNL_CD").value;
+    console.log(DIR_ROOT + "/sys/pttConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C");
+    xhr.open("GET", DIR_ROOT + "/sys/pttConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
             console.log("pttConfig 정보 기록 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
-        }else{
+        } else {
             console.log("pttConfig 정보 기록 에러!!!");
         }
-    }    
+    }
 });
 //삭제를 클릭했을때 xhr로 데이터를 제거
-modalDelBtn.addEventListener("click",()=>{
+modalDelBtn.addEventListener("click", () => {
     if (!confirm("삭제 하시겠습니까?")) {
         return false;
-    }                     
+    }
     let xhr = new XMLHttpRequest();
-    let deleteUrl='';
-    document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
-        if(key==0){deleteUrl+="&PTT_CD="+input.value}
+    let deleteUrl = '';
+    document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
+        if (key == 0) { deleteUrl += "&PTT_CD=" + input.value }
     });
-    console.log("/sys/pttConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
-    xhr.open("GET", "/sys/pttConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
+    console.log(DIR_ROOT + "/sys/pttConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D");
+    xhr.open("GET", DIR_ROOT + "/sys/pttConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
             console.log("pttConfig 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
-        }else{
+        } else {
             console.log("pttConfig 정보 제거 에러!!!");
         }
-    }    
+    }
 });
 //검색 필터링을 위한 코드
-document.querySelectorAll(".filter").forEach((f,key)=>{
-    f.addEventListener("change",() => {
-        mytbl.hrDt.xhr.where['PSNL_CD']=document.getElementById("PSNL_CD").value;
-        mytbl.hrDt.xhr.where[f.id]=f.value;
-        mytbl.hrDt.xhr.page=0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
+document.querySelectorAll(".filter").forEach((f, key) => {
+    f.addEventListener("change", () => {
+        mytbl.hrDt.xhr.where['PSNL_CD'] = document.getElementById("PSNL_CD").value;
+        mytbl.hrDt.xhr.where[f.id] = f.value;
+        mytbl.hrDt.xhr.page = 0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
         mytbl.show("myTbl");
     });
 });
 //날짜 형식 자동 하이픈 추가를 위한 코드
 document.querySelectorAll(".dateBox").forEach(dtBox => {
-    dtBox.onkeyup = function(event){
+    dtBox.onkeyup = function (event) {
         event = event || window.event;
         var _val = this.value.trim();
-        this.value = autoHypenDate(_val) ;
+        this.value = autoHypenDate(_val);
     }
 });
 //직원코드 검색 팝업 띄우기
-document.getElementById("psnlSerchPop").addEventListener('click',()=>{
+document.getElementById("psnlSerchPop").addEventListener('click', () => {
     window.open('/components/psnlPopup.php', '조직 검색', 'width=500, height=500');
 });
-document.getElementById("PSNL_NM").addEventListener("keyup", (evt)=>{
+document.getElementById("PSNL_NM").addEventListener("keyup", (evt) => {
     if (evt.keyCode == 13) {
-        window.open('/components/psnlPopup.php', '조직 검색', 'width=500, height=500');
+        window.open(DIR_ROOT + '/components/psnlPopup.php', '조직 검색', 'width=500, height=500');
     }
 });
-function myTblRefresh(){ //팝업창에서 정보를 선택하면 검색 필터링을 진행한다.
-    document.querySelectorAll(".filter").forEach((f,key)=>{
-        mytbl.hrDt.xhr.where['PSNL_CD']=document.getElementById("PSNL_CD").value;
-        mytbl.hrDt.xhr.where[f.id]=f.value;
-        mytbl.hrDt.xhr.page=0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
+function myTblRefresh() { //팝업창에서 정보를 선택하면 검색 필터링을 진행한다.
+    document.querySelectorAll(".filter").forEach((f, key) => {
+        mytbl.hrDt.xhr.where['PSNL_CD'] = document.getElementById("PSNL_CD").value;
+        mytbl.hrDt.xhr.where[f.id] = f.value;
+        mytbl.hrDt.xhr.page = 0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
         mytbl.show("myTbl");
-    });    
+    });
 }

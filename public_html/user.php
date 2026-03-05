@@ -120,13 +120,13 @@
     <br>
 </div>
 
-<link href="/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
-<script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
-<script type='text/javascript' src='/assets/js/modal.js'></script>
-<script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/user.js'></script>
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/user.js'></script>
 
 <?php include('components/footer.php'); ?>
 

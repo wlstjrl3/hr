@@ -47,7 +47,7 @@
         <div class="colGrp">
             <div class="colHd2L clBg5 cl2"><span><b>개인코드<br>/ 조직명</b></span></div>
             <div class="colBd">
-                <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;" value="<?php echo @$_REQUEST['PSNL_CD'];?>"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;" value="<?php echo @$_REQUEST['ORG_NM'];?>">
+                <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;" value="<?php echo @$_REQUEST['PSNL_CD']; ?>"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;" value="<?php echo @$_REQUEST['ORG_NM']; ?>">
             </div>
         </div>        
         <div class="colGrp">
@@ -55,8 +55,8 @@
                 <span><b>직책<br>/ 직원성명</b></span><br>
             </div>
             <div class="colBd" style="">
-                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;" value="<?php echo @$_REQUEST['POSITION'];?>">
-                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM'];?>">
+                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;" value="<?php echo @$_REQUEST['POSITION']; ?>">
+                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM']; ?>">
                 <button id="psnlSerchPop" style="padding:3px;">검색</button>
             </div>    
         </div>
@@ -100,14 +100,14 @@
     <br>
 </div>
 
-<link href="/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
-<script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
-<script type='text/javascript' src='/assets/js/modal.js'></script>
-<script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/insList.js'></script>
-<script type='text/javascript' src='/assets/js/dateForm.js'></script>
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/insList.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateForm.js'></script>
 
 <?php include('components/footer.php'); ?>
 

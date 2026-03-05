@@ -1,5 +1,7 @@
-<?php 
-include('./components/header.php'); 
+<?php
+
+include('./components/header.php');
+
 include "./dbconn/dbconn.php";
 ?>
 <div class="modalForm">
@@ -69,15 +71,20 @@ include "./dbconn/dbconn.php";
             <div class="colBd"><select id="UPR_ORG" class="filter">
                 <option value="">전체</option>
                 <?php
-                    $sql = "SELECT UPPR_ORG_CD,ORG_NM,ORG_CD FROM BONDANG_HR.ORG_INFO WHERE ORG_TYPE=9 ORDER BY UPPR_ORG_CD ASC,ORG_NM ASC";
-                    $result = mysqli_query($conn,$sql);
-                    mysqli_close($conn);
-                    while($row = mysqli_fetch_assoc($result)){
-                        echo '<option class="';
-                        if($row['UPPR_ORG_CD']=='13061001'){echo 'sw1d';}else{echo 'sw2d';}
-                        echo '" value="'.$row['ORG_CD'].'">'.$row['ORG_NM'].'</option>"';
-                    }
-                ?>
+$sql = "SELECT UPPR_ORG_CD,ORG_NM,ORG_CD FROM BONDANG_HR.ORG_INFO WHERE ORG_TYPE=9 ORDER BY UPPR_ORG_CD ASC,ORG_NM ASC";
+$result = mysqli_query($conn, $sql);
+mysqli_close($conn);
+while ($row = mysqli_fetch_assoc($result)) {
+    echo '<option class="';
+    if ($row['UPPR_ORG_CD'] == '13061001') {
+        echo 'sw1d';
+    }
+    else {
+        echo 'sw2d';
+    }
+    echo '" value="' . $row['ORG_CD'] . '">' . $row['ORG_NM'] . '</option>"';
+}
+?>
             </select></div>
         </div>
         <div class="colGrp">
@@ -117,13 +124,13 @@ include "./dbconn/dbconn.php";
     <br>
 </div>
 
-<link href="/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="/assets/css/searchArea.css?ver=0" rel="stylesheet" />
-<script type='text/javascript' src='/assets/js/hr_tbl.js'></script>
-<script type='text/javascript' src='/assets/js/modal.js'></script>
-<script type='text/javascript' src='/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='/assets/js/orgList.js'></script>
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/orgList.js'></script>
 
 <?php include('components/footer.php'); ?>
 

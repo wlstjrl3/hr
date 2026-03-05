@@ -13,6 +13,9 @@ $dbPass = isset($env['DB_PASS']) ? $env['DB_PASS'] : 'dbPass';
 $dbName = isset($env['DB_NAME']) ? $env['DB_NAME'] : 'dbName';
 $dbPort = isset($env['DB_PORT']) ? $env['DB_PORT'] : 'dbPort';
 
+// Define root directory for redirection and asset paths
+define('DIR_ROOT', isset($env['BASE_PATH']) ? $env['BASE_PATH'] : '');
+
 $conn = mysqli_connect(
     $dbHost,
     $dbUser,
