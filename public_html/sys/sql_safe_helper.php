@@ -1,0 +1,155 @@
+<?php
+/**
+ * sys/*.php 공통 헬퍼 모듈
+ * - DB 연결 초기화
+ * - 보안 검증 (API Key)
+ * - ORDER BY / LIMIT 안전 검증
+ * - Prepared Statement 실행 헬퍼
+ */
+
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+include __DIR__ . "/../dbconn/dbconn.php";
+
+/**
+ * API Key 보안 검증을 수행합니다.
+ * 검증 실패 시 스크립트를 종료합니다.
+ * 
+ * @param mysqli $conn DB 연결 객체
+ * @param string $key 검증할 API Key
+ */
+function verifyApiKey($conn, $key)
+{
+    $authStmt = $conn->prepare("SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = ? LIMIT 1");
+    $authStmt->bind_param("s", $key);
+    $authStmt->execute();
+    if ($authStmt->get_result()->num_rows < 1) {
+        $authStmt->close();
+        die;
+    }
+    $authStmt->close();
+}
+
+/**
+ * Prepared Statement를 실행하고 결과를 배열로 반환합니다.
+ * $stmt->close()를 fetch 이후에 호출하여 결과 set 해제 문제를 방지합니다.
+ * 
+ * @param mysqli $conn DB 연결 객체
+ * @param string $sql 전체 SQL 문자열 (플레이스홀더 포함)
+ * @param string $types bind_param 타입 문자열 (예: "ssi")
+ * @param array $params 바인딩할 파라미터 배열
+ * @return array 결과 행 배열
+ */
+function executeQuery($conn, $sql, $types = "", $params = [])
+{
+    $stmt = $conn->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $data[] = $row;
+    }
+    $stmt->close();
+    return $data;
+}
+
+/**
+ * Prepared Statement를 실행합니다 (INSERT/UPDATE/DELETE 용).
+ * 결과 행이 필요 없는 쿼리에 사용합니다.
+ * 
+ * @param mysqli $conn DB 연결 객체
+ * @param string $sql SQL 문자열
+ * @param string $types bind_param 타입 문자열
+ * @param array $params 바인딩할 파라미터 배열
+ * @return int 영향받은 행 수
+ */
+function executeUpdate($conn, $sql, $types = "", $params = [])
+{
+    $stmt = $conn->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $affected = $stmt->affected_rows;
+    $stmt->close();
+    return $affected;
+}
+
+/**
+ * ORDER BY 파라미터를 검증하여 안전한 SQL 문자열을 반환합니다.
+ * 프론트엔드에서 "COLUMN_NAME asc" 또는 "COLUMN_NAME desc" 형식으로 전달됩니다.
+ * 
+ * @param string $orderInput $_REQUEST['ORDER'] 값
+ * @param array $allowedColumns 허용된 컬럼명 배열
+ * @return string 안전한 ORDER BY SQL 문자열 또는 빈 문자열
+ */
+function safeOrderBy($orderInput, $allowedColumns)
+{
+    if (empty($orderInput))
+        return "";
+
+    // "COLUMN_NAME direction" 형식으로 분리
+    $parts = explode(' ', trim($orderInput));
+    $column = $parts[0];
+    $direction = isset($parts[1]) ? strtolower($parts[1]) : 'asc';
+
+    // direction 검증
+    if ($direction !== 'asc' && $direction !== 'desc') {
+        $direction = 'asc';
+    }
+
+    // 컬럼명 화이트리스트 검증
+    if (in_array($column, $allowedColumns)) {
+        return " ORDER BY " . $column . " " . $direction;
+    }
+
+    return "";
+}
+
+/**
+ * LIMIT 파라미터를 검증하여 안전한 SQL 문자열을 반환합니다.
+ * 프론트엔드에서 "offset,limit" 형식 (예: "0,10")으로 전달됩니다.
+ * 
+ * @param string $limitInput $_REQUEST['LIMIT'] 값
+ * @return string 안전한 LIMIT SQL 문자열 또는 빈 문자열
+ */
+function safeLimit($limitInput)
+{
+    if (empty($limitInput))
+        return "";
+
+    // "offset,limit" 형식 확인
+    if (strpos($limitInput, ',') !== false) {
+        $parts = explode(',', $limitInput);
+        $offset = intval($parts[0]);
+        $limit = intval($parts[1]);
+        if ($offset >= 0 && $limit > 0) {
+            return " LIMIT " . $offset . "," . $limit;
+        }
+    }
+    else {
+        // 단일 숫자 형식
+        $limit = intval($limitInput);
+        if ($limit > 0) {
+            return " LIMIT " . $limit;
+        }
+    }
+
+    return "";
+}
+
+/**
+ * JSON 응답을 출력하고 DB 연결을 닫습니다.
+ * 
+ * @param mysqli $conn DB 연결 객체
+ * @param array $data 출력할 데이터
+ */
+function jsonResponse($conn, $data)
+{
+    mysqli_close($conn);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+}
+?>

@@ -1,8 +1,6 @@
 <?php
-    error_reporting( E_ALL );
-    ini_set( "display_errors", 1 );
-    include "../dbconn/dbconn.php";
-    if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
+include "sql_safe_helper.php";
+verifyApiKey($conn, @$_REQUEST['key']);
     //기본 쿼리
     $sql = "";
     for($i=1;$i<=12;$i++){

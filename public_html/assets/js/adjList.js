@@ -192,7 +192,7 @@ document.querySelectorAll(".dateBox").forEach(dtBox => {
 });
 //직원코드 검색 팝업 띄우기
 document.getElementById("psnlSerchPop").addEventListener('click', () => {
-    window.open('/components/psnlPopup.php', '조직 검색', 'width=500, height=500');
+    window.open(DIR_ROOT + '/components/psnlPopup.php', '조직 검색', 'width=500, height=500');
 });
 document.getElementById("PSNL_NM").addEventListener("keyup", (evt) => {
     if (evt.keyCode == 13) {

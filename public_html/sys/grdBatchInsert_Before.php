@@ -1,9 +1,6 @@
 <?php
-    error_reporting( E_ALL );
-    ini_set( "display_errors", 1 );
-    include "../dbconn/dbconn.php";
-    if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
-
+include "sql_safe_helper.php";
+verifyApiKey($conn, @$_REQUEST['key']);
     $inputs = file_get_contents("php://input");
     $param = json_decode($inputs, true); // JSON을 PHP 배열로 변환
     //$param = json_decode(json_encode(json_decode($inputs)),true); //json 디코드로 껍질을 풀어도 속에 Object형이 남아있어서 다시 인코드 후 디코드를 하여 array형태로 변환

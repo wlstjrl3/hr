@@ -1,9 +1,6 @@
 <?php
-    error_reporting( E_ALL );
-    ini_set( "display_errors", 1 );
-    include "../dbconn/dbconn.php";
-    if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
-    
+include "sql_safe_helper.php";
+verifyApiKey($conn, @$_REQUEST['key']);
     if($_REQUEST['CRUD']=='C'){
         if($_REQUEST['PSNL_NUM']==""){}else{ //주민번호가 기입되어 있다면 중복데이터 존재여부를 체크한다.
             if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.PSNL_INFO WHERE PSNL_CD != '".@$_REQUEST['PSNL_CD']."' AND PSNL_NUM = '".@$_REQUEST['PSNL_NUM']."' LIMIT 1"))>0){echo "중복되는 주민번호가 존재합니다.";die;} //보안 검증

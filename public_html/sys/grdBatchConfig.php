@@ -1,9 +1,6 @@
 <?php
-    error_reporting( E_ALL );
-    ini_set( "display_errors", 1 );
-    include "../dbconn/dbconn.php";
-    if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
-
+include "sql_safe_helper.php";
+verifyApiKey($conn, @$_REQUEST['key']);
     $inputs = file_get_contents("php://input");
     $param = json_decode($inputs, true); // JSON을 PHP 배열로 변환
     //동일한 테이블에서 조회한 값을 다시 INSERT로 즉시 사용하는 것은 불가능함. 때문에 미리 SELECT처리를 한 뒤에 두번째 연결에서 INSERT 하는 방식으로 구현

@@ -1,9 +1,6 @@
 <?php
-    error_reporting( E_ALL );
-    ini_set( "display_errors", 1 );
-    include "../dbconn/dbconn.php";
-    if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
-    
+include "sql_safe_helper.php";
+verifyApiKey($conn, @$_REQUEST['key']);
     if($_REQUEST['CRUD']=='C'){
         if($_REQUEST['TRS_CD']==""){ //신규 작성
             $sql = "INSERT INTO BONDANG_HR.PSNL_TRANSFER(PSNL_CD,ORG_CD,WORK_TYPE,POSITION,TRS_TYPE,TRS_DTL,TRS_DT,REG_DT";

@@ -1,9 +1,6 @@
 <?php
-    error_reporting( E_ALL );
-    ini_set( "display_errors", 1 );
-    include "../dbconn/dbconn.php";
-    if(mysqli_num_rows(mysqli_query($conn,"SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = '".@$_REQUEST['key']."' LIMIT 1"))<1){die;} //보안 검증
-    
+include "sql_safe_helper.php";
+verifyApiKey($conn, @$_REQUEST['key']);
     if($_REQUEST['CRUD']=='C'){
         $sql = "INSERT INTO BONDANG_HR.ORG_INFO(ORG_CD, ORG_NM, UPPR_ORG_CD, ORG_TYPE, ORG_IN_TEL, ORG_OUT_TEL, REFRESH_DT, REG_DT) VALUES ('";
         $sql = $sql.$_REQUEST['ORG_CD']."','".$_REQUEST['ORG_NM']."','".$_REQUEST['UPPR_ORG_CD']."','".$_REQUEST['ORG_TYPE']."','".$_REQUEST['ORG_IN_TEL']."','".$_REQUEST['ORG_OUT_TEL'];
