@@ -1,62 +1,58 @@
 <?php
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
-    //갯수 카운트 쿼리
-    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.USER_TB";
-    //기본 쿼리
-    $sql = "SELECT * FROM BONDANG_HR.USER_TB";
-    //조건문 지정
-    $whereSql = " WHERE 1=1 ";
-    if(@$_REQUEST['USER_ID']){
-        $whereSql=$whereSql." AND USER_ID LIKE '%".$_REQUEST['USER_ID']."%'";
-    }
-    if(@$_REQUEST['USER_NM']){
-        $whereSql=$whereSql." AND USER_NM LIKE '%".$_REQUEST['USER_NM']."%'";
-    }
-    if(@$_REQUEST['USER_PASS']){
-        $whereSql=$whereSql." AND USER_PASS LIKE '%".$_REQUEST['USER_PASS']."%'";
-    }
-    if(@$_REQUEST['EMAIL']){
-        $whereSql=$whereSql." AND EMAIL LIKE '%".$_REQUEST['EMAIL']."%'";
-    }
-    if(@$_REQUEST['MEMO']){
-        $whereSql=$whereSql." AND MEMO LIKE '%".$_REQUEST['MEMO']."%'";
-    }
-    if(@$_REQUEST['REG_DT_From']){
-        $whereSql=$whereSql." AND REG_DT >= '".$_REQUEST['REG_DT_From']." 00:00:00'";
-    }
-    if(@$_REQUEST['REG_DT_To']){
-        $whereSql=$whereSql." AND REG_DT <= '".$_REQUEST['REG_DT_To']." 23:59:59'";
-    }
 
+$rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.USER_TB";
+$sql = "SELECT * FROM BONDANG_HR.USER_TB";
 
-    //정렬 기준 지정
-    $orderSql = "";
-    if(@$_REQUEST['ORDER']){
-        $orderSql = $orderSql." ORDER BY ".$_REQUEST['ORDER'];
-    }
-    //리미트 지정
-    $limitSql = "";
-    if(@$_REQUEST['LIMIT']){
-        $limitSql = $limitSql." LIMIT ".$_REQUEST['LIMIT'];
-    }
-    
-    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
-    $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
+$whereSql = " WHERE 1=1 ";
+$params = [];
+$types = "";
 
-    $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
-    mysqli_close($conn);
+if (@$_REQUEST['USER_ID']) {
+    $whereSql .= " AND USER_ID LIKE ?";
+    $params[] = '%' . $_REQUEST['USER_ID'] . '%';
+    $types .= "s";
+}
+if (@$_REQUEST['USER_NM']) {
+    $whereSql .= " AND USER_NM LIKE ?";
+    $params[] = '%' . $_REQUEST['USER_NM'] . '%';
+    $types .= "s";
+}
+if (@$_REQUEST['USER_PASS']) {
+    $whereSql .= " AND USER_PASS LIKE ?";
+    $params[] = '%' . $_REQUEST['USER_PASS'] . '%';
+    $types .= "s";
+}
+if (@$_REQUEST['EMAIL']) {
+    $whereSql .= " AND EMAIL LIKE ?";
+    $params[] = '%' . $_REQUEST['EMAIL'] . '%';
+    $types .= "s";
+}
+if (@$_REQUEST['MEMO']) {
+    $whereSql .= " AND MEMO LIKE ?";
+    $params[] = '%' . $_REQUEST['MEMO'] . '%';
+    $types .= "s";
+}
+if (@$_REQUEST['REG_DT_From']) {
+    $whereSql .= " AND REG_DT >= ?";
+    $params[] = $_REQUEST['REG_DT_From'] . " 00:00:00";
+    $types .= "s";
+}
+if (@$_REQUEST['REG_DT_To']) {
+    $whereSql .= " AND REG_DT <= ?";
+    $params[] = $_REQUEST['REG_DT_To'] . " 23:59:59";
+    $types .= "s";
+}
 
-    while($row = mysqli_fetch_assoc($result)){
-        $data[] = $row;
-    }
-    $datas = array(
-       "data" => @$data
-       ,"date" => "2021-99-99"
-       ,"totalCnt" => $totalCnt["ROW_CNT"]
-       ,"filterCnt" => $filterCnt["ROW_CNT"]
-    ); 
+$allowedColumns = ['USER_CD', 'USER_ID', 'USER_NM', 'USER_PASS', 'USER_AUTH', 'EMAIL', 'POSITION', 'ORG_NM', 'REG_DT', 'MEMO'];
+$orderSql = safeOrderBy(@$_REQUEST['ORDER'], $allowedColumns);
+$limitSql = safeLimit(@$_REQUEST['LIMIT']);
 
-    echo json_encode($datas, JSON_UNESCAPED_UNICODE);
+$totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
+$filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
+$filterCnt = $filterResult[0];
+$data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

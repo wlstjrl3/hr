@@ -17,50 +17,46 @@ verifyApiKey($conn, @$_REQUEST['key']);
     ";
     //조건문 지정
     $whereSql = " WHERE 1=1"; //" WHERE PSNL_CD='".@$_REQUEST['PSNL_CD']."'";
+    $params = [];
+    $types = "";
     if(@$_REQUEST['PSNL_CD']){
-        $whereSql=$whereSql." AND A.PSNL_CD='".@$_REQUEST['PSNL_CD']."'";
+        $whereSql .= " AND A.PSNL_CD = ?";
+        $params[] = @$_REQUEST['PSNL_CD'];
+        $types .= "s";
     }
     if(@$_REQUEST['OPI_DT_From']){
-        $whereSql=$whereSql." AND OPI_DT >= '".$_REQUEST['OPI_DT_From']."'";
+        $whereSql .= " AND OPI_DT >= ?";
+        $params[] = $_REQUEST['OPI_DT_From'];
+        $types .= "s";
     }
     if(@$_REQUEST['OPI_DT_To']){
-        $whereSql=$whereSql." AND OPI_DT <= '".$_REQUEST['OPI_DT_To']."'";
+        $whereSql .= " AND OPI_DT <= ?";
+        $params[] = $_REQUEST['OPI_DT_To'];
+        $types .= "s";
     }
     if(@$_REQUEST['OPI_PERSON']){
-        $whereSql=$whereSql." AND OPI_PERSON LIKE '%".$_REQUEST['OPI_PERSON']."%'";
+        $whereSql .= " AND OPI_PERSON LIKE ?";
+        $params[] = '%'.$_REQUEST['OPI_PERSON'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['OPI_DTL']){
-        $whereSql=$whereSql." AND OPI_DTL LIKE '%".$_REQUEST['OPI_DTL']."%'";
+        $whereSql .= " AND OPI_DTL LIKE ?";
+        $params[] = '%'.$_REQUEST['OPI_DTL'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['OPI_TYPE']){
-        $whereSql=$whereSql." AND OPI_TYPE = '".$_REQUEST['OPI_TYPE']."'";
+        $whereSql .= " AND OPI_TYPE = ?";
+        $params[] = $_REQUEST['OPI_TYPE'];
+        $types .= "s";
     }
     //정렬 기준 지정
-    $orderSql = "";
-    if(@$_REQUEST['ORDER']){
-        $orderSql = $orderSql." ORDER BY ".$_REQUEST['ORDER'];
-    }
+    $orderSql = safeOrderBy(@$_REQUEST['ORDER'], []);
     //리미트 지정
-    $limitSql = "";
-    if(@$_REQUEST['LIMIT']){
-        $limitSql = $limitSql." LIMIT ".$_REQUEST['LIMIT'];
-    }
-    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
-    $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
-    
-    $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
-    mysqli_close($conn);
-
-    while($row = mysqli_fetch_assoc($result)){
-        $data[] = $row;
-    }
-    $datas = array(
-       "data" => @$data
-       //,"query" => $sql.$whereSql.$orderSql.$limitSql
-       ,"totalCnt" => $totalCnt["ROW_CNT"]
-       ,"filterCnt" => $filterCnt["ROW_CNT"]
-    ); 
-
-    echo json_encode($datas, JSON_UNESCAPED_UNICODE);
+    $limitSql = safeLimit(@$_REQUEST['LIMIT']);
+    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
+    $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
+    $filterCnt = $filterResult[0];
+    $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+    jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

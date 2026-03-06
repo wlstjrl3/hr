@@ -17,45 +17,35 @@ verifyApiKey($conn, @$_REQUEST['key']);
         FROM BONDANG_HR.ORG_INFO A LEFT OUTER JOIN BONDANG_HR.ORG_INFO B ON A.UPPR_ORG_CD = B.ORG_CD";
     //조건문 지정
     $whereSql = " WHERE 1=1 ";
+    $params = [];
+    $types = "";
     if(@$_REQUEST['UUPR_ORG']){
         $whereSql=$whereSql." AND (B.UPPR_ORG_CD = '".$_REQUEST['UUPR_ORG']."' OR A.UPPR_ORG_CD = '".$_REQUEST['UUPR_ORG']."')";
     }
     if(@$_REQUEST['UPR_ORG']){
-        $whereSql=$whereSql." AND A.UPPR_ORG_CD = '".$_REQUEST['UPR_ORG']."'";
+        $whereSql .= " AND A.UPPR_ORG_CD = ?";
+        $params[] = $_REQUEST['UPR_ORG'];
+        $types .= "s";
     }
     if(@$_REQUEST['ORG_NM']){
-        $whereSql=$whereSql." AND A.ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'";
+        $whereSql .= " AND A.ORG_NM LIKE ?";
+        $params[] = '%'.$_REQUEST['ORG_NM'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['ORG_TYPE']){
-        $whereSql=$whereSql." AND A.ORG_TYPE = '".$_REQUEST['ORG_TYPE']."'";
+        $whereSql .= " AND A.ORG_TYPE = ?";
+        $params[] = $_REQUEST['ORG_TYPE'];
+        $types .= "s";
     }
     //정렬 기준 지정
-    $orderSql = "";
-    if(@$_REQUEST['ORDER']){
-        $orderSql = $orderSql." ORDER BY ".$_REQUEST['ORDER'];
-    }
+    $orderSql = safeOrderBy(@$_REQUEST['ORDER'], []);
     //리미트 지정
-    $limitSql = "";
-    if(@$_REQUEST['LIMIT']){
-        $limitSql = $limitSql." LIMIT ".$_REQUEST['LIMIT'];
-    }
+    $limitSql = safeLimit(@$_REQUEST['LIMIT']);
     
-    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
-    $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
-
-    $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
-    mysqli_close($conn);
-
-    while($row = mysqli_fetch_assoc($result)){
-        $data[] = $row;
-    }
-    $datas = array(
-       "data" => @$data
-       //,"query" => $sql.$whereSql.$orderSql.$limitSql
-       ,"totalCnt" => $totalCnt["ROW_CNT"]
-       ,"filterCnt" => $filterCnt["ROW_CNT"]
-    ); 
-
-    echo json_encode($datas, JSON_UNESCAPED_UNICODE);
+    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
+    $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
+    $filterCnt = $filterResult[0];
+    $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+    jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

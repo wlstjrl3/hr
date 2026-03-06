@@ -7,17 +7,25 @@ verifyApiKey($conn, @$_REQUEST['key']);
     $sql = "SELECT * FROM BONDANG_HR.SALARY_TB";
     //조건문 지정
     $whereSql = " WHERE 1=1 ";
+    $params = [];
+    $types = "";
     if(@$_REQUEST['SLR_YEAR']){
         $whereSql=$whereSql." AND SLR_YEAR LIKE '%".$_REQUEST['SLR_YEAR']."%'"; //조직 정보의 B테이블에서 가져온다.
     }
     if(@$_REQUEST['SLR_TYPE']){
-        $whereSql=$whereSql." AND SLR_TYPE LIKE '%".$_REQUEST['SLR_TYPE']."%'";
+        $whereSql .= " AND SLR_TYPE LIKE ?";
+        $params[] = '%'.$_REQUEST['SLR_TYPE'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['SLR_GRADE']){
-        $whereSql=$whereSql." AND SLR_GRADE LIKE '%".$_REQUEST['SLR_GRADE']."%'";
+        $whereSql .= " AND SLR_GRADE LIKE ?";
+        $params[] = '%'.$_REQUEST['SLR_GRADE'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['SLR_PAY']){
-        $whereSql=$whereSql." AND SLR_PAY LIKE '%".$_REQUEST['SLR_PAY']."%'";
+        $whereSql .= " AND SLR_PAY LIKE ?";
+        $params[] = '%'.$_REQUEST['SLR_PAY'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['NORMAL_PAY_From']){
         $whereSql=$whereSql." AND (NORMAL_PAY >= ".$_REQUEST['NORMAL_PAY_From'].")";
@@ -32,32 +40,14 @@ verifyApiKey($conn, @$_REQUEST['key']);
         $whereSql=$whereSql." AND (LEGAL_PAY <= ".$_REQUEST['LEGAL_PAY_To'].")";
     }
     //정렬 기준 지정
-    $orderSql = "";
-    if(@$_REQUEST['ORDER']){
-        $orderSql = $orderSql." ORDER BY ".$_REQUEST['ORDER'];
-    }
+    $orderSql = safeOrderBy(@$_REQUEST['ORDER'], []);
     //리미트 지정
-    $limitSql = "";
-    if(@$_REQUEST['LIMIT']){
-        $limitSql = $limitSql." LIMIT ".$_REQUEST['LIMIT'];
-    }
+    $limitSql = safeLimit(@$_REQUEST['LIMIT']);
     
-    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
-    $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
-
-    $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
-    mysqli_close($conn);
-
-    while($row = mysqli_fetch_assoc($result)){
-        $data[] = $row;
-    }
-    $datas = array(
-       "data" => @$data
-       ,"date" => "2021-99-99"
-       ,"totalCnt" => $totalCnt["ROW_CNT"]
-       ,"filterCnt" => $filterCnt["ROW_CNT"]
-    ); 
-
-    echo json_encode($datas, JSON_UNESCAPED_UNICODE);
+    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
+    $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
+    $filterCnt = $filterResult[0];
+    $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+    jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

@@ -101,8 +101,15 @@ function safeOrderBy($orderInput, $allowedColumns)
         $direction = 'asc';
     }
 
-    // 컬럼명 화이트리스트 검증
-    if (in_array($column, $allowedColumns)) {
+    if (!empty($allowedColumns)) {
+        // 컬럼명 화이트리스트 검증
+        if (in_array($column, $allowedColumns)) {
+            return " ORDER BY " . $column . " " . $direction;
+        }
+    }
+
+    // 허용 컬럼 목록이 없거나 (빈 배열), 화이트리스트 검증실패시 안전성 검증 정규식으로 재확인
+    if (preg_match('/^[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)?$/', $column)) {
         return " ORDER BY " . $column . " " . $direction;
     }
 

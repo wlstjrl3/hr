@@ -22,60 +22,58 @@ verifyApiKey($conn, @$_REQUEST['key']);
     ";
     //조건문 지정
     $whereSql = " WHERE 1=1 ";
+    $params = [];
+    $types = "";
 
     if(@$_REQUEST['PSNL_CD']){
-        $whereSql=$whereSql." AND A.PSNL_CD = '".$_REQUEST['PSNL_CD']."'";
+        $whereSql .= " AND A.PSNL_CD = ?";
+        $params[] = $_REQUEST['PSNL_CD'];
+        $types .= "s";
     }    
     if(@$_REQUEST['ORG_NM']){
         $whereSql=$whereSql." AND ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'"; //조직 정보의 B테이블에서 가져온다.
     }
     if(@$_REQUEST['PSNL_NM']){
-        $whereSql=$whereSql." AND PSNL_NM LIKE '%".$_REQUEST['PSNL_NM']."%'";
+        $whereSql .= " AND PSNL_NM LIKE ?";
+        $params[] = '%'.$_REQUEST['PSNL_NM'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['BAPT_NM']){
-        $whereSql=$whereSql." AND BAPT_NM LIKE '%".$_REQUEST['BAPT_NM']."%'";
+        $whereSql .= " AND BAPT_NM LIKE ?";
+        $params[] = '%'.$_REQUEST['BAPT_NM'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['PHONE_NUM']){
-        $whereSql=$whereSql." AND PHONE_NUM LIKE '%".$_REQUEST['PHONE_NUM']."%'";
+        $whereSql .= " AND PHONE_NUM LIKE ?";
+        $params[] = '%'.$_REQUEST['PHONE_NUM'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['PSNL_BIRTH_From']){ //PSNL_NUM을 날짜형식으로 변경하여 비교해야함.
-        $whereSql=$whereSql." AND PSNL_NUM >= '".$_REQUEST['PSNL_BIRTH']." 00:00:00'";
+        $whereSql .= " AND PSNL_NUM >= ?";
+        $params[] = $_REQUEST['PSNL_BIRTH'] . " 00:00:00";
+        $types .= "s";
     }
     if(@$_REQUEST['PSNL_BIRTH_To']){ //PSNL_NUM을 날짜형식으로 변경하여 비교해야함.
-        $whereSql=$whereSql." AND PSNL_NUM <= '".$_REQUEST['PSNL_BIRTH_To']." 23:59:59'";
+        $whereSql .= " AND PSNL_NUM <= ?";
+        $params[] = $_REQUEST['PSNL_BIRTH_To'] . " 23:59:59";
+        $types .= "s";
     }
     if(@$_REQUEST['PSNL_NUM']){
-        $whereSql=$whereSql." AND PSNL_NUM LIKE '%".$_REQUEST['PSNL_NUM']."%'";
+        $whereSql .= " AND PSNL_NUM LIKE ?";
+        $params[] = '%'.$_REQUEST['PSNL_NUM'].'%';
+        $types .= "s";
     }
 
 
     //정렬 기준 지정
-    $orderSql = "";
-    if(@$_REQUEST['ORDER']){
-        $orderSql = $orderSql." ORDER BY ".$_REQUEST['ORDER'];
-    }
+    $orderSql = safeOrderBy(@$_REQUEST['ORDER'], []);
     //리미트 지정
-    $limitSql = "";
-    if(@$_REQUEST['LIMIT']){
-        $limitSql = $limitSql." LIMIT ".$_REQUEST['LIMIT'];
-    }
+    $limitSql = safeLimit(@$_REQUEST['LIMIT']);
     
-    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
-    $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
-
-    $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
-    mysqli_close($conn);
-
-    while($row = mysqli_fetch_assoc($result)){
-        $data[] = $row;
-    }
-    $datas = array(
-       "data" => @$data
-       ,"date" => "2021-99-99"
-       ,"totalCnt" => $totalCnt["ROW_CNT"]
-       ,"filterCnt" => $filterCnt["ROW_CNT"]
-    ); 
-
-    echo json_encode($datas, JSON_UNESCAPED_UNICODE);
+    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
+    $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
+    $filterCnt = $filterResult[0];
+    $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+    jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

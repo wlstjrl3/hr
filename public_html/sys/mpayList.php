@@ -37,6 +37,7 @@ WHERE A.PSNL_CD = ".@$_REQUEST['PSNL_CD']."
             ";
         }
     }
+    // TODO: 이 파일의 INSERT/UPDATE는 동적 컬럼 구조이므로 수동 Prepared Statement 변환 필요
     $result = mysqli_query($conn,$sql);
     mysqli_close($conn);
 

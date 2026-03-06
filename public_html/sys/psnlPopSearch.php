@@ -23,43 +23,33 @@ include "sql_safe_helper.php";
     ";
     //조건문 지정
     $whereSql = " WHERE 1=1 ";
+    $params = [];
+    $types = "";
     
     if(@$_REQUEST['PSNL_NM']){
-        $whereSql=$whereSql." AND PSNL_NM LIKE '%".$_REQUEST['PSNL_NM']."%'";
+        $whereSql .= " AND PSNL_NM LIKE ?";
+        $params[] = '%'.$_REQUEST['PSNL_NM'].'%';
+        $types .= "s";
     }
     if(@$_REQUEST['BAPT_NM']){
-        $whereSql=$whereSql." AND BAPT_NM LIKE '%".$_REQUEST['BAPT_NM']."%'";
+        $whereSql .= " AND BAPT_NM LIKE ?";
+        $params[] = '%'.$_REQUEST['BAPT_NM'].'%';
+        $types .= "s";
     }    
     if(@$_REQUEST['ORG_NM']){
-        $whereSql=$whereSql." AND B.ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'";
+        $whereSql .= " AND B.ORG_NM LIKE ?";
+        $params[] = '%'.$_REQUEST['ORG_NM'].'%';
+        $types .= "s";
     }
     //정렬 기준 지정
-    $orderSql = "";
-    if(@$_REQUEST['ORDER']){
-        $orderSql = $orderSql." ORDER BY ".$_REQUEST['ORDER'];
-    }
+    $orderSql = safeOrderBy(@$_REQUEST['ORDER'], []);
     //리미트 지정
-    $limitSql = "";
-    if(@$_REQUEST['LIMIT']){
-        $limitSql = $limitSql." LIMIT ".$_REQUEST['LIMIT'];
-    }
+    $limitSql = safeLimit(@$_REQUEST['LIMIT']);
     
-    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
-    $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
-
-    $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
-    mysqli_close($conn);
-
-    while($row = mysqli_fetch_assoc($result)){
-        $data[] = $row;
-    }
-    $datas = array(
-       "data" => @$data
-       ,"date" => "2021-99-99"
-       ,"totalCnt" => $totalCnt["ROW_CNT"]
-       ,"filterCnt" => $filterCnt["ROW_CNT"]
-    ); 
-
-    echo json_encode($datas, JSON_UNESCAPED_UNICODE);
+    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
+    $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
+    $filterCnt = $filterResult[0];
+    $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+    jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

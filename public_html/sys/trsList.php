@@ -1,10 +1,9 @@
 <?php
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
-    //갯수 카운트 쿼리
-    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_TRANSFER A LEFT OUTER JOIN ORG_INFO C ON A.ORG_CD = C.ORG_CD";
-    //기본 쿼리
-    $sql = "SELECT C.ORG_NM,B.PSNL_NM,A.*,
+
+$rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_TRANSFER A LEFT OUTER JOIN ORG_INFO C ON A.ORG_CD = C.ORG_CD";
+$sql = "SELECT C.ORG_NM,B.PSNL_NM,A.*,
     CASE 
     WHEN TRS_TYPE=1 THEN '입사' 
     WHEN TRS_TYPE=2 THEN '퇴사' 
@@ -12,52 +11,50 @@ verifyApiKey($conn, @$_REQUEST['key']);
      FROM BONDANG_HR.PSNL_TRANSFER A
     LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
     LEFT OUTER JOIN ORG_INFO C ON A.ORG_CD = C.ORG_CD";
-    //조건문 지정
-    $whereSql = " WHERE 1=1"; //" WHERE PSNL_CD='".@$_REQUEST['PSNL_CD']."'";
-    if(@$_REQUEST['PSNL_CD']){
-        $whereSql=$whereSql." AND A.PSNL_CD='".@$_REQUEST['PSNL_CD']."'";
-    }
-    if(@$_REQUEST['ORG_NM']){
-        $whereSql=$whereSql." AND ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'";
-    }
-    if(@$_REQUEST['TRS_TYPE']){
-        $whereSql=$whereSql." AND TRS_TYPE = '".$_REQUEST['TRS_TYPE']."'";
-    }
-    if(@$_REQUEST['TRS_DTL']){
-        $whereSql=$whereSql." AND TRS_DTL LIKE '%".$_REQUEST['TRS_DTL']."%'";
-    }
-    if(@$_REQUEST['TRS_DT_From']){
-        $whereSql=$whereSql." AND TRS_DT >= '".$_REQUEST['TRS_DT_From']."'";
-    }
-    if(@$_REQUEST['TRS_DT_To']){
-        $whereSql=$whereSql." AND TRS_DT <= '".$_REQUEST['TRS_DT_To']."'";
-    }
-    //정렬 기준 지정
-    $orderSql = "";
-    if(@$_REQUEST['ORDER']){
-        $orderSql = $orderSql." ORDER BY ".$_REQUEST['ORDER'];
-    }
-    //리미트 지정
-    $limitSql = "";
-    if(@$_REQUEST['LIMIT']){
-        $limitSql = $limitSql." LIMIT ".$_REQUEST['LIMIT'];
-    }
-    $totalCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql));
-    $filterCnt = mysqli_fetch_assoc(mysqli_query($conn,$rowCntSql.$whereSql));
 
-    $result = mysqli_query($conn,$sql.$whereSql.$orderSql.$limitSql);
-    mysqli_close($conn);
+$whereSql = " WHERE 1=1";
+$params = [];
+$types = "";
 
-    while($row = mysqli_fetch_assoc($result)){
-        $data[] = $row;
-    }
-    $datas = array(
-       "data" => @$data
-       ,"query" => $sql.$whereSql.$orderSql.$limitSql
-       ,"totalCnt" => $totalCnt["ROW_CNT"]
-       ,"filterCnt" => $filterCnt["ROW_CNT"]
-    ); 
+if (@$_REQUEST['PSNL_CD']) {
+    $whereSql .= " AND A.PSNL_CD=?";
+    $params[] = $_REQUEST['PSNL_CD'];
+    $types .= "s";
+}
+if (@$_REQUEST['ORG_NM']) {
+    $whereSql .= " AND ORG_NM LIKE ?";
+    $params[] = '%' . $_REQUEST['ORG_NM'] . '%';
+    $types .= "s";
+}
+if (@$_REQUEST['TRS_TYPE']) {
+    $whereSql .= " AND TRS_TYPE = ?";
+    $params[] = $_REQUEST['TRS_TYPE'];
+    $types .= "s";
+}
+if (@$_REQUEST['TRS_DTL']) {
+    $whereSql .= " AND TRS_DTL LIKE ?";
+    $params[] = '%' . $_REQUEST['TRS_DTL'] . '%';
+    $types .= "s";
+}
+if (@$_REQUEST['TRS_DT_From']) {
+    $whereSql .= " AND TRS_DT >= ?";
+    $params[] = $_REQUEST['TRS_DT_From'];
+    $types .= "s";
+}
+if (@$_REQUEST['TRS_DT_To']) {
+    $whereSql .= " AND TRS_DT <= ?";
+    $params[] = $_REQUEST['TRS_DT_To'];
+    $types .= "s";
+}
 
-    echo json_encode($datas, JSON_UNESCAPED_UNICODE);
+$allowedColumns = ['PSNL_CD', 'ORG_NM', 'TRS_TYPE', 'TRS_DTL', 'TRS_DT', 'REG_DT', 'PSNL_NM', 'TRS_CD', 'POSITION', 'WORK_TYPE', 'APP_DT'];
+$orderSql = safeOrderBy(@$_REQUEST['ORDER'], $allowedColumns);
+$limitSql = safeLimit(@$_REQUEST['LIMIT']);
+
+$totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
+$filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
+$filterCnt = $filterResult[0];
+$data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>
