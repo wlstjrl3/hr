@@ -11,7 +11,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset='utf8' />
+    <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=0.001" rel="stylesheet" />
