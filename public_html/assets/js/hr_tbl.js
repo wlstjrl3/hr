@@ -3,7 +3,6 @@ class hr_tbl {
         this.hrDt = hrDt;
     }
     show(tbNm) {
-        let xhr = new XMLHttpRequest();
         let resValue = this.hrDt.xhr.url; //XHR로 불러올 URL을 기본 지정
         resValue += "?key=" + this.hrDt.xhr.key; //API 호출에 사용할 보안인증키 추후 MD5암호화 정보로 이용할 예정
         Object.keys(this.hrDt.xhr.where).forEach(wh => { //JSON의 KEY NAME 명칭을 가져온 뒤 그 갯수만큼 반복
@@ -13,14 +12,16 @@ class hr_tbl {
         });
         resValue += "&ORDER=" + this.hrDt.columns[this.hrDt.xhr.order.column].data + " " + this.hrDt.xhr.order.direction;
         resValue += "&LIMIT=" + this.hrDt.xhr.page * this.hrDt.xhr.limit + "," + this.hrDt.xhr.limit; //페이지네이션 정보를 추가한다.
-        //debugger;
-        xhr.open("GET", resValue); xhr.send(); //XHR을 즉시 호출한다.
-        xhr.onload = () => {
-            if (xhr.status === 200) { //XHR 응답이 존재한다면
-                //debugger;
-                var tableData = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
-                let totalCnt = JSON.parse(xhr.response)['totalCnt'];
-                let filterCnt = JSON.parse(xhr.response)['filterCnt'];
+
+        fetch(resValue)
+            .then(response => {
+                if (!response.ok) throw new Error(response.statusText);
+                return response.json();
+            })
+            .then(json => {
+                var tableData = json['data']; //응답 받은 JSON데이터를 파싱한다.
+                let totalCnt = json['totalCnt'];
+                let filterCnt = json['filterCnt'];
                 //let query = JSON.parse(xhr.response)['query'];
                 //debugger;
                 //테이블 객체 생성 이벤트//
@@ -228,14 +229,13 @@ class hr_tbl {
                         }
                     });
                 });
-            } else { //XHR 응답이 존재하지 않는다면(에러)
-                console.error(xhr.status, xhr.statusText);
-            }
-        };
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
     };
     xportBind() {
         document.getElementById("xport").addEventListener("click", async () => {
-            let xhr = new XMLHttpRequest();
             let resValue = this.hrDt.xhr.url;
             resValue += "?key=" + this.hrDt.xhr.key;
             Object.keys(this.hrDt.xhr.where).forEach(wh => {
@@ -249,10 +249,14 @@ class hr_tbl {
             }
             //엑셀다운로드는 페이징과 무관하게 전체 데이터를 가져와야 하므로 limit 데이터를 풀고 별도 코드를 통해 xhr로 가져와야 함!
             //resValue += "&LIMIT="+this.hrDt.xhr.page*this.hrDt.xhr.limit+","+this.hrDt.xhr.limit;
-            xhr.open("GET", resValue); xhr.send();
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    var rows = JSON.parse(xhr.response)['data'];
+
+            fetch(resValue)
+                .then(response => {
+                    if (!response.ok) throw new Error(response.statusText);
+                    return response.json();
+                })
+                .then(json => {
+                    var rows = json['data'];
                     const worksheet = XLSX.utils.json_to_sheet(rows);
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
@@ -270,10 +274,10 @@ class hr_tbl {
                     const yyyymmdd = `${year}${month}${day}`;
 
                     XLSX.writeFile(workbook, yyyymmdd + window.location.pathname + ".xlsx", { compression: true });
-                } else {
-                    console.error(xhr.status, xhr.statusText);
-                }
-            }
+                })
+                .catch(error => {
+                    console.error('Export Fetch error:', error);
+                });
         });
     }
     dataBind() {
