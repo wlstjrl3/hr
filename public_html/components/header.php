@@ -162,6 +162,19 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <hr>
                 </li>
                 <li>
+                    <a class="fs5" href="#">통계확인
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="<?php echo DIR_ROOT; ?>/orgHrcount">
+                                └&nbsp;본당직원현황
+                            </a>
+                        </li>
+                    </ul>
+                    <hr>
+                </li>
+                <li>
                     <a class="fs5" href="./logout.php">로그아웃</a>
                     <hr>
                 </li>             

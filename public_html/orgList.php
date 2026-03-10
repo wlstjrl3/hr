@@ -2,7 +2,6 @@
 
 include('./components/header.php');
 
-include "./dbconn/dbconn.php";
 ?>
 <div class="modalForm">
     <div class="modalBg"></div>
