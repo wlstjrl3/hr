@@ -67,7 +67,9 @@ while ($row = mysqli_fetch_assoc($result)) {
             </select> 
             <span>개씩 보기</span>
         </div>
-        <table id="myTbl"></table>
+        <div class="xScroll">
+            <table id="myTbl" style="width: 100%; min-width: 1250px; table-layout: fixed;"></table>
+        </div>
         <div id="tblPagination"></div>
     </div>
     <br>
@@ -89,6 +91,22 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 #showColList {
     z-index: 10;
+}
+.hr_tbl th {
+    white-space: normal !important;
+    vertical-align: middle !important;
+    word-break: keep-all;
+    font-size: 13px;
+    padding: 5px !important;
+}
+.hr_tbl th p {
+    padding: 5px !important;
+}
+.statCol {
+    width: 6%;
+}
+.nameCol {
+    width: 10% !important;
 }
 </style>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
