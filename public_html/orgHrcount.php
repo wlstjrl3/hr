@@ -6,14 +6,14 @@ include('./components/header.php');
 <div class="container">
 
     <h4 class="cl3 pddS">
-        본당직원현황
+        본당별직원현황
     </h4>
 
     <div class="searchArea">
-        <div class="colGrp">
+        <div class="colGrp" style="display:none;">
             <div class="colHd clBg5 cl2"><span><b>대리구</b></span></div>
-            <div class="colBd"><select id="UUPR_ORG" class="filter">
-                <option value="">전체</option><option value="13061001">제1대리구</option><option value="13062001">제2대리구</option>
+            <div class="colBd"><select id="UUPR_ORG" class="filter" disabled>
+                <option value="13061001" selected>제1대리구</option><option value="13062001">제2대리구</option>
             </select></div>
         </div>
         <div class="colGrp">

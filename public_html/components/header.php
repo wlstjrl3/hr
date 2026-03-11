@@ -162,7 +162,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <ul>
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/orgHrcount">
-                                └&nbsp;본당직원현황
+                                └&nbsp;본당별직원현황
                             </a>
                         </li>
                     </ul>

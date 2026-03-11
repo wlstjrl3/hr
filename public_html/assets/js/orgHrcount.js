@@ -11,7 +11,7 @@ var mytbl = new hr_tbl({
         columXHR: '',
         key: psnlKey.value, //api 호출할 보안 개인인증키
         where: {
-            nothing: '',
+            UUPR_ORG: '13061001',
         },
         order: {
             column: '0',
@@ -84,3 +84,5 @@ document.getElementById("UUPR_ORG").addEventListener("change", evt => {
         document.querySelectorAll(".sw1d").forEach(tmp => { tmp.style.display = "block"; }); document.querySelectorAll(".sw2d").forEach(tmp => { tmp.style.display = "block"; });
     }
 });
+//초기 진입시 제1대리구 고정에 따른 지구 필터링 트리거
+document.querySelectorAll(".sw1d").forEach(tmp => { tmp.style.display = "block"; }); document.querySelectorAll(".sw2d").forEach(tmp => { tmp.style.display = "none"; });
