@@ -74,25 +74,27 @@ batchInsert.addEventListener("click", () => {
             });
             const userConfirmed = confirm(`총 ${chkedBoxes.length}명을\n승급일 ${userInputDt} 로\n일괄 처리합니다.`);
             if (userConfirmed) {
-                var xhr = new XMLHttpRequest();//XMLHttpRequest 객체 생성
-                xhr.open('POST', DIR_ROOT + '/sys/grdBatchConfig.php?key=' + psnlKey.value + '&CRUD=C', true);//요청을 보낼 방식, 주소, 비동기여부 설정                
-                xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8');//HTTP 요청 헤더 설정
-
                 const jsonDate = {
                     date: userInputDt,
                     psnlCd: chkedBoxes,
                 }
-
-                xhr.send(JSON.stringify(jsonDate));  //JSON,stringify를 이용하여 json으로 변환
-                xhr.onload = () => {//통신후 작업
-                    if (xhr.status == 200) {//통신 성공
-                        alert(xhr.response);
+                const url = DIR_ROOT + '/sys/grdBatchConfig.php?key=' + psnlKey.value + '&CRUD=C';
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-type': 'application/json;charset=UTF-8' },
+                    body: JSON.stringify(jsonDate)
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(response.statusText);
+                        return response.text();
+                    })
+                    .then(text => {
+                        alert(text);
                         mytbl.show("myTbl");
-                    } else {
-                        alert(`통신 실패 type2`);
-                    }
-                }
-                //xhr.onloadend = () => {}
+                    })
+                    .catch(error => {
+                        alert("통신 실패 type2: " + error.message);
+                    });
             }
             else {
                 alert("진행이 취소되었습니다.");
@@ -114,25 +116,26 @@ batchDel.addEventListener("click", () => {
     });
     const userConfirmed = confirm(`삭제된 데이터는 복구 할 수 없습니다.\n승급관리 > 개별 급호봉 관리 페이지에서\n엑셀 다운로드 후 진행하시기 바랍니다.\n\n총 ${chkedBoxes.length}명의 승급 정보를 일괄삭제 합니까?`);
     if (userConfirmed) {
-        var xhr = new XMLHttpRequest();//XMLHttpRequest 객체 생성
-        xhr.open('POST', DIR_ROOT + '/sys/grdBatchConfig.php?key=' + psnlKey.value + '&CRUD=D', true);//요청을 보낼 방식, 주소, 비동기여부 설정                
-        xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8');//HTTP 요청 헤더 설정
-
         const jsonDate = {
             grdCd: chkedBoxes,
         }
-
-        xhr.send(JSON.stringify(jsonDate));  //JSON,stringify를 이용하여 json으로 변환
-        xhr.onload = () => {//통신후 작업
-            if (xhr.status == 200) {//통신 성공
-                debugger;
-                alert(xhr.response);
+        const url = DIR_ROOT + '/sys/grdBatchConfig.php?key=' + psnlKey.value + '&CRUD=D';
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-type': 'application/json;charset=UTF-8' },
+            body: JSON.stringify(jsonDate)
+        })
+            .then(response => {
+                if (!response.ok) throw new Error(response.statusText);
+                return response.text();
+            })
+            .then(text => {
+                alert(text);
                 mytbl.show("myTbl");
-            } else {
-                alert(`통신 실패 type2`);
-            }
-        }
-        //xhr.onloadend = () => {}
+            })
+            .catch(error => {
+                alert("통신 실패 type2: " + error.message);
+            });
     }
     else {
         alert("진행이 취소되었습니다.");

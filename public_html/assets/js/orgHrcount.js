@@ -1,4 +1,10 @@
 //데이터테이블을 지정한다.
+const tblStyle = document.createElement('style');
+tblStyle.innerHTML = `
+    .v-line-left { border-left: 1px solid #adb5bd !important; }
+    .v-line-right { border-right: 1px solid #adb5bd !important; }
+`;
+document.head.appendChild(tblStyle);
 var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/orgHrcount.php',
@@ -20,7 +26,7 @@ var mytbl = new hr_tbl({
         , { title: "조직명", data: "ORG_NM", className: "" }
         , { title: "상위조직", data: "UPR_ORG_NM", className: "" }
         , {
-            title: "정규직", data: "REGULAR_CNT", className: "", render: function (data, row) {
+            title: "정규직", data: "REGULAR_CNT", className: "v-line-left", render: function (data, row) {
                 const style = "display:inline-block; min-width:60px; padding:1px 10px; background:#f8f9fa; border:1px solid #ddd; border-radius:3px; color:#444; text-decoration:none; cursor:pointer; font-weight:500; font-size:12px; line-height:20px;";
                 return (data != 0 && data != '0') ? `<a href="${DIR_ROOT}/psnlTotal?TRS_TYPE=1&ORG_NM=${encodeURIComponent(row.ORG_NM)}&WORK_TYPE=${encodeURIComponent('정규')}" style="${style}" onclick="event.stopPropagation();">${data}</a>` : data;
             }
@@ -32,11 +38,17 @@ var mytbl = new hr_tbl({
             }
         }
         , {
-            title: "계약직", data: "CONT_CNT", className: "", render: function (data, row) {
+            title: "계약직", data: "CONT_CNT", className: "v-line-right", render: function (data, row) {
                 const style = "display:inline-block; min-width:60px; padding:1px 10px; background:#f8f9fa; border:1px solid #ddd; border-radius:3px; color:#444; text-decoration:none; cursor:pointer; font-weight:500; font-size:12px; line-height:20px;";
                 return (data != 0 && data != '0') ? `<a href="${DIR_ROOT}/psnlTotal?TRS_TYPE=1&ORG_NM=${encodeURIComponent(row.ORG_NM)}&WORK_TYPE=${encodeURIComponent('계약')}" style="${style}" onclick="event.stopPropagation();">${data}</a>` : data;
             }
         }
+        , { title: "사무장", data: "POS_MGR_CNT", className: "v-line-left" }
+        , { title: "사무원", data: "POS_CLK_CNT", className: "" }
+        , { title: "관리장", data: "POS_MNT_CNT", className: "" }
+        , { title: "가사사용인", data: "POS_DMS_CNT", className: "v-line-right" }
+        , { title: "남", data: "MALE_CNT", className: "v-line-left" }
+        , { title: "여", data: "FEMALE_CNT", className: "v-line-right" }
         , {
             title: "인원합계", data: "TOTAL_CNT", className: "", render: function (data, row) {
                 const style = "display:inline-block; min-width:60px; padding:1px 10px; background:#f1f3f5; border:1px solid #ced4da; border-radius:3px; color:#212529; text-decoration:none; cursor:pointer; font-weight:700; font-size:12px; line-height:20px;";

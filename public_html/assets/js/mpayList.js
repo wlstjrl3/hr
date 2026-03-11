@@ -15,47 +15,48 @@ document.querySelectorAll(".filter").forEach((f, key) => {
     });
 });
 
-//xhr을 이용한 실시간 정보로드
-function xhrLoad() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", DIR_ROOT + "/sys/mpayList.php?key=" + psnlKey.value + "&PSNL_CD=" + document.getElementById("PSNL_CD").value + "&MPAY_YEAR=" + document.getElementById("MPAY_YEAR").value); xhr.send();
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
-            var tmp = JSON.parse(xhr.response)['sql']; //응답 받은 JSON데이터를 파싱한다.
-            //debugger;
-            let htmlTxt = ` <ul>
-                                <li>기준년월</li>
-                                <li>급(Lv)</li>
-                                <li>호</li>
-                                <li>기본급</li>
-                                <li>법정수당</li>
-                                <li>직책수당</li>
-                                <li>가족수당</li>
-                                <li>자격수당</li>
-                                <li>장애인수당</li>
-                                <li>조정수당</li>
-                                <li>급여액</li>
-                            </ul>`;
-            if (res != null) {
-                res.forEach((tr, key) => {
-                    htmlTxt += '<ul>'
-                    htmlTxt += '    <li>' + tr.YEAR_MON + '</li>' //WORK_TYPE, ADVANCE_DT 데이터는 미표기함
-                    htmlTxt += '    <li>' + tr.GRD_GRADE + '</li>'
-                    htmlTxt += '    <li>' + tr.GRD_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.NORMAL_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.LEGAL_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.POSI_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.FML_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.LCS_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.DIS_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.ADJ_PAY + '</li>'
-                    htmlTxt += '    <li>' + tr.TOTAL_PAY + '</li>'
-                    htmlTxt += '</ul>'
-                });
-            }
-            document.getElementById("mpayTbl").innerHTML = htmlTxt;
+//fetch를 이용한 실시간 정보로드
+async function xhrLoad() {
+    const url = DIR_ROOT + "/sys/mpayList.php?key=" + psnlKey.value + "&PSNL_CD=" + document.getElementById("PSNL_CD").value + "&MPAY_YEAR=" + document.getElementById("MPAY_YEAR").value;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(response.statusText);
+        const json = await response.json();
+        const res = json['data'];
+
+        let htmlTxt = ` <ul>
+                            <li>기준년월</li>
+                            <li>급(Lv)</li>
+                            <li>호</li>
+                            <li>기본급</li>
+                            <li>법정수당</li>
+                            <li>직책수당</li>
+                            <li>가족수당</li>
+                            <li>자격수당</li>
+                            <li>장애인수당</li>
+                            <li>조정수당</li>
+                            <li>급여액</li>
+                        </ul>`;
+        if (res != null) {
+            res.forEach((tr, key) => {
+                htmlTxt += '<ul>'
+                htmlTxt += '    <li>' + tr.YEAR_MON + '</li>'
+                htmlTxt += '    <li>' + tr.GRD_GRADE + '</li>'
+                htmlTxt += '    <li>' + tr.GRD_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.NORMAL_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.LEGAL_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.POSI_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.FML_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.LCS_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.DIS_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.ADJ_PAY + '</li>'
+                htmlTxt += '    <li>' + tr.TOTAL_PAY + '</li>'
+                htmlTxt += '</ul>'
+            });
         }
+        document.getElementById("mpayTbl").innerHTML = htmlTxt;
+    } catch (error) {
+        console.error("mpayLoad 에러:", error);
     }
 }
 

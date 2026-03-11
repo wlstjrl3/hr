@@ -3,17 +3,17 @@ class hr_tbl {
         this.hrDt = hrDt;
     }
     show(tbNm) {
-        let resValue = this.hrDt.xhr.url; //XHR로 불러올 URL을 기본 지정
-        resValue += "?key=" + this.hrDt.xhr.key; //API 호출에 사용할 보안인증키 추후 MD5암호화 정보로 이용할 예정
+        let apiUrl = this.hrDt.xhr.url; //API로 불러올 URL을 기본 지정
+        apiUrl += "?key=" + this.hrDt.xhr.key; //API 호출에 사용할 보안인증키
         Object.keys(this.hrDt.xhr.where).forEach(wh => { //JSON의 KEY NAME 명칭을 가져온 뒤 그 갯수만큼 반복
             if (this.hrDt.xhr.where[wh] != '') { //해당 명칭에 값이 존재한다면
-                resValue += "&" + wh + "=" + this.hrDt.xhr.where[wh]; //XHR에서 DB 통신할 WHERE 조건으로 KEY명칭과 값을 덧붙인다
+                apiUrl += "&" + wh + "=" + this.hrDt.xhr.where[wh]; //WHERE 조건으로 KEY명칭과 값을 덧붙인다
             }
         });
-        resValue += "&ORDER=" + this.hrDt.columns[this.hrDt.xhr.order.column].data + " " + this.hrDt.xhr.order.direction;
-        resValue += "&LIMIT=" + this.hrDt.xhr.page * this.hrDt.xhr.limit + "," + this.hrDt.xhr.limit; //페이지네이션 정보를 추가한다.
+        apiUrl += "&ORDER=" + this.hrDt.columns[this.hrDt.xhr.order.column].data + " " + this.hrDt.xhr.order.direction;
+        apiUrl += "&LIMIT=" + this.hrDt.xhr.page * this.hrDt.xhr.limit + "," + this.hrDt.xhr.limit; //페이지네이션 정보를 추가한다.
 
-        fetch(resValue)
+        fetch(apiUrl)
             .then(response => {
                 if (!response.ok) throw new Error(response.statusText);
                 return response.json();
@@ -236,21 +236,21 @@ class hr_tbl {
     };
     xportBind() {
         document.getElementById("xport").addEventListener("click", async () => {
-            let resValue = this.hrDt.xhr.url;
-            resValue += "?key=" + this.hrDt.xhr.key;
+            let apiUrl = this.hrDt.xhr.url;
+            apiUrl += "?key=" + this.hrDt.xhr.key;
             Object.keys(this.hrDt.xhr.where).forEach(wh => {
                 if (this.hrDt.xhr.where[wh] != '') {
-                    resValue += "&" + wh + "=" + this.hrDt.xhr.where[wh];
+                    apiUrl += "&" + wh + "=" + this.hrDt.xhr.where[wh];
                 }
             });
             if (this.hrDt.xhr.order != '') { /* 2025-01-14 정렬기준을 포함하도록 코드 추가 */
-                resValue += "&ORDER=" + this.hrDt.columns[this.hrDt.xhr.order.column].data + " " + this.hrDt.xhr.order.direction;
+                apiUrl += "&ORDER=" + this.hrDt.columns[this.hrDt.xhr.order.column].data + " " + this.hrDt.xhr.order.direction;
                 debugger;
             }
-            //엑셀다운로드는 페이징과 무관하게 전체 데이터를 가져와야 하므로 limit 데이터를 풀고 별도 코드를 통해 xhr로 가져와야 함!
-            //resValue += "&LIMIT="+this.hrDt.xhr.page*this.hrDt.xhr.limit+","+this.hrDt.xhr.limit;
+            //엑셀다운로드는 페이징과 무관하게 전체 데이터를 가져와야 하므로 limit 데이터를 풀고 별도 코드를 통해 가져와야 함!
+            //apiUrl += "&LIMIT="+this.hrDt.xhr.page*this.hrDt.xhr.limit+","+this.hrDt.xhr.limit;
 
-            fetch(resValue)
+            fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) throw new Error(response.statusText);
                     return response.json();

@@ -45,17 +45,20 @@ newCol.addEventListener("click", () => {
         }
     });
 });
-//행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
+//행을 클릭했을때 fetch로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log(DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R");
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
+    const url = DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R";
+    console.log(url);
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+        })
+        .then(json => {
+            var res = json['data'];
             if (res != null) {
                 /* 발령정보 페이지로 이동버튼 */
-                document.getElementById("goTrsListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/trsList?PSNL_CD=" + res[0].PSNL_CD + "&PSNL_NM=" + res[0].PSNL_NM + "&ORG_CD=" + res[0].ORG_CD + "&ORG_NM=" + res[0].ORG_NM });
+                document.getElementById("goTrsListBtn").onclick = () => { location.href = DIR_ROOT + "/trsList?PSNL_CD=" + res[0].PSNL_CD + "&PSNL_NM=" + res[0].PSNL_NM + "&ORG_CD=" + res[0].ORG_CD + "&ORG_NM=" + res[0].ORG_NM };
 
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input, key) => {
                     switch (key) {
@@ -77,14 +80,13 @@ function trDataXHR(idx) {
                     }
                 });
             }
-        } else {
-            console.log("psnlConfigXhr 정보 로드 에러");
-        }
-    }
+        })
+        .catch(error => {
+            console.error("psnlConfigXhr 정보 로드 에러:", error);
+        });
 }
-//저장을 클릭했을때 xhr로 데이터를 기록
+//저장을 클릭했을때 fetch로 데이터를 기록
 modalEdtBtn.addEventListener("click", () => {
-    let xhr = new XMLHttpRequest();
     let writeUrl = '';
     try {
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
@@ -100,45 +102,49 @@ modalEdtBtn.addEventListener("click", () => {
     } catch (e) {
         console.log("필수값 체크"); return false;
     }
-    console.log(DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C");
-    xhr.open("GET", DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
-            if (res == "") {
+    const url = DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C";
+    console.log(url);
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.text();
+        })
+        .then(text => {
+            if (text === "") {
                 console.log("psnlConfig 정보 기록 완료");
                 mytbl.show('myTbl'); //테이블의 아이디
                 modalClose();
             } else {
-                alert("오류발생! 아래 코드를 개발자에게 전달해주세요.\n\n" + res);
+                alert("오류발생! 아래 코드를 개발자에게 전달해주세요.\n\n" + text);
             }
-        } else {
-            alert(xhr.statusText + " 정보 기록 에러!!!");
-        }
-    }
+        })
+        .catch(error => {
+            alert("정보 기록 에러!!!: " + error.message);
+        });
 });
-//삭제를 클릭했을때 xhr로 데이터를 제거
+//삭제를 클릭했을때 fetch로 데이터를 제거
 modalDelBtn.addEventListener("click", () => {
     if (!confirm("삭제 하시겠습니까?")) {
         return false;
     }
-    let xhr = new XMLHttpRequest();
     let deleteUrl = '';
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
         if (key == 0) { deleteUrl += "&PSNL_CD=" + input.value }
     });
-    console.log(DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D");
-    xhr.open("GET", DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
+    const url = DIR_ROOT + "/sys/psnlConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D";
+    console.log(url);
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
             console.log("psnl 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
-        } else {
-            console.log("psnl 정보 제거 에러!!!");
-        }
-    }
+        })
+        .catch(error => {
+            console.log("psnl 정보 제거 에러!!!:", error);
+        });
 });
 
 //검색 필터링을 위한 코드

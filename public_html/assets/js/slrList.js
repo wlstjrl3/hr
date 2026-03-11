@@ -46,43 +46,32 @@ newCol.addEventListener("click", () => {
         }
     });
 });
-//행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
+//행을 클릭했을때 fetch로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + "&SLR_CD=" + idx + "&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log(DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + "&SLR_CD=" + idx + "&CRUD=R");
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
+    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + "&SLR_CD=" + idx + "&CRUD=R";
+    console.log(url);
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+        })
+        .then(json => {
+            var res = json['data'];
             if (res != null) {
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input, key) => {
                     switch (key) {
-                        case 0:
-                            input.value = res[0].SLR_CD
-                            break;
-                        case 1:
-                            input.value = res[0].SLR_YEAR;
-                            break;
-                        case 2:
-                            input.value = res[0].SLR_GRADE;
-                            break;
-                        case 3:
-                            input.value = res[0].SLR_PAY;
-                            break;
-                        case 4:
-                            input.value = res[0].NORMAL_PAY;
-                            break;
-                        case 5:
-                            input.value = res[0].LEGAL_PAY;
-                            break;
+                        case 0: input.value = res[0].SLR_CD; break;
+                        case 1: input.value = res[0].SLR_YEAR; break;
+                        case 2: input.value = res[0].SLR_GRADE; break;
+                        case 3: input.value = res[0].SLR_PAY; break;
+                        case 4: input.value = res[0].NORMAL_PAY; break;
+                        case 5: input.value = res[0].LEGAL_PAY; break;
                     }
                 });
                 document.querySelector(".modalForm").querySelector("select").value = res[0].SLR_TYPE;
                 document.querySelector(".modalForm").querySelectorAll("input").forEach((tmpEle, key) => {
                     tmpEle.disabled = false;
-                    if (key > 1) {
-                        tmpEle.style.backgroundColor = '#FFF';
-                    }
+                    if (key > 1) tmpEle.style.backgroundColor = '#FFF';
                 });
                 if (res[0].SLR_TYPE == '최저시급') {
                     document.querySelector(".modalForm").querySelectorAll("input").forEach((tmpEle, key) => {
@@ -94,14 +83,13 @@ function trDataXHR(idx) {
                     });
                 }
             }
-        } else {
-            console.log("slrConfigXhr 정보 로드 에러");
-        }
-    }
+        })
+        .catch(error => {
+            console.error("slrConfigXhr 정보 로드 에러:", error);
+        });
 }
-//저장을 클릭했을때 xhr로 데이터를 기록
+//저장을 클릭했을때 fetch로 데이터를 기록
 modalEdtBtn.addEventListener("click", () => {
-    let xhr = new XMLHttpRequest();
     let writeUrl = '';
     let slrType = document.querySelector(".modalForm").querySelector("select").value;
     try {
@@ -127,45 +115,49 @@ modalEdtBtn.addEventListener("click", () => {
     } catch (e) {
         console.log("필수값 체크"); return false;
     }
-    console.log(DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C");
-    xhr.open("GET", DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
-            if (res == "") {
+    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C";
+    console.log(url);
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.text();
+        })
+        .then(text => {
+            if (text === "") {
                 console.log("slrConfig 정보 기록 완료");
                 mytbl.show('myTbl'); //테이블의 아이디
                 modalClose();
             } else {
-                alert("오류발생! 아래 코드를 개발자에게 전달해주세요.\n\n" + res);
+                alert("오류발생! 아래 코드를 개발자에게 전달해주세요.\n\n" + text);
             }
-        } else {
-            alert(xhr.statusText + " 정보 기록 에러!!!");
-        }
-    }
+        })
+        .catch(error => {
+            alert("정보 기록 에러!!!: " + error.message);
+        });
 });
-//삭제를 클릭했을때 xhr로 데이터를 제거
+//삭제를 클릭했을때 fetch로 데이터를 제거
 modalDelBtn.addEventListener("click", () => {
     if (!confirm("삭제 하시겠습니까?")) {
         return false;
     }
-    let xhr = new XMLHttpRequest();
     let deleteUrl = '';
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
         if (key == 0) { deleteUrl += "&SLR_CD=" + input.value }
     });
-    console.log(DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D");
-    xhr.open("GET", DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
+    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D";
+    console.log(url);
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
             console.log("slr 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
-        } else {
-            console.log("slr 정보 제거 에러!!!");
-        }
-    }
+        })
+        .catch(error => {
+            console.log("slr 정보 제거 에러!!!:", error);
+        });
 });
 //일괄삭제버튼을 눌렀을때
 batchDel.addEventListener("click", () => {
@@ -175,22 +167,20 @@ batchDel.addEventListener("click", () => {
         let regex = /^\d{4}-\d{2}-\d{2}$/;// YYYY-MM-DD 형식의 정규식
         // 정규식으로 확인
         if (regex.test(dateInput)) {
-            let xhr = new XMLHttpRequest();
-            xhr.open("GET", DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + "&CRUD=BD&REG_DT=" + dateInput); xhr.send(); //XHR을 즉시 호출한다.
-            xhr.onload = () => {
-                if (xhr.status === 200) { //XHR 응답이 존재한다면
-                    alert(xhr.responseText);
+            const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + "&CRUD=BD&REG_DT=" + dateInput;
+            fetch(url)
+                .then(response => response.text())
+                .then(text => {
+                    alert(text);
                     mytbl.show('myTbl'); //테이블의 아이디
                     modalClose();
-                } else {
-                    alert("slr 정보 제거 에러!!!");
-                }
-            }
+                })
+                .catch(error => {
+                    alert("slr 정보 제거 에러!!!: " + error.message);
+                });
         } else {
             alert("잘못된 날짜 형식입니다.\nYYYY-MM-DD 형식으로 입력하시기 바랍니다.");
         }
-    } else {
-        //alert("작업이 취소되었습니다.");
     }
 });
 //엑셀 업로드를 위한 코드
@@ -215,19 +205,22 @@ document.querySelector("#file").addEventListener('change', target => {
                     alert("파일 구조가 잘못되었습니다.");
                     return false;
                 }
-                var xhr = new XMLHttpRequest();//XMLHttpRequest 객체 생성
-                xhr.open('POST', DIR_ROOT + '/sys/slrBatchInsert.php?key=' + psnlKey.value, true);//요청을 보낼 방식, 주소, 비동기여부 설정                
-                xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8');//HTTP 요청 헤더 설정
-                xhr.send(JSON.stringify(rows));  //JSON,stringify를 이용하여 json으로 변환해야만 php상에서 엑셀 텍스트가 json으로 인식됨
-                xhr.onload = () => {//통신후 작업
-                    if (xhr.status == 200) {//통신 성공
-                        //console.log(xhr.response); 
+                fetch(DIR_ROOT + '/sys/slrBatchInsert.php?key=' + psnlKey.value, {
+                    method: 'POST',
+                    headers: { 'Content-type': 'application/json;charset=UTF-8' },
+                    body: JSON.stringify(rows)
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(response.statusText);
+                        return response.text();
+                    })
+                    .then(text => {
+                        console.log(text);
                         mytbl.show("myTbl");
-                    } else {
-                        console.log("통신 실패 type1");//통신 실패
-                    }
-                }
-                xhr.onloadend = () => { }
+                    })
+                    .catch(error => {
+                        console.error("통신 실패:", error);
+                    });
             })
         };
 

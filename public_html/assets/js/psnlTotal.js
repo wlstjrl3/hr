@@ -50,175 +50,90 @@ var mytbl = new hr_tbl({
     ],
 });
 
-//행을 클릭했을때 xhr로 다시 끌어올 데이터
-function trDataXHR(idx) {
+//행을 클릭했을때 fetch로 다시 끌어올 데이터
+async function trDataXHR(idx) {
     //이전 정보 초기화 INIT
-    document.getElementById("mdBdOrgNm").innerHTML = "";
-    document.getElementById("mdBdPsnlNm").innerHTML = "";
-    document.getElementById("mdBdBaptNm").innerHTML = "";
-    document.getElementById("mdBdPsnlNum").innerHTML = "";
-    document.getElementById("mdBdPhoneNum").innerHTML = "";
-    document.getElementById("mdBdPosition").innerHTML = "";
-    document.getElementById("mdBdTrsType").innerHTML = "";
-    document.getElementById("mdBdTrsDt").innerHTML = "";
-    document.getElementById("mdBdWorkType").innerHTML = "";
-    document.getElementById("mdBdGrdPay").innerHTML = "";
-    document.getElementById("fmlTbl").innerHTML = "";
-    document.getElementById("adjTbl").innerHTML = "";
-    document.getElementById("opiTbl").innerHTML = "";
+    const ids = ["mdBdOrgNm", "mdBdPsnlNm", "mdBdBaptNm", "mdBdPsnlNum", "mdBdPhoneNum", "mdBdPosition", "mdBdTrsType", "mdBdTrsDt", "mdBdWorkType", "mdBdGrdPay", "mdBdAdvDt", "mdBdAdvRng", "fmlTbl", "adjTbl", "opiTbl"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = "";
+    });
 
-    let xhr1 = new XMLHttpRequest();
-    //let xhr2 = new XMLHttpRequest();
-    //let xhr3 = new XMLHttpRequest();
-    let xhr4 = new XMLHttpRequest();
-    let xhr5 = new XMLHttpRequest();
-    let xhr6 = new XMLHttpRequest();
-    xhr1.open("GET", DIR_ROOT + "/sys/psnlTotal.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R"); xhr1.send();
-    console.log(DIR_ROOT + "/sys/psnlTotal.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R");
-    xhr1.onload = () => {
-        if (xhr1.status === 200) {
-            var res = JSON.parse(xhr1.response)['data']; if (res != null) {
+    try {
+        // 1. 기본 정보 조회
+        const res1 = await fetch(`${DIR_ROOT}/sys/psnlTotal.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        const data1 = res1.data;
+        if (!data1) return;
 
-                if (res[0].POSITION == "가사사용인") {
-                    document.querySelectorAll(".modalFooter button").forEach(ftBtn => {
-                        ftBtn.style.display = "none";
-                    });
-                    document.getElementById("goPsnlListBtn").style.display = "inline-block";//기초정보
-                    document.getElementById("goTrsListBtn").style.display = "inline-block";//발령정보
-                    document.getElementById("goPttListBtn").style.display = "inline-block";//최저시급정보
-                } else {
-                    document.querySelectorAll(".modalFooter button").forEach(ftBtn => {
-                        ftBtn.style.display = "inline-block";
-                    });
-                    document.getElementById("goPttListBtn").style.display = "none";
-                }
-                document.getElementById("mdBdOrgNm").innerHTML = res[0].ORG_NM;
-                document.getElementById("mdBdPsnlNm").innerHTML = res[0].PSNL_NM;
-                document.getElementById("mdBdBaptNm").innerHTML = res[0].BAPT_NM;
-                document.getElementById("mdBdPsnlNum").innerHTML = res[0].PSNL_NUM;
-                document.getElementById("mdBdPhoneNum").innerHTML = res[0].PHONE_NUM;
-                document.getElementById("mdBdTrsType").innerHTML = res[0].TRS_TYPE;
-                document.getElementById("mdBdPosition").innerHTML = res[0].POSITION;
-                document.getElementById("mdBdTrsDt").innerHTML = res[0].TRS_DT;
-                document.getElementById("mdBdWorkType").innerHTML = res[0].WORK_TYPE;
-                if (res[0].GRD_GRADE) { document.getElementById("mdBdGrdPay").innerHTML = res[0].GRD_GRADE + "급 " + res[0].GRD_PAY + "호"; }
-                document.getElementById("mdBdAdvDt").innerHTML = res[0].ADVANCE_DT;
-                document.getElementById("mdBdAdvRng").innerHTML = res[0].ADVANCE_RNG;
-                document.getElementById("mdBdOrgInTel").innerHTML = "본당 내선번호 : " + res[0].ORG_IN_TEL + " / 전화번호 : " + res[0].ORG_OUT_TEL;
-                //각 상세보기 페이지 이동 버튼
-                document.getElementById("goPsnlListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/psnlList?PSNL_NM=" + res[0].PSNL_NM + "&BAPT_NM=" + res[0].BAPT_NM + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
-                document.getElementById("goTrsListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/trsList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
-                document.getElementById("goGrdListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/grdList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
-                document.getElementById("goFmlListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/fmlList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
-                document.getElementById("goAdjListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/adjList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
-                document.getElementById("goInsListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/insList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
-                document.getElementById("goOpiListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/opiList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
-                document.getElementById("goMPayListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/mpayList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD + "&MPAY_YEAR=" + res[0].ADVANCE_DT.substr(0, 4) });
-                document.getElementById("goPttListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/pttList?PSNL_CD=" + idx + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_NM=" + res[0].ORG_NM + "&ORG_CD=" + res[0].ORG_CD });
+        const row = data1[0];
+        // UI 업데이트
+        if (row.POSITION == "가사사용인") {
+            document.querySelectorAll(".modalFooter button").forEach(ftBtn => ftBtn.style.display = "none");
+            document.getElementById("goPsnlListBtn").style.display = "inline-block";
+            document.getElementById("goTrsListBtn").style.display = "inline-block";
+            document.getElementById("goPttListBtn").style.display = "inline-block";
+        } else {
+            document.querySelectorAll(".modalFooter button").forEach(ftBtn => ftBtn.style.display = "inline-block");
+            document.getElementById("goPttListBtn").style.display = "none";
+        }
 
-                xhr4.open("GET", DIR_ROOT + "/sys/fmlList.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R"); xhr4.send();
-            }
+        document.getElementById("mdBdOrgNm").innerHTML = row.ORG_NM;
+        document.getElementById("mdBdPsnlNm").innerHTML = row.PSNL_NM;
+        document.getElementById("mdBdBaptNm").innerHTML = row.BAPT_NM;
+        document.getElementById("mdBdPsnlNum").innerHTML = row.PSNL_NUM;
+        document.getElementById("mdBdPhoneNum").innerHTML = row.PHONE_NUM;
+        document.getElementById("mdBdTrsType").innerHTML = row.TRS_TYPE;
+        document.getElementById("mdBdPosition").innerHTML = row.POSITION;
+        document.getElementById("mdBdTrsDt").innerHTML = row.TRS_DT;
+        document.getElementById("mdBdWorkType").innerHTML = row.WORK_TYPE;
+        if (row.GRD_GRADE) document.getElementById("mdBdGrdPay").innerHTML = row.GRD_GRADE + "급 " + row.GRD_PAY + "호";
+        document.getElementById("mdBdAdvDt").innerHTML = row.ADVANCE_DT;
+        document.getElementById("mdBdAdvRng").innerHTML = row.ADVANCE_RNG;
+        document.getElementById("mdBdOrgInTel").innerHTML = "본당 내선번호 : " + row.ORG_IN_TEL + " / 전화번호 : " + row.ORG_OUT_TEL;
+
+        // 버튼 이벤트 바인딩
+        document.getElementById("goPsnlListBtn").onclick = () => { location.href = DIR_ROOT + "/psnlList?PSNL_NM=" + row.PSNL_NM + "&BAPT_NM=" + row.BAPT_NM + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+        document.getElementById("goTrsListBtn").onclick = () => { location.href = DIR_ROOT + "/trsList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+        document.getElementById("goGrdListBtn").onclick = () => { location.href = DIR_ROOT + "/grdList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+        document.getElementById("goFmlListBtn").onclick = () => { location.href = DIR_ROOT + "/fmlList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+        document.getElementById("goAdjListBtn").onclick = () => { location.href = DIR_ROOT + "/adjList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+        document.getElementById("goInsListBtn").onclick = () => { location.href = DIR_ROOT + "/insList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+        document.getElementById("goOpiListBtn").onclick = () => { location.href = DIR_ROOT + "/opiList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+        document.getElementById("goMPayListBtn").onclick = () => { location.href = DIR_ROOT + "/mpayList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD + "&MPAY_YEAR=" + (row.ADVANCE_DT ? row.ADVANCE_DT.substr(0, 4) : "") };
+        document.getElementById("goPttListBtn").onclick = () => { location.href = DIR_ROOT + "/pttList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
+
+        // 2. 가족 정보 조회
+        const res4 = await fetch(`${DIR_ROOT}/sys/fmlList.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        if (res4.data) {
+            let tmpStr = `<ul class="clBg5"><li class="th"><span>가족성명</span></li><li class="th"><span>관계</span></li><li class="th"><span>생년월일</span></li><li class="th"><span>상세정보</span></li><li class="clearB"></li></ul>`;
+            res4.data.forEach(f => {
+                tmpStr += `<ul class="clBgW"><li class="td"><span>${f.FML_NM}</span></li><li class="td"><span>${f.FML_RELATION}</span></li><li class="td"><span>${f.FML_BIRTH}</span></li><li class="td"><span>${f.FML_DTL}</span></li><li class="clearB"></li></ul>`;
+            });
+            document.getElementById("fmlTbl").innerHTML = tmpStr;
         }
-    }
-    xhr4.onload = () => {
-        if (xhr4.status === 200) {
-            var res = JSON.parse(xhr4.response)['data'];
-            if (res != null) {
-                tmpStr = `
-            <ul class="clBg5">
-                <li class="th"><span>가족성명</span></li>
-                <li class="th"><span>관계</span></li>
-                <li class="th"><span>생년월일</span></li>
-                <li class="th"><span>상세정보</span></li>
-                <li class="clearB"></li>
-            </ul>
-            `;
-                for ($i = 0; $i < res.length; $i++) {
-                    tmpStr += `
-                    <ul class="clBgW">
-                        <li class="td"><span>`+ res[$i].FML_NM + `</span></li>
-                        <li class="td"><span>`+ res[$i].FML_RELATION + `</span></li>
-                        <li class="td"><span>`+ res[$i].FML_BIRTH + `</span></li>
-                        <li class="td"><span>`+ res[$i].FML_DTL + `</span></li>
-                        <li class="clearB"></li>
-                    </ul>
-                `;
-                }
-                document.getElementById("fmlTbl").innerHTML = tmpStr;
-            }
-            xhr5.open("GET", DIR_ROOT + "/sys/adjList.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R"); xhr5.send();
+
+        // 3. 제수당 정보 조회
+        const res5 = await fetch(`${DIR_ROOT}/sys/adjList.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        if (res5.data) {
+            let tmpStr = `<ul class="clBg5"><li class="th"><span>수당타입</span></li><li class="th"><span>명칭</span></li><li class="th"><span>등급</span></li><li class="th"><span>수당금액</span></li><li class="clearB"></li></ul>`;
+            res5.data.forEach(a => {
+                tmpStr += `<ul class="clBgW"><li class="td"><span>${a.ADJ_TYPE}</span></li><li class="td"><span>${a.ADJ_NM}</span></li><li class="td"><span>${a.ADJ_LEVEL}</span></li><li class="td"><span>${a.ADJ_PAY}</span></li><li class="clearB"></li></ul>`;
+            });
+            document.getElementById("adjTbl").innerHTML = tmpStr;
         }
-    }
-    xhr5.onload = () => {
-        if (xhr5.status === 200) {
-            var res = JSON.parse(xhr5.response)['data'];
-            if (res != null) {
-                if (res != null) {
-                    tmpStr = `
-                <ul class="clBg5">
-                    <li class="th"><span>수당타입</span></li>
-                    <li class="th"><span>명칭</span></li>
-                    <li class="th"><span>등급</span></li>
-                    <li class="th"><span>수당금액</span></li>
-                    <li class="clearB"></li>
-                </ul>
-                `;
-                    for ($i = 0; $i < res.length; $i++) {
-                        tmpStr += `
-                        <ul class="clBgW">
-                            <li class="td"><span>`+ res[$i].ADJ_TYPE + `</span></li>
-                            <li class="td"><span>`+ res[$i].ADJ_NM + `</span></li>
-                            <li class="td"><span>`+ res[$i].ADJ_LEVEL + `</span></li>
-                            <li class="td"><span>`+ res[$i].ADJ_PAY + `</span></li>
-                            <li class="clearB"></li>
-                        </ul>
-                    `;
-                    }
-                    document.getElementById("adjTbl").innerHTML = tmpStr;
-                }
-            }
-            xhr6.open("GET", DIR_ROOT + "/sys/opiList.php?key=" + psnlKey.value + "&PSNL_CD=" + idx + "&CRUD=R"); xhr6.send();
+
+        // 4. 상벌/평가 정보 조회
+        const res6 = await fetch(`${DIR_ROOT}/sys/opiList.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        if (res6.data) {
+            let tmpStr = `<ul class="clBg5"><li class="th"><span>타입</span></li><li class="th"><span>날짜</span></li><li class="th"><span>평가자</span></li><li class="th"><span>내용</span></li><li class="clearB"></li></ul>`;
+            const opiTypes = { 1: "긍정", 2: "부정", 3: "포상", 4: "징계" };
+            res6.data.forEach(o => {
+                tmpStr += `<ul class="clBgW"><li class="td"><span>${opiTypes[o.OPI_TYPE] || ""}</span></li><li class="td"><span>${o.OPI_DT}</span></li><li class="td"><span>${o.OPI_PERSON}</span></li><li class="td"><span>${o.OPI_DTL}</span></li><li class="clearB"></li></ul>`;
+            });
+            document.getElementById("opiTbl").innerHTML = tmpStr;
         }
-    }
-    xhr6.onload = () => {
-        if (xhr6.status === 200) {
-            var res = JSON.parse(xhr6.response)['data'];
-            if (res != null) {
-                if (res != null) {
-                    tmpStr = `
-                <ul class="clBg5">
-                    <li class="th"><span>타입</span></li></li>
-                    <li class="th"><span>날짜</span></li></li>
-                    <li class="th"><span>평가자</span></li></li>
-                    <li class="th"><span>내용</span></li></li>
-                    <li class="clearB"></li>
-                </ul>
-                `;
-                    for ($i = 0; $i < res.length; $i++) {
-                        tmpStr += `
-                        <ul class="clBgW">
-                            <li class="td"><span>`;
-                        if (res[$i].OPI_TYPE == 1) {
-                            tmpStr += "긍정";
-                        } else if (res[$i].OPI_TYPE == 2) {
-                            tmpStr += "부정";
-                        } else if (res[$i].OPI_TYPE == 3) {
-                            tmpStr += "포상";
-                        } else if (res[$i].OPI_TYPE == 4) {
-                            tmpStr += "징계";
-                        }
-                        tmpStr += `</span></li>
-                            <li class="td"><span>`+ res[$i].OPI_DT + `</span></li>
-                            <li class="td"><span>`+ res[$i].OPI_PERSON + `</span></li>
-                            <li class="td"><span>`+ res[$i].OPI_DTL + `</span></li>
-                            <li class="clearB"></li>
-                        </ul>
-                    `;
-                    }
-                    document.getElementById("opiTbl").innerHTML = tmpStr;
-                }
-            }
-        }
+    } catch (e) {
+        console.error("Data load failed:", e);
     }
 }
 

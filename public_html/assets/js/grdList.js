@@ -55,17 +55,20 @@ newCol.addEventListener("click", () => {
         }
     });
 });
-//행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
+//행을 클릭했을때 fetch로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + "&GRD_CD=" + idx + "&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log(DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + "&GRD_CD=" + idx + "&CRUD=R");
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
+    const url = DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + "&GRD_CD=" + idx + "&CRUD=R";
+    console.log(url);
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+        })
+        .then(json => {
+            var res = json['data'];
             if (res != null) {
-                /* 급호봉관리 페이지로 이동버튼 */
-                document.getElementById("goAdjListBtn").addEventListener("click", () => { location.href = DIR_ROOT + "/adjList?PSNL_CD=" + res[0].PSNL_CD + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_CD=" + res[0].ORG_CD + "&ORG_NM=" + res[0].ORG_NM + "&WORK_TYPE=" + res[0].WORK_TYPE });
+                /* 조정수당관리 페이지로 이동버튼 */
+                document.getElementById("goAdjListBtn").onclick = () => { location.href = DIR_ROOT + "/adjList?PSNL_CD=" + res[0].PSNL_CD + "&PSNL_NM=" + res[0].PSNL_NM + "&POSITION=" + res[0].POSITION + "&ORG_CD=" + res[0].ORG_CD + "&ORG_NM=" + res[0].ORG_NM + "&WORK_TYPE=" + res[0].WORK_TYPE };
 
                 document.getElementById("PSNL_CD").value = res[0].PSNL_CD;
                 document.getElementById("ORG_NM").value = res[0].ORG_NM;
@@ -73,33 +76,22 @@ function trDataXHR(idx) {
                 document.getElementById("PSNL_NM").value = res[0].PSNL_NM;
                 document.querySelector(".modalBody").querySelectorAll("input").forEach((input, key) => {
                     switch (key) {
-                        case 0:
-                            input.value = res[0].GRD_CD
-                            break;
-                        case 1:
-                            input.value = res[0].ADVANCE_DT;
-                            break;
-                        case 2:
-                            input.value = res[0].GRD_GRADE;
-                            break;
-                        case 3:
-                            input.value = res[0].GRD_PAY;
-                            break;
-                        case 4:
-                            input.value = res[0].GRD_DTL;
-                            break;
+                        case 0: input.value = res[0].GRD_CD; break;
+                        case 1: input.value = res[0].ADVANCE_DT; break;
+                        case 2: input.value = res[0].GRD_GRADE; break;
+                        case 3: input.value = res[0].GRD_PAY; break;
+                        case 4: input.value = res[0].GRD_DTL; break;
                     }
                 });
                 document.querySelector(".modalBody").querySelector("b").innerHTML = res[0].ORG_NM + " " + res[0].POSITION + " " + res[0].PSNL_NM;
             }
-        } else {
-            console.log("grdConfigXhr 정보 로드 에러");
-        }
-    }
+        })
+        .catch(error => {
+            console.error("grdConfigXhr 정보 로드 에러:", error);
+        });
 }
-//저장을 클릭했을때 xhr로 데이터를 기록
+//저장을 클릭했을때 fetch로 데이터를 기록
 modalEdtBtn.addEventListener("click", () => {
-    let xhr = new XMLHttpRequest();
     let writeUrl = '';
     try {
         document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
@@ -128,41 +120,45 @@ modalEdtBtn.addEventListener("click", () => {
         console.log("필수값 체크"); return false;
     }
     writeUrl += "&PSNL_CD=" + document.getElementById("PSNL_CD").value;
-    console.log(DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C");
-    xhr.open("GET", DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
+    const url = DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C";
+    console.log(url);
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.text();
+        })
+        .then(text => {
             console.log("grdConfig 정보 기록 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
-        } else {
-            console.log("grdConfig 정보 기록 에러!!!");
-        }
-    }
+        })
+        .catch(error => {
+            console.log("grdConfig 정보 기록 에러!!!:", error);
+        });
 });
-//삭제를 클릭했을때 xhr로 데이터를 제거
+//삭제를 클릭했을때 fetch로 데이터를 제거
 modalDelBtn.addEventListener("click", () => {
     if (!confirm("삭제 하시겠습니까?")) {
         return false;
     }
-    let xhr = new XMLHttpRequest();
     let deleteUrl = '';
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
         if (key == 0) { deleteUrl += "&GRD_CD=" + input.value }
     });
-    console.log(DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D");
-    xhr.open("GET", DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
-    xhr.onload = () => {
-        if (xhr.status === 200) { //XHR 응답이 존재한다면
-            //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
+    const url = DIR_ROOT + "/sys/grdConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D";
+    console.log(url);
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
             console.log("grdConfig 정보 삭제 완료");
             mytbl.show('myTbl'); //테이블의 아이디
             modalClose();
-        } else {
-            console.log("grdConfig 정보 제거 에러!!!");
-        }
-    }
+        })
+        .catch(error => {
+            console.log("grdConfig 정보 제거 에러!!!:", error);
+        });
 });
 //검색 필터링을 위한 코드
 document.querySelectorAll(".filter").forEach((f, key) => {
