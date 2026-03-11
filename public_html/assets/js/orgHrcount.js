@@ -56,7 +56,7 @@ var mytbl = new hr_tbl({
             }
         }
         , {
-            title: "신자수", data: "PERSON_CNT", className: "", render: function (data, row) {
+            title: "신자수", data: "PERSON_CNT", className: "v-line-left", render: function (data, row) {
                 return data ? data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
             }
         }
@@ -86,3 +86,55 @@ document.getElementById("UUPR_ORG").addEventListener("change", evt => {
 });
 //초기 진입시 제1대리구 고정에 따른 지구 필터링 트리거
 document.querySelectorAll(".sw1d").forEach(tmp => { tmp.style.display = "block"; }); document.querySelectorAll(".sw2d").forEach(tmp => { tmp.style.display = "none"; });
+
+//표시 항목 변경 팝업 구성
+document.getElementById("showCol").addEventListener("click", () => {
+    showColList.style.display = "block";
+    document.querySelector(".showColBg").style.visibility = "visible";
+});
+document.querySelector(".showColBg").addEventListener("click", () => {
+    showColList.style.display = "none";
+    document.querySelector(".showColBg").style.visibility = "hidden";
+});
+const showColList = document.getElementById("showColList");
+
+const colGroups = [
+    { title: "고용형태", id: "grpWorkType", keys: ["REGULAR_CNT", "FUNC_CNT", "CONT_CNT"], checked: "checked" },
+    { title: "직종", id: "grpPosition", keys: ["POS_MGR_CNT", "POS_CLK_CNT", "POS_MNT_CNT", "POS_DMS_CNT"], checked: "checked" },
+    { title: "성별", id: "grpGender", keys: ["MALE_CNT", "FEMALE_CNT"], checked: "checked" },
+    { title: "신자수", id: "grpPersonCnt", keys: ["PERSON_CNT"], checked: "checked" }
+];
+
+colGroups.forEach(group => {
+    showColList.innerHTML += `
+    <div>
+        <input type="checkbox" class="showColGrpToggle" data-keys="${group.keys.join(',')}" id="${group.id}Toggle" ${group.checked}/>
+        <label for="${group.id}Toggle">${group.title}</label>
+    </div>
+    `;
+});
+
+// 원래의 className 값을 보존하기 위해 초기화 시 백업
+for (let i = 0; i < Object.keys(mytbl.hrDt.columns).length; i++) {
+    const col = mytbl.hrDt.columns[i];
+    col.originalClassName = col.className || "";
+}
+
+document.querySelectorAll(".showColGrpToggle").forEach(st => {
+    st.addEventListener("click", (tmp) => {
+        let keys = tmp.currentTarget.dataset.keys.split(',');
+        let isChecked = tmp.currentTarget.checked;
+
+        for (let i = 0; i < Object.keys(mytbl.hrDt.columns).length; i++) {
+            const col = mytbl.hrDt.columns[i];
+            if (keys.includes(col.data)) {
+                if (isChecked == false) {
+                    col.className = "hidden";
+                } else {
+                    col.className = col.originalClassName; // 원래 클래스로 복원 (예: v-line-left 등)
+                }
+            }
+        }
+        mytbl.show("myTbl");
+    });
+});

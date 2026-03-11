@@ -51,6 +51,10 @@ while ($row = mysqli_fetch_assoc($result)) {
     <br>
     <div class="tableOutFrm">
         <div class="pddS floatL">
+            <div class="showColBg"></div>
+            <a id="showCol" class="pddS clBg3 clW rndCorner pointer">표시 항목 변경</a>
+        </div><div id="showColList"></div>
+        <div class="pddS floatL">
             <a id="xport" class="pddS clBg3 clW rndCorner pointer">엑셀 다운로드</a>
         </div>
         <div class="pddS floatR">
@@ -71,6 +75,22 @@ while ($row = mysqli_fetch_assoc($result)) {
 
 <link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
 <link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/showColList.css?ver=0" rel="stylesheet" />
+<style>
+.showColBg{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    z-index:1;
+    left:0;
+    top:0;
+    visibility:hidden;
+}
+#showColList {
+    z-index: 10;
+}
+</style>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/orgHrcount.js'></script>
