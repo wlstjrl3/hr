@@ -140,6 +140,11 @@ if (@$_REQUEST['WORK_TYPE']) {
     $params[] = '%' . $_REQUEST['WORK_TYPE'] . '%';
     $types .= "s";
 }
+if (@$_REQUEST['EXCLUDE_POS']) {
+    $whereSql .= " AND C.POSITION NOT LIKE ?";
+    $params[] = '%' . $_REQUEST['EXCLUDE_POS'] . '%';
+    $types .= "s";
+}
 if (@$_REQUEST['TRS_TYPE']) {
     if ($_REQUEST['TRS_TYPE'] == 1) {
         $whereSql = $whereSql . " AND C.TRS_TYPE IN ('1','3')";

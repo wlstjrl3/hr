@@ -5,7 +5,7 @@
     <div class="tableOutFrm xScroll width100">
         <div id="rtrTbl" class="fs7 addTblForm" style="min-width:800px;"></div>
     </div>
-    <h4 class="cl3 pddS">근속10/20/30주년 대상자 리스트</h4>
+    <h4 class="cl3 pddS">근속10/20/30주년 대상자</h4>
     <div class="tableOutFrm xScroll width100">
         <div id="ctnTbl" class="fs7 addTblForm" style="min-width:800px;"></div>
     </div>
