@@ -30,11 +30,11 @@ $sql = "SELECT
         ,C2.TRS_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
         ,IFNULL((
             SELECT PERSON_CNT FROM ORG_HISTORY WHERE B.ORG_CD = ORG_HISTORY.ORG_CD
-            AND LEFT(OH_DT,4) = (LEFT(D.ADVANCE_DT,4)-1)
+            ORDER BY OH_DT DESC LIMIT 1
         ),0) AS PERSON_CNT
         ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM,A.PHONE_NUM,LEFT(A.PSNL_NUM,14) AS PSNL_NUM
         ,TRUNCATE(DATEDIFF(CURDATE(), C.TRS_DT)/365,1) AS TRS_ELAPSE 
-        ,D.ADVANCE_DT
+        ,IFNULL(CONCAT(PTT.PTT_YEAR, '(최저)'), D.ADVANCE_DT) AS ADVANCE_DT
         ,CASE 
         WHEN SUBSTR(D.ADVANCE_DT,6,2) = '01' THEN '상반기'
         WHEN SUBSTR(D.ADVANCE_DT,6,2) = '07' THEN '하반기'
@@ -67,18 +67,24 @@ $sql = "SELECT
             AND LEFT(ADJ_STT_DT,4) <= LEFT(D.ADVANCE_DT,4)
             AND (LEFT(ADJ_END_DT,4) >= LEFT(D.ADVANCE_DT,4) OR ADJ_END_DT is null)
         ),0) AS ADJUST_PAY4
-        ,FORMAT(
-        IFNULL((
-            SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE PSNL_CD = A.PSNL_CD
-            AND LEFT(ADJ_STT_DT,4) <= LEFT(D.ADVANCE_DT,4)
-            AND (LEFT(ADJ_END_DT,4) >= LEFT(D.ADVANCE_DT,4) OR ADJ_END_DT is null)
-        ),0) + 
-        IFNULL((
-            SELECT SUM(FML_PAY) FROM PSNL_FAMILY WHERE PSNL_CD = A.PSNL_CD
-            AND LEFT(FML_STT_DT,4) <= LEFT(D.ADVANCE_DT,4)
-            AND (LEFT(FML_END_DT,4) >= LEFT(D.ADVANCE_DT,4) OR FML_END_DT is null)
-        ),0) +
-        E.NORMAL_PAY+E.LEGAL_PAY+0,0) AS EXPECT_PAY
+        ,IF(PTT.PTT_CD IS NOT NULL,
+            CONCAT(
+                FORMAT(CEIL(PTT.PTT_ADDHOUR*4.345*E_MIN.LEGAL_PAY*1.5/10)*10+(CEIL((PTT.PTT_HOUR+(PTT.PTT_HOUR*4/20))*(365/7/12))*E_MIN.LEGAL_PAY+PTT.PTT_ADJPAY),0),
+                '<br><span class=\"fs7 cl3\">(', PTT.PTT_DAY, '일*', PTT.PTT_HOUR, '시', IF(IFNULL(PTT.PTT_ADJPAY,0) > 0, CONCAT('+', IF(PTT.PTT_ADJPAY % 10000 = 0, CAST(FLOOR(PTT.PTT_ADJPAY/10000) AS CHAR), CAST(ROUND(PTT.PTT_ADJPAY/10000, 1) AS CHAR)), '만'), ''), ')</span>'
+            ),
+            FORMAT(
+                IFNULL((
+                    SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE PSNL_CD = A.PSNL_CD
+                    AND LEFT(ADJ_STT_DT,4) <= LEFT(D.ADVANCE_DT,4)
+                    AND (LEFT(ADJ_END_DT,4) >= LEFT(D.ADVANCE_DT,4) OR ADJ_END_DT is null)
+                ),0) + 
+                IFNULL((
+                    SELECT SUM(FML_PAY) FROM PSNL_FAMILY WHERE PSNL_CD = A.PSNL_CD
+                    AND LEFT(FML_STT_DT,4) <= LEFT(D.ADVANCE_DT,4)
+                    AND (LEFT(FML_END_DT,4) >= LEFT(D.ADVANCE_DT,4) OR FML_END_DT is null)
+                ),0) +
+                E.NORMAL_PAY+E.LEGAL_PAY+0,0)
+        ) AS EXPECT_PAY
         ,B.ORG_IN_TEL, B.ORG_OUT_TEL
         FROM PSNL_INFO A
         LEFT OUTER JOIN (
@@ -107,6 +113,14 @@ $sql = "SELECT
 
         /* C2의 최근고용형태 참조 & 계약직+무기 계약직 동시 조건에 들어가도록 join 조건에 concat을 이용한 like 조건을 적용함.*/
         LEFT OUTER JOIN SALARY_TB E ON C2.WORK_TYPE LIKE CONCAT('%',E.SLR_TYPE) AND  D.GRD_GRADE = E.SLR_GRADE AND D.GRD_PAY = E.SLR_PAY AND SLR_YEAR = LEFT(D.ADVANCE_DT,4)
+        
+        LEFT OUTER JOIN (
+            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
+            FROM PSNL_PARTTIME
+            GROUP BY PSNL_CD
+        ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD
+        LEFT OUTER JOIN SALARY_TB E_MIN ON PTT.PTT_YEAR = E_MIN.SLR_YEAR AND E_MIN.SLR_TYPE = '최저시급'
         ";
 //조건문 지정
 $whereSql = " WHERE 1=1 ";

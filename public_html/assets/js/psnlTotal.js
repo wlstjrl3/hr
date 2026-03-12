@@ -35,8 +35,22 @@ var mytbl = new hr_tbl({
         , { title: "경과(근속)", data: "TRS_ELAPSE", className: "" }
         , { title: "승급일", data: "ADVANCE_DT", className: "" }
         , { title: "분기", data: "ADVANCE_RNG", className: "hidden" }
-        , { title: "급(Lv)", data: "GRD_GRADE", className: "" }
-        , { title: "호", data: "GRD_PAY", className: "" }
+        , { 
+            title: "급(Lv)", data: "GRD_GRADE", className: "", render: function (data, row) {
+                if (row.WORK_TYPE && row.WORK_TYPE.includes('계약직') && (row.GRD_PAY == 0 || row.GRD_PAY == '0')) {
+                    return "Lv " + data;
+                }
+                return data;
+            }
+        }
+        , { 
+            title: "호", data: "GRD_PAY", className: "", render: function (data, row) {
+                if (row.WORK_TYPE && row.WORK_TYPE.includes('계약직') && (data == 0 || data == '0')) {
+                    return "";
+                }
+                return data;
+            }
+        }
         , { title: "기본급", data: "NORMAL_PAY", className: "" }
         , { title: "법정수당", data: "LEGAL_PAY", className: "" }
         , { title: "신자수", data: "PERSON_CNT", className: "hidden" }
@@ -253,38 +267,64 @@ document.querySelector(".showColBg").addEventListener("click", () => {
     showColList.style.display = "none";
     document.querySelector(".showColBg").style.visibility = "hidden";
 });
-showColList = document.getElementById("showColList");
-for ($i = 0; $i < Object.keys(mytbl.hrDt.columns).length; $i++) {
-    let tmpChk;
-    if (mytbl.hrDt.columns[$i].className == "hidden") { } else {
-        tmpChk = "checked";
-    }
+const showColList = document.getElementById("showColList");
+
+const colGroups = [
+    { title: "재직상태", id: "grpTrsInfo", keys: ["TRS_TYPE", "TRS_DT", "APP_DT", "TRS_ELAPSE"], checked: "checked" },
+    { title: "승급정보", id: "grpGrdInfo", keys: ["ADVANCE_DT", "ADVANCE_RNG", "GRD_GRADE", "GRD_PAY"], checked: "checked" },
+    { title: "기본급", id: "grpPayInfo", keys: ["NORMAL_PAY", "LEGAL_PAY"], checked: "checked" },
+    { title: "각종수당", id: "grpAdjPayInfo", keys: ["ADJUST_PAY1", "FAMILY_PAY", "ADJUST_PAY2", "ADJUST_PAY3", "ADJUST_PAY4"], checked: "checked" },
+    { title: "개인정보", id: "grpPsnlInfo", keys: ["PHONE_NUM", "PSNL_NUM"], checked: "" },
+    { title: "예상급여", id: "EXPECT_PAY", keys: ["EXPECT_PAY"], checked: "checked" },
+    { title: "신자수", id: "PERSON_CNT", keys: ["PERSON_CNT"], checked: "" },
+    { title: "내선번호", id: "ORG_IN_TEL", keys: ["ORG_IN_TEL"], checked: "" }
+];
+
+colGroups.forEach(group => {
     showColList.innerHTML += `
     <div>
-        <input type="checkbox" class="showColToggle" data-toggle="`+ mytbl.hrDt.columns[$i].data + `" id="` + mytbl.hrDt.columns[$i].data + `Toggle" ` + tmpChk + `/>
-        <label for="`+ mytbl.hrDt.columns[$i].data + `Toggle">` + mytbl.hrDt.columns[$i].title + `</label>
+        <input type="checkbox" class="showColGrpToggle" data-keys="${group.keys.join(',')}" id="${group.id}Toggle" ${group.checked}/>
+        <label for="${group.id}Toggle">${group.title}</label>
     </div>
     `;
+});
+
+// 원래의 className 값을 보존하기 위해 초기화 시 백업
+for (let i = 0; i < mytbl.hrDt.columns.length; i++) {
+    const col = mytbl.hrDt.columns[i];
+    // 표시 항목 변경 시 원복할 클래스에서 'hidden'을 제외하고 저장합니다.
+    col.originalClassName = col.className.replace(/\bhidden\b/g, "").trim();
 }
-document.querySelectorAll(".showColToggle").forEach((st, key) => {
+
+document.querySelectorAll(".showColGrpToggle").forEach(st => {
     st.addEventListener("click", (tmp) => {
-        let targetName = tmp.currentTarget.dataset.toggle;
-        for ($i = 0; $i < Object.keys(mytbl.hrDt.columns).length; $i++) {
-            if (mytbl.hrDt.columns[$i].data == targetName) {
-                if (tmp.currentTarget.checked == false) {
-                    mytbl.hrDt.columns[$i].className = "hidden";
+        let keys = tmp.currentTarget.dataset.keys.split(',');
+        let isChecked = tmp.currentTarget.checked;
+
+        for (let i = 0; i < mytbl.hrDt.columns.length; i++) {
+            const col = mytbl.hrDt.columns[i];
+            if (keys.includes(col.data)) {
+                if (isChecked == false) {
+                    col.className = "hidden";
                 } else {
-                    mytbl.hrDt.columns[$i].className = "";
+                    col.className = col.originalClassName;
                 }
             }
         }
         mytbl.show("myTbl");
 
-        checkCnt = document.querySelectorAll('.showColToggle:checked').length;
-        if (checkCnt > 10) {
-            myTbl.style.width = (checkCnt * 100) + "px";
+        // 보이는 컬럼 수 계산하여 테이블 너비 조정
+        let visibleColCnt = 0;
+        for (let i = 0; i < mytbl.hrDt.columns.length; i++) {
+            if (mytbl.hrDt.columns[i].className !== "hidden") {
+                visibleColCnt++;
+            }
+        }
+
+        if (visibleColCnt > 10) {
+            document.getElementById("myTbl").style.width = (visibleColCnt * 100) + "px";
         } else {
-            myTbl.style.width = "100%";
+            document.getElementById("myTbl").style.width = "100%";
         }
     });
 });
