@@ -21,7 +21,7 @@ include('./components/header.php');
             <div class="colBd"><select id="UPR_ORG" class="filter">
                 <option value="">전체</option>
                 <?php
-$sql = "SELECT UPPR_ORG_CD,ORG_NM,ORG_CD FROM ORG_INFO WHERE ORG_TYPE=9 ORDER BY UPPR_ORG_CD ASC,ORG_NM ASC";
+$sql = "SELECT UPPR_ORG_CD,ORG_NM,ORG_CD FROM ORG_INFO WHERE ORG_TYPE=9 AND ORG_NM LIKE '%지구' ORDER BY UPPR_ORG_CD ASC,ORG_NM ASC";
 $result = mysqli_query($conn, $sql);
 mysqli_close($conn);
 while ($row = mysqli_fetch_assoc($result)) {
