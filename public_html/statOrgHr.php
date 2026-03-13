@@ -111,6 +111,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 </style>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/orgHrcount.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statOrgHr.js'></script>
 
 <?php include('components/footer.php'); ?>

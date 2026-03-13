@@ -8,7 +8,7 @@ tblStyle.innerHTML = `
 document.head.appendChild(tblStyle);
 var mytbl = new hr_tbl({
     xhr: {
-        url: DIR_ROOT + '/sys/orgHrcount.php',
+        url: DIR_ROOT + '/sys/statOrgHr.php',
         columXHR: '',
         key: psnlKey.value, //api 호출할 보안 개인인증키
         where: {

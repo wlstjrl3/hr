@@ -18,7 +18,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
     <link href="<?php echo DIR_ROOT; ?>/assets/css/header.css?ver=0.001" rel="stylesheet" />
     <script defer src="https://sinseiki.github.io/noIE.js/noIE.js" ></script><!--익스플로러 사용제한-->    
     <script type='text/javascript'>const DIR_ROOT = '<?php echo DIR_ROOT; ?>';</script>
-    <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/header.js'></script>
+    <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statOrgHr.js'></script>
 
     <title>제1대리구 본당직원 인적 관리시스템</title>
 </head>
@@ -161,7 +161,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     </a>
                     <ul>
                         <li>
-                            <a href="<?php echo DIR_ROOT; ?>/orgHrcount">
+                            <a href="<?php echo DIR_ROOT; ?>/statOrgHr">
                                 └&nbsp;본당별직원현황
                             </a>
                         </li>
