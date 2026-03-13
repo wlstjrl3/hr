@@ -38,6 +38,8 @@ WITH TEMP_TBL AS (
 SELECT * FROM TEMP_TBL
     ";
     //조건문 지정
+    $params = [];
+    $types = "";
     $whereSql = " WHERE TRS_TYPE <> 2 AND ((GRD_GRADE>=6 AND CNTT >= 4) OR (GRD_GRADE=5 AND CNTT >= 5))"; //
     if(@$_REQUEST['ORG_NM']){
         $whereSql .= " AND ORG_NM LIKE ?";
