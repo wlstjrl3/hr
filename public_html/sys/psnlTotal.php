@@ -139,6 +139,21 @@ if (@$_REQUEST['PSNL_NM']) {
     $params[] = '%' . $_REQUEST['PSNL_NM'] . '%';
     $types .= "s";
 }
+if (@$_REQUEST['PSNL_CD_LIST']) {
+    $cdList = explode(',', $_REQUEST['PSNL_CD_LIST']);
+    $plcs = [];
+    foreach($cdList as $cd) {
+        $cdVal = trim($cd);
+        if ($cdVal !== '') {
+            $params[] = $cdVal;
+            $types .= "s";
+            $plcs[] = "?";
+        }
+    }
+    if (count($plcs) > 0) {
+        $whereSql .= " AND A.PSNL_CD IN (" . implode(',', $plcs) . ")";
+    }
+}
 if (@$_REQUEST['BAPT_NM']) {
     $whereSql .= " AND BAPT_NM LIKE ?";
     $params[] = '%' . $_REQUEST['BAPT_NM'] . '%';
@@ -219,6 +234,50 @@ if (@$_REQUEST['TRS_DT_To']) {
     $params[] = $_REQUEST['TRS_DT_To'] . " 23:59:59";
     $types .= "s";
 }
+
+// statWorkType 통계 연결 모드 필터
+if (@$_REQUEST['STAT_MODE'] == '1') {
+    $rowCntSql .= " LEFT OUTER JOIN (
+            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
+            FROM PSNL_PARTTIME
+            GROUP BY PSNL_CD
+        ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD ";
+
+    $cat = @$_REQUEST['STAT_CAT'];
+    $target = @$_REQUEST['STAT_TARGET'];
+    $org_cd = @$_REQUEST['STAT_ORG_CD'];
+       
+    // statWorkType 조건 일치 (퇴사제외)
+    $whereSql .= " AND C2.TRS_TYPE != '2'";
+       
+    if ($cat == 'REG_MALE') {
+        $whereSql .= " AND (C2.WORK_TYPE = '정규직' OR C2.WORK_TYPE = '기능직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9')";
+    } else if ($cat == 'REG_FEMALE') {
+        $whereSql .= " AND (C2.WORK_TYPE = '정규직' OR C2.WORK_TYPE = '기능직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
+    } else if ($cat == 'CONT_MALE') {
+        $whereSql .= " AND (C2.WORK_TYPE LIKE '%계약직%' OR C2.WORK_TYPE = '무기계약직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9')";
+    } else if ($cat == 'CONT_FEMALE') {
+        $whereSql .= " AND (C2.WORK_TYPE LIKE '%계약직%' OR C2.WORK_TYPE = '무기계약직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
+    } else if ($cat == 'SHORT_MALE') {
+        $whereSql .= " AND PTT.PTT_HOUR < 40 AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9')";
+    } else if ($cat == 'SHORT_FEMALE') {
+        $whereSql .= " AND PTT.PTT_HOUR < 40 AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
+    }
+       
+    if ($target == 'ALL') {
+        $whereSql .= " AND (B.UPPR_ORG_CD = '13061001' OR B.UPPR_ORG_CD IN (SELECT ORG_CD FROM ORG_INFO WHERE UPPR_ORG_CD = '13061001') OR B.ORG_CD = '13061001')";
+    } else if ($target == 'DISTRICT') {
+        $whereSql .= " AND (B.UPPR_ORG_CD = ? OR B.ORG_CD = ?)";
+        $params[] = $org_cd; $params[] = $org_cd;
+        $types .= "ss";
+    } else if ($target == 'HOLY' || $target == 'PARISH') {
+        $whereSql .= " AND (B.ORG_CD = ?)";
+        $params[] = $org_cd;
+        $types .= "s";
+    }
+}
+
 
 //정렬 기준 지정
 $orderSql = safeOrderBy(@$_REQUEST['ORDER'], []);

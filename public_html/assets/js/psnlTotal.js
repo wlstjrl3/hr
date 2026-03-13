@@ -334,9 +334,20 @@ window.onload = function () {
     //파라미터 중 셀렉트 파타미터값이 존재한다면 기초 세팅한다.
     const url = window.location.href; // 현재 URL을 가져온다.
     const params = new URLSearchParams(new URL(url).search); // URLSearchParams 객체 생성
-    document.getElementById("WORK_TYPE").value = params.get("WORK_TYPE");
-    document.getElementById("TRS_TYPE").value = params.get("TRS_TYPE");
-    //debugger;
+    document.getElementById("WORK_TYPE").value = params.get("WORK_TYPE") || "";
+    document.getElementById("TRS_TYPE").value = params.get("TRS_TYPE") !== null ? params.get("TRS_TYPE") : "1";
+    
+    if (params.get("PSNL_CD_LIST")) {
+        document.getElementById("PSNL_CD_LIST").value = params.get("PSNL_CD_LIST");
+    }
+
+    if (params.get("STAT_MODE")) {
+        mytbl.hrDt.xhr.where["STAT_MODE"] = params.get("STAT_MODE");
+        mytbl.hrDt.xhr.where["STAT_TARGET"] = params.get("STAT_TARGET");
+        mytbl.hrDt.xhr.where["STAT_ORG_CD"] = params.get("STAT_ORG_CD");
+        mytbl.hrDt.xhr.where["STAT_CAT"] = params.get("STAT_CAT");
+    }
+
     //파라미터 기초세팅 종료
     setTimeout(function () { //뒤로가기에 값이 모두 바인딩 될때까지 딜레이가 존재하여 timeout을 추가함.
         document.querySelectorAll(".filter").forEach((f, key) => {

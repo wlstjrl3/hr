@@ -93,6 +93,10 @@
             <div class="colBd"><input id="PSNL_NUM" class="juminNumBox filter"></div>
         </div>
         <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>개인번호(사번)</b></span></div>
+            <div class="colBd"><input id="PSNL_CD_LIST" class="filter" placeholder="다중검색시 쉼표(,) 구분" value="<?php echo @$_REQUEST['PSNL_CD_LIST']; ?>"></div>
+        </div>
+        <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>입/퇴사일</b></span></div>
             <div class="colBd"><input class="dateBox dualDateBox filter" id="TRS_DT_From"><span>~</span><input class="dateBox dualDateBox filter" id="TRS_DT_To"></div>
         </div>        
