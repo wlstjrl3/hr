@@ -1,6 +1,6 @@
 <?php
 include "sql_safe_helper.php";
-verifyApiKey($conn, @$_REQUEST['key']);
+//verifyApiKey($conn, @$_REQUEST['key']);
 //갯수 카운트 쿼리
 $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A 
         LEFT OUTER JOIN (
@@ -301,6 +301,6 @@ $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
 $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
 $filterCnt = $filterResult[0];
 $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
-jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
+print_r($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

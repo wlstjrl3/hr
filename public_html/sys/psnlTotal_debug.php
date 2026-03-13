@@ -1,6 +1,6 @@
 <?php
 include "sql_safe_helper.php";
-verifyApiKey($conn, @$_REQUEST['key']);
+//verifyApiKey($conn, @$_REQUEST['key']);
 //갯수 카운트 쿼리
 $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A 
         LEFT OUTER JOIN (
@@ -115,16 +115,15 @@ $sql = "SELECT
         ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD
 
+        /* C2의 최근고용형태 참조 & 계약직+무기 계약직 동시 조건에 들어가도록 join 조건에 concat을 이용한 like 조건을 적용함.*/
+        LEFT OUTER JOIN SALARY_TB E ON C2.WORK_TYPE LIKE CONCAT('%',E.SLR_TYPE) AND  D.GRD_GRADE = E.SLR_GRADE AND D.GRD_PAY = E.SLR_PAY AND SLR_YEAR = NULLIF(GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000')), '0000')
+        
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
             FROM PSNL_PARTTIME
             GROUP BY PSNL_CD
         ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD
-
-        /* C2의 최근고용형태 참조 & 계약직+무기 계약직 동시 조건에 들어가도록 join 조건에 concat을 이용한 like 조건을 적용함.*/
-        LEFT OUTER JOIN SALARY_TB E ON C2.WORK_TYPE LIKE CONCAT('%',E.SLR_TYPE) AND  D.GRD_GRADE = E.SLR_GRADE AND D.GRD_PAY = E.SLR_PAY AND SLR_YEAR = NULLIF(GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000')), '0000')
-
         LEFT OUTER JOIN SALARY_TB E_MIN ON PTT.PTT_YEAR = E_MIN.SLR_YEAR AND E_MIN.SLR_TYPE = '최저시급'
         ";
 //조건문 지정
@@ -301,6 +300,6 @@ $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
 $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
 $filterCnt = $filterResult[0];
 $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
-jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
+print_r($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>
