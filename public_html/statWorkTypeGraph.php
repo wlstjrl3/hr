@@ -25,6 +25,15 @@ include('./components/header.php');
             </div>
         </div>
         <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>구분</b></span></div>
+            <div class="colBd">
+                <select id="GROUP_BY" class="filter">
+                    <option value="gender">성별</option>
+                    <option value="age">연령대</option>
+                </select>
+            </div>
+        </div>
+        <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>간격</b></span></div>
             <div class="colBd">
                 <select id="INTERVAL" class="filter">
@@ -48,6 +57,22 @@ include('./components/header.php');
         <canvas id="myChart"></canvas>
     </div>
     <br>
+</div>
+
+<!-- 상세 내역 모달 -->
+<div id="detailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#fff; width:400px; max-width:90%; border-radius:8px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.3);">
+        <div style="padding:15px; background:#f8f9fa; border-bottom:1px solid #dee2e6; display:flex; justify-content:space-between; align-items:center;">
+            <h5 id="modalTitle" style="margin:0; font-size:16px;">상세 내역</h5>
+            <span style="cursor:pointer; font-size:20px;" onclick="document.getElementById('detailModal').style.display='none'">&times;</span>
+        </div>
+        <div id="modalBody" style="padding:20px; max-height:400px; overflow-y:auto;">
+            <!-- 데이터가 여기에 동적으로 로드됩니다 -->
+        </div>
+        <div style="padding:10px; background:#f8f9fa; border-top:1px solid #dee2e6; text-align:right;">
+            <button class="btn btn-secondary" style="padding:5px 15px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;" onclick="document.getElementById('detailModal').style.display='none'">닫기</button>
+        </div>
+    </div>
 </div>
 
 <style>
