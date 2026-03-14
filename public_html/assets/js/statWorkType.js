@@ -5,6 +5,7 @@ var mytbl = new hr_tbl({
         key: psnlKey.value,
         where: {
             TARGET_TYPE: 'ALL',
+            BASE_DATE: document.getElementById("BASE_DATE") ? document.getElementById("BASE_DATE").value : new Date().toISOString().split('T')[0],
         },
         order: {
             column: '0',
@@ -23,13 +24,15 @@ var mytbl = new hr_tbl({
         , { title: "계약직 여성", data: "CONT_FEMALE", className: "statCol", render: function(d,r){ return getWorkTypeLink(d,r,'CONT_FEMALE'); } }
         , { title: "단축근로 남성", data: "SHORT_MALE", className: "statCol", render: function(d,r){ return getWorkTypeLink(d,r,'SHORT_MALE'); } }
         , { title: "단축근로 여성", data: "SHORT_FEMALE", className: "statCol", render: function(d,r){ return getWorkTypeLink(d,r,'SHORT_FEMALE'); } }
+        , { title: "총계", data: "TOTAL_CNT", className: "statCol", render: function(d,r){ return getWorkTypeLink(d,r,'TOTAL_CNT'); } }
     ],
 });
 
 function getWorkTypeLink(data, row, cat) {
     if(data == 0 || data == '0') return data;
     const targetType = document.getElementById("TARGET_TYPE") ? document.getElementById("TARGET_TYPE").value || 'ALL' : 'ALL';
-    const href = `${DIR_ROOT}/psnlTotal?STAT_MODE=1&STAT_TARGET=${encodeURIComponent(targetType)}&STAT_ORG_CD=${encodeURIComponent(row.ORG_CD)}&STAT_CAT=${encodeURIComponent(cat)}`;
+    const baseDate = document.getElementById("BASE_DATE") ? document.getElementById("BASE_DATE").value : new Date().toISOString().split('T')[0];
+    const href = `${DIR_ROOT}/psnlTotal?STAT_MODE=1&STAT_TARGET=${encodeURIComponent(targetType)}&STAT_ORG_CD=${encodeURIComponent(row.ORG_CD)}&STAT_CAT=${encodeURIComponent(cat)}&STAT_BASE_DATE=${encodeURIComponent(baseDate)}`;
     const style = "display:inline-block; min-width:60px; padding:1px 10px; background:#f8f9fa; border:1px solid #ddd; border-radius:3px; color:#444; text-decoration:none; cursor:pointer; font-weight:500; font-size:12px; line-height:20px;";
     return `<a href="${href}" style="${style}" onclick="event.stopPropagation();">${data}</a>`;
 }

@@ -1,6 +1,6 @@
 <?php
 include "sql_safe_helper.php";
-//verifyApiKey($conn, @$_REQUEST['key']);
+
 
 $baseYear = @$_REQUEST['STAT_BASE_YEAR'];
 $trsCond = "";
@@ -261,9 +261,18 @@ if (@$_REQUEST['STAT_MODE'] == '1') {
     $rowCntSql .= " LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
             FROM PSNL_PARTTIME
+            {$pttCond}
             GROUP BY PSNL_CD
         ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
-        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD ";
+        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD 
+        
+        LEFT OUTER JOIN (
+            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
+            FROM GRADE_HISTORY
+            {$grdCond}
+            GROUP BY PSNL_CD
+        ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD ";
 
     $cat = @$_REQUEST['STAT_CAT'];
     $target = @$_REQUEST['STAT_TARGET'];
@@ -326,6 +335,6 @@ $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
 $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
 $filterCnt = $filterResult[0];
 $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
-print_r($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
+jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

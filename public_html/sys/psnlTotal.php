@@ -1,12 +1,25 @@
 <?php
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
+
+$baseDate = @$_REQUEST['STAT_BASE_DATE'];
+$trsCond = "";
+$pttCond = "";
+$grdCond = "";
+if ($baseDate) {
+    $baseDateEsc = mysqli_real_escape_string($conn, $baseDate);
+    $baseDateStr = str_replace('-', '', $baseDateEsc);
+    $trsCond = " AND REPLACE(TRS_DT, '-', '') <= '{$baseDateStr}' ";
+    $pttCond = " WHERE PTT_YEAR <= LEFT('{$baseDateStr}', 4) ";
+    $grdCond = " WHERE REPLACE(ADVANCE_DT, '-', '') <= '{$baseDateStr}' ";
+}
+
 //갯수 카운트 쿼리
 $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A 
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
-            WHERE TRS_TYPE IN (1,2)
+            WHERE TRS_TYPE IN (1,2) {$trsCond}
             GROUP BY PSNL_CD
         ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
@@ -14,6 +27,7 @@ $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
+            WHERE 1=1 {$trsCond}
             GROUP BY PSNL_CD
         ) C2_SUB ON C2_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C2 ON C2.TRS_CD = C2_SUB.MAX_TRS_CD
@@ -94,7 +108,7 @@ $sql = "SELECT
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
-            WHERE TRS_TYPE IN (1,2)
+            WHERE TRS_TYPE IN (1,2) {$trsCond}
             GROUP BY PSNL_CD
         ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
@@ -102,6 +116,7 @@ $sql = "SELECT
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
+            WHERE 1=1 {$trsCond}
             GROUP BY PSNL_CD
         ) C2_SUB ON C2_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C2 ON C2.TRS_CD = C2_SUB.MAX_TRS_CD
@@ -111,6 +126,7 @@ $sql = "SELECT
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
             FROM GRADE_HISTORY
+            {$grdCond}
             GROUP BY PSNL_CD
         ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD
@@ -118,6 +134,7 @@ $sql = "SELECT
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
             FROM PSNL_PARTTIME
+            {$pttCond}
             GROUP BY PSNL_CD
         ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD
@@ -144,21 +161,7 @@ if (@$_REQUEST['PSNL_NM']) {
     $params[] = '%' . $_REQUEST['PSNL_NM'] . '%';
     $types .= "s";
 }
-if (@$_REQUEST['PSNL_CD_LIST']) {
-    $cdList = explode(',', $_REQUEST['PSNL_CD_LIST']);
-    $plcs = [];
-    foreach ($cdList as $cd) {
-        $cdVal = trim($cd);
-        if ($cdVal !== '') {
-            $params[] = $cdVal;
-            $types .= "s";
-            $plcs[] = "?";
-        }
-    }
-    if (count($plcs) > 0) {
-        $whereSql .= " AND A.PSNL_CD IN (" . implode(',', $plcs) . ")";
-    }
-}
+
 if (@$_REQUEST['BAPT_NM']) {
     $whereSql .= " AND BAPT_NM LIKE ?";
     $params[] = '%' . $_REQUEST['BAPT_NM'] . '%';
@@ -245,9 +248,18 @@ if (@$_REQUEST['STAT_MODE'] == '1') {
     $rowCntSql .= " LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
             FROM PSNL_PARTTIME
+            {$pttCond}
             GROUP BY PSNL_CD
         ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
-        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD ";
+        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD 
+        
+        LEFT OUTER JOIN (
+            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
+            FROM GRADE_HISTORY
+            {$grdCond}
+            GROUP BY PSNL_CD
+        ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD ";
 
     $cat = @$_REQUEST['STAT_CAT'];
     $target = @$_REQUEST['STAT_TARGET'];
@@ -273,6 +285,9 @@ if (@$_REQUEST['STAT_MODE'] == '1') {
     }
     else if ($cat == 'SHORT_FEMALE') {
         $whereSql .= " AND PTT.PTT_HOUR < 40 AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
+    }
+    else if ($cat == 'TOTAL_CNT') {
+        // 총계의 경우 별도의 성별/근무형태 필터링 없음
     }
 
     if ($target == 'ALL') {

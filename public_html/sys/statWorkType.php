@@ -2,6 +2,10 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
 
+$baseDate = @$_REQUEST['BASE_DATE'] ?: date('Y-m-d');
+$safeBaseDate = mysqli_real_escape_string($conn, $baseDate);
+$safeBaseDateStr = str_replace('-', '', $safeBaseDate);
+
 $subqueryC = "SELECT 
                     T.ORG_CD,
                     SUM(CASE WHEN (T.WORK_TYPE = '정규직' OR T.WORK_TYPE = '기능직') AND (PT.PTT_HOUR >= 40 OR PT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(P.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9') THEN 1 ELSE 0 END) AS REG_MALE,
@@ -13,16 +17,23 @@ $subqueryC = "SELECT
                 FROM PSNL_INFO P
                 JOIN PSNL_TRANSFER T ON T.TRS_CD = (
                     SELECT TRS_CD FROM PSNL_TRANSFER T2
-                    WHERE T2.PSNL_CD = P.PSNL_CD
-                    ORDER BY TRS_DT DESC LIMIT 1
+                    WHERE T2.PSNL_CD = P.PSNL_CD AND REPLACE(T2.TRS_DT, '-', '') <= '{$safeBaseDateStr}'
+                    ORDER BY REPLACE(T2.TRS_DT, '-', '') DESC, T2.TRS_CD DESC LIMIT 1
                 )
-                LEFT JOIN (
-                    SELECT PSNL_CD, PTT_HOUR FROM PSNL_PARTTIME P1
-                    WHERE PTT_CD = (
-                        SELECT MAX(PTT_CD) FROM PSNL_PARTTIME P2
-                        WHERE P2.PSNL_CD = P1.PSNL_CD
-                    )
-                ) PT ON P.PSNL_CD = PT.PSNL_CD
+                LEFT OUTER JOIN (
+                    SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
+                    FROM PSNL_PARTTIME
+                    WHERE PTT_YEAR <= LEFT('{$safeBaseDateStr}', 4)
+                    GROUP BY PSNL_CD
+                ) PTT_SUB ON PTT_SUB.PSNL_CD = P.PSNL_CD
+                LEFT OUTER JOIN PSNL_PARTTIME PT ON PT.PTT_CD = PTT_SUB.MAX_PTT_CD
+                LEFT OUTER JOIN (
+                    SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY REPLACE(ADVANCE_DT, '-', '') DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
+                    FROM GRADE_HISTORY
+                    WHERE REPLACE(ADVANCE_DT, '-', '') <= '{$safeBaseDateStr}'
+                    GROUP BY PSNL_CD
+                ) D_SUB ON D_SUB.PSNL_CD = P.PSNL_CD
+                LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD
                 WHERE T.TRS_TYPE != '2'
                 GROUP BY T.ORG_CD";
 
@@ -38,7 +49,8 @@ if ($target == 'ALL') {
                     SUM(IFNULL(C.CONT_MALE, 0)) AS CONT_MALE,
                     SUM(IFNULL(C.CONT_FEMALE, 0)) AS CONT_FEMALE,
                     SUM(IFNULL(C.SHORT_MALE, 0)) AS SHORT_MALE,
-                    SUM(IFNULL(C.SHORT_FEMALE, 0)) AS SHORT_FEMALE
+                    SUM(IFNULL(C.SHORT_FEMALE, 0)) AS SHORT_FEMALE,
+                    SUM(IFNULL(C.REG_MALE, 0) + IFNULL(C.REG_FEMALE, 0) + IFNULL(C.CONT_MALE, 0) + IFNULL(C.CONT_FEMALE, 0) + IFNULL(C.SHORT_MALE, 0) + IFNULL(C.SHORT_FEMALE, 0)) AS TOTAL_CNT
                   FROM BONDANG_HR.ORG_INFO A
                   LEFT OUTER JOIN ($subqueryC) C ON A.ORG_CD = C.ORG_CD";
     $whereSql = " WHERE (A.UPPR_ORG_CD = '13061001' OR A.UPPR_ORG_CD IN (SELECT ORG_CD FROM BONDANG_HR.ORG_INFO WHERE UPPR_ORG_CD = '13061001') OR A.ORG_CD = '13061001') ";
@@ -50,7 +62,8 @@ if ($target == 'ALL') {
                     SUM(IFNULL(C.CONT_MALE, 0)) AS CONT_MALE,
                     SUM(IFNULL(C.CONT_FEMALE, 0)) AS CONT_FEMALE,
                     SUM(IFNULL(C.SHORT_MALE, 0)) AS SHORT_MALE,
-                    SUM(IFNULL(C.SHORT_FEMALE, 0)) AS SHORT_FEMALE
+                    SUM(IFNULL(C.SHORT_FEMALE, 0)) AS SHORT_FEMALE,
+                    SUM(IFNULL(C.REG_MALE, 0) + IFNULL(C.REG_FEMALE, 0) + IFNULL(C.CONT_MALE, 0) + IFNULL(C.CONT_FEMALE, 0) + IFNULL(C.SHORT_MALE, 0) + IFNULL(C.SHORT_FEMALE, 0)) AS TOTAL_CNT
                   FROM BONDANG_HR.ORG_INFO D
                   LEFT OUTER JOIN BONDANG_HR.ORG_INFO A ON (A.UPPR_ORG_CD = D.ORG_CD OR A.ORG_CD = D.ORG_CD)
                   LEFT OUTER JOIN ($subqueryC) C ON A.ORG_CD = C.ORG_CD";
@@ -63,7 +76,8 @@ if ($target == 'ALL') {
                     IFNULL(C.CONT_MALE, 0) AS CONT_MALE,
                     IFNULL(C.CONT_FEMALE, 0) AS CONT_FEMALE,
                     IFNULL(C.SHORT_MALE, 0) AS SHORT_MALE,
-                    IFNULL(C.SHORT_FEMALE, 0) AS SHORT_FEMALE
+                    IFNULL(C.SHORT_FEMALE, 0) AS SHORT_FEMALE,
+                    (IFNULL(C.REG_MALE, 0) + IFNULL(C.REG_FEMALE, 0) + IFNULL(C.CONT_MALE, 0) + IFNULL(C.CONT_FEMALE, 0) + IFNULL(C.SHORT_MALE, 0) + IFNULL(C.SHORT_FEMALE, 0)) AS TOTAL_CNT
                   FROM BONDANG_HR.ORG_INFO A
                   LEFT OUTER JOIN BONDANG_HR.ORG_INFO B ON A.UPPR_ORG_CD = B.ORG_CD
                   LEFT OUTER JOIN ($subqueryC) C ON A.ORG_CD = C.ORG_CD";
@@ -76,7 +90,8 @@ if ($target == 'ALL') {
                     IFNULL(C.CONT_MALE, 0) AS CONT_MALE,
                     IFNULL(C.CONT_FEMALE, 0) AS CONT_FEMALE,
                     IFNULL(C.SHORT_MALE, 0) AS SHORT_MALE,
-                    IFNULL(C.SHORT_FEMALE, 0) AS SHORT_FEMALE
+                    IFNULL(C.SHORT_FEMALE, 0) AS SHORT_FEMALE,
+                    (IFNULL(C.REG_MALE, 0) + IFNULL(C.REG_FEMALE, 0) + IFNULL(C.CONT_MALE, 0) + IFNULL(C.CONT_FEMALE, 0) + IFNULL(C.SHORT_MALE, 0) + IFNULL(C.SHORT_FEMALE, 0)) AS TOTAL_CNT
                   FROM BONDANG_HR.ORG_INFO A
                   LEFT OUTER JOIN BONDANG_HR.ORG_INFO B ON A.UPPR_ORG_CD = B.ORG_CD
                   LEFT OUTER JOIN ($subqueryC) C ON A.ORG_CD = C.ORG_CD";

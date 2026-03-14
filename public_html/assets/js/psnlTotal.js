@@ -30,7 +30,14 @@ var mytbl = new hr_tbl({
         , { title: "연락처", data: "PHONE_NUM", className: "hidden" }
         , { title: "주민번호", data: "PSNL_NUM", className: "hidden" }
         , { title: "재직구분", data: "TRS_TYPE", className: "hidden" }
-        , { title: "입/퇴사일", data: "TRS_DT", className: "" }
+        , { 
+            title: "입/퇴사일", data: "TRS_DT", className: "", render: function (data, row) {
+                if (row.TRS_TYPE === '퇴사' && data) {
+                    return data + "(퇴)";
+                }
+                return data;
+            }
+        }
         , { title: "임용일", data: "APP_DT", className: "hidden" }
         , { title: "경과(근속)", data: "TRS_ELAPSE", className: "" }
         , { title: "승급일", data: "ADVANCE_DT", className: "" }
@@ -98,7 +105,7 @@ async function trDataXHR(idx) {
         document.getElementById("mdBdPhoneNum").innerHTML = row.PHONE_NUM;
         document.getElementById("mdBdTrsType").innerHTML = row.TRS_TYPE;
         document.getElementById("mdBdPosition").innerHTML = row.POSITION;
-        document.getElementById("mdBdTrsDt").innerHTML = row.TRS_DT;
+        document.getElementById("mdBdTrsDt").innerHTML = row.TRS_DT + (row.TRS_TYPE === '퇴사' ? "(퇴)" : "");
         document.getElementById("mdBdWorkType").innerHTML = row.WORK_TYPE;
         if (row.GRD_GRADE) document.getElementById("mdBdGrdPay").innerHTML = row.GRD_GRADE + "급 " + row.GRD_PAY + "호";
         document.getElementById("mdBdAdvDt").innerHTML = row.ADVANCE_DT;
@@ -337,15 +344,14 @@ window.onload = function () {
     document.getElementById("WORK_TYPE").value = params.get("WORK_TYPE") || "";
     document.getElementById("TRS_TYPE").value = params.get("TRS_TYPE") !== null ? params.get("TRS_TYPE") : "1";
     
-    if (params.get("PSNL_CD_LIST")) {
-        document.getElementById("PSNL_CD_LIST").value = params.get("PSNL_CD_LIST");
-    }
+
 
     if (params.get("STAT_MODE")) {
         mytbl.hrDt.xhr.where["STAT_MODE"] = params.get("STAT_MODE");
         mytbl.hrDt.xhr.where["STAT_TARGET"] = params.get("STAT_TARGET");
         mytbl.hrDt.xhr.where["STAT_ORG_CD"] = params.get("STAT_ORG_CD");
         mytbl.hrDt.xhr.where["STAT_CAT"] = params.get("STAT_CAT");
+        mytbl.hrDt.xhr.where["STAT_BASE_DATE"] = params.get("STAT_BASE_DATE");
     }
 
     //파라미터 기초세팅 종료

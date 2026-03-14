@@ -8,6 +8,12 @@ include('./components/header.php');
 
     <div class="searchArea">
         <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>기준일</b></span></div>
+            <div class="colBd">
+                <input type="date" id="BASE_DATE" class="filter" value="<?php echo date('Y-m-d'); ?>">
+            </div>
+        </div>
+        <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>대상</b></span></div>
             <div class="colBd">
                 <select id="TARGET_TYPE" class="filter">
