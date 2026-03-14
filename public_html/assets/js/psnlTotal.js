@@ -344,14 +344,24 @@ window.onload = function () {
     document.getElementById("WORK_TYPE").value = params.get("WORK_TYPE") || "";
     document.getElementById("TRS_TYPE").value = params.get("TRS_TYPE") !== null ? params.get("TRS_TYPE") : "1";
     
+    if (params.get("POSITION")) document.getElementById("POSITION").value = params.get("POSITION");
+    if (params.get("AGE_MIN")) document.getElementById("AGE_MIN").value = params.get("AGE_MIN");
+    if (params.get("AGE_MAX")) document.getElementById("AGE_MAX").value = params.get("AGE_MAX");
+    if (params.get("PSNL_BIRTH_From")) document.getElementById("PSNL_BIRTH_From").value = params.get("PSNL_BIRTH_From");
+    if (params.get("PSNL_BIRTH_To")) document.getElementById("PSNL_BIRTH_To").value = params.get("PSNL_BIRTH_To");
 
+    if (params.get("STAT_BASE_DATE")) {
+        mytbl.hrDt.xhr.where["STAT_BASE_DATE"] = params.get("STAT_BASE_DATE");
+    }
+    if (params.get("GENDER")) {
+        mytbl.hrDt.xhr.where["GENDER"] = params.get("GENDER");
+    }
 
     if (params.get("STAT_MODE")) {
         mytbl.hrDt.xhr.where["STAT_MODE"] = params.get("STAT_MODE");
         mytbl.hrDt.xhr.where["STAT_TARGET"] = params.get("STAT_TARGET");
         mytbl.hrDt.xhr.where["STAT_ORG_CD"] = params.get("STAT_ORG_CD");
         mytbl.hrDt.xhr.where["STAT_CAT"] = params.get("STAT_CAT");
-        mytbl.hrDt.xhr.where["STAT_BASE_DATE"] = params.get("STAT_BASE_DATE");
     }
 
     //파라미터 기초세팅 종료

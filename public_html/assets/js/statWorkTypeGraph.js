@@ -69,9 +69,33 @@ function showDetailModal(date, key, label) {
                 html += '<tr><td colspan="2" style="padding:20px; text-align:center; color:#888;">해당하는 인원이 없습니다.</td></tr>';
             } else {
                 entries.forEach(([pos, count]) => {
+                    let url = `${DIR_ROOT}/psnlTotal?STAT_BASE_DATE=${date}&POSITION=${encodeURIComponent(pos)}`;
+                    
+                    if (workType === 'REG') url += '&WORK_TYPE=' + encodeURIComponent('정규');
+                    if (workType === 'CONT') url += '&WORK_TYPE=' + encodeURIComponent('계약');
+
+                    if (groupBy === 'gender') {
+                        if (key === 'male') url += '&GENDER=M';
+                        if (key === 'female') url += '&GENDER=F';
+                    } else { // age
+                        const year = parseInt(date.substring(0, 4));
+                        let minAge = 0, maxAge = 999;
+                        if (key === 'age_20') { minAge = 20; maxAge = 29; }
+                        else if (key === 'age_30') { minAge = 30; maxAge = 39; }
+                        else if (key === 'age_40') { minAge = 40; maxAge = 49; }
+                        else if (key === 'age_50') { minAge = 50; maxAge = 59; }
+                        else if (key === 'age_60') { minAge = 60; }
+                        
+                        const earlyYear = year - maxAge;
+                        const lateYear = year - minAge;
+                        url += `&PSNL_BIRTH_From=${earlyYear}-01-01&PSNL_BIRTH_To=${lateYear}-12-31`;
+                    }
+
                     html += `<tr>
                         <td style="padding:10px; border:1px solid #ddd;">${pos}</td>
-                        <td style="padding:10px; border:1px solid #ddd; text-align:center; font-weight:bold;">${count}명</td>
+                        <td style="padding:10px; border:1px solid #ddd; text-align:center; font-weight:bold;">
+                            <a href="${url}" target="_blank" style="color:#007bff; text-decoration:underline;">${count}명</a>
+                        </td>
                     </tr>`;
                 });
                 const total = entries.reduce((acc, curr) => acc + curr[1], 0);

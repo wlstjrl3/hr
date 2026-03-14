@@ -197,6 +197,13 @@ if (@$_REQUEST['PHONE_NUM']) {
     $params[] = '%' . $_REQUEST['PHONE_NUM'] . '%';
     $types .= "s";
 }
+if (@$_REQUEST['GENDER']) {
+    if ($_REQUEST['GENDER'] == 'M') {
+        $whereSql .= " AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9')";
+    } else if ($_REQUEST['GENDER'] == 'F') {
+        $whereSql .= " AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
+    }
+}
 // PSNL_NUM에서 완전한 YYYY-MM-DD 형식의 생년월일을 동적으로 생성
 // 주민등록번호의 7번째 자리(성별/세기 구분)를 사용하여 연도 세기를 결정
 $derivedBirthDateSql = "CONCAT(
