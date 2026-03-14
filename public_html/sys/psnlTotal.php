@@ -168,17 +168,17 @@ if (@$_REQUEST['BAPT_NM']) {
     $types .= "s";
 }
 if (@$_REQUEST['POSITION']) {
-    $whereSql .= " AND C.POSITION LIKE ?";
+    $whereSql .= " AND C2.POSITION LIKE ?";
     $params[] = '%' . $_REQUEST['POSITION'] . '%';
     $types .= "s";
 }
 if (@$_REQUEST['WORK_TYPE']) {
-    $whereSql .= " AND C.WORK_TYPE LIKE ?";
+    $whereSql .= " AND C2.WORK_TYPE LIKE ?";
     $params[] = '%' . $_REQUEST['WORK_TYPE'] . '%';
     $types .= "s";
 }
 if (@$_REQUEST['EXCLUDE_POS']) {
-    $whereSql .= " AND C.POSITION NOT LIKE ?";
+    $whereSql .= " AND C2.POSITION NOT LIKE ?";
     $params[] = '%' . $_REQUEST['EXCLUDE_POS'] . '%';
     $types .= "s";
 }
