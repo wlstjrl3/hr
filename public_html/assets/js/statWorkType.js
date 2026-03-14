@@ -40,6 +40,19 @@ function getWorkTypeLink(data, row, cat) {
 mytbl.show('myTbl');
 mytbl.xportBind();
 
+function checkDateNotice() {
+    const baseDate = document.getElementById("BASE_DATE") ? document.getElementById("BASE_DATE").value : "";
+    const notice = document.getElementById('dateNotice');
+    if (notice) {
+        if (baseDate && parseInt(baseDate.substring(0, 4)) < 2023) {
+            notice.style.display = 'block';
+        } else {
+            notice.style.display = 'none';
+        }
+    }
+}
+checkDateNotice();
+
 document.querySelectorAll(".filter").forEach((f) => {
     f.addEventListener("change", () => {
         if (f.id === "TARGET_TYPE") {
@@ -50,6 +63,10 @@ document.querySelectorAll(".filter").forEach((f) => {
                 document.getElementById("UPR_ORG").value = "";
                 delete mytbl.hrDt.xhr.where["UPR_ORG"];
             }
+        }
+        
+        if (f.id === "BASE_DATE") {
+            checkDateNotice();
         }
         
         mytbl.hrDt.xhr.where[f.id] = f.value;

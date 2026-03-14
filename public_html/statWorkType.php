@@ -41,6 +41,9 @@ include('./components/header.php');
         </div>
     </div>
     <div class="clearB"></div>
+    <div id="dateNotice" style="display:none; color: #d9534f; background: #fff1f0; border: 1px solid #ffa39e; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 13px;">
+        <strong>⚠️ 안내:</strong> 본 인사 프로그램의 데이터 입력은 <b>2023년 이후</b>부터 시작되었습니다. 2023년 이전의 인원 통계는 실제 고용 인원수와 차이가 있을 수 있으니 참고하시기 바랍니다.
+    </div>
 
     <br>
     <div class="tableOutFrm">

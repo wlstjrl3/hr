@@ -170,6 +170,11 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                                 └&nbsp;고용형태현황
                             </a>
                         </li>
+                        <li>
+                            <a href="<?php echo DIR_ROOT; ?>/statWorkTypeGraph">
+                                └&nbsp;고용형태 그래프
+                            </a>
+                        </li>
                     </ul>
                     <!--(남여/나이대/직종/평균임금/평균근속)직종별 남여분포, 나이대별 평균임금, 성별에 따른 평균근속 등 조합 조회 그래프 표시기능-->
                     <hr>
