@@ -94,6 +94,10 @@ transition:0.2s;width:12px;filter:invert(1);margin-top:0px;
         z-index: 1;
         top: 5px; /*상단 여백*/
         background-color: #369;
+        transition: top 0.2s ease-in-out;
+    }
+    .nav-up .side-nav {
+        top: -49px; /* header.nav-up top(-54px) + 5px(기존상단여백) = -49px */
     }
     .sideNavBlock > li{
         float:left;

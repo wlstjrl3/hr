@@ -28,7 +28,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
     <header id="header">
         <!-- Sidebar navigation {{{ --> 
         <div class="hd-nav-margin" style="width:0%;height:100%;float:left;background-color:white;position:fixed;z-index:3;top:54px;"></div>
-        <div class="side-nav">
+        <div class="side-nav" id="sideNav">
             <ul class="sideNavBlock">
                 <li>
                     <a class="fs5" href="<?php echo DIR_ROOT; ?>/">
@@ -39,23 +39,23 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <hr>
                 </li>
                 <li>
-                    <a class="fs5" href="#">인사정보 관리
+                    <a class="fs5" href="#">인사정보
                         <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
                     <ul>
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/psnlTotal?TRS_TYPE=1">
-                                └&nbsp;직원 종합정보 조회
+                                └&nbsp;직원 종합정보
                             </a>
                         </li>
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/psnlList">
-                                └&nbsp;직원 기초정보
+                                └&nbsp;직원 기초등록
                             </a>
                         </li>
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/trsList">
-                                └&nbsp;입퇴사 발령관리
+                                └&nbsp;입퇴사 발령
                             </a>
                         </li>
                         <li>
@@ -64,25 +64,33 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo DIR_ROOT; ?>/insList">
-                                └&nbsp;보증보험 정보 관리
-                            </a>
-                        </li>
-                        <li>
                             <a href="<?php echo DIR_ROOT; ?>/opiList">
-                                └&nbsp;상벌/직무평가 관리
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?php echo DIR_ROOT; ?>/">
-                                <span class="cl6">└&nbsp;발급 대장 관리</span>
+                                └&nbsp;상벌/직무평가
                             </a>
                         </li>
                     </ul>
                     <hr>
                 </li>
                 <li>
-                    <a class="fs5" href="#">승급 관리
+                    <a class="fs5" href="#">개발예정
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="<?php echo DIR_ROOT; ?>/insList">
+                                └&nbsp;보증보험 정보
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?php echo DIR_ROOT; ?>/certPrint">
+                                └&nbsp;증명서 발급
+                            </a>
+                        </li>
+                    </ul>
+                    <hr>
+                </li>
+                <li>
+                    <a class="fs5" href="#">승급
                         <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
                     <ul>
@@ -105,7 +113,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <hr>
                 </li>
                 <li>
-                    <a class="fs5" href="#">급여 관리
+                    <a class="fs5" href="#">급여
                         <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
                     <ul>
@@ -116,7 +124,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                         </li>
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/pttList.php">
-                                └&nbsp;최저임금 대상관리
+                                └&nbsp;최저임금 등록
                             </a>
                         </li>
                         <li>
@@ -133,7 +141,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <hr>
                 </li>    
                 <li>
-                    <a class="fs5" href="#">기초정보 관리
+                    <a class="fs5" href="#">기초정보
                         <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
                     <ul>
@@ -156,7 +164,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <hr>
                 </li>
                 <li>
-                    <a class="fs5" href="#">통계확인
+                    <a class="fs5" href="#">통계
                         <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
                     <ul>
@@ -179,10 +187,6 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <!--(남여/나이대/직종/평균임금/평균근속)직종별 남여분포, 나이대별 평균임금, 성별에 따른 평균근속 등 조합 조회 그래프 표시기능-->
                     <hr>
                 </li>
-                <li>
-                    <a class="fs5" href="./logout.php">로그아웃</a>
-                    <hr>
-                </li>             
             </ul>
         </div>
         <!-- Sidebar navigation }}}-->  

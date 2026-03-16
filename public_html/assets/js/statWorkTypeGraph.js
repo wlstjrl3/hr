@@ -35,6 +35,29 @@ function initChart() {
                 y: {
                     beginAtZero: true,
                     ticks: { stepSize: 1 }
+                },
+                x: {
+                    ticks: {
+                        callback: function(value, index, values) {
+                            const label = this.getLabelForValue(value);
+                            // Check if we have multiline data (stored in chart.summaryData)
+                            if (myChart.summaryData && myChart.summaryData[index]) {
+                                if (myChart.summaryData && myChart.summaryData[index]) {
+                                    // 배열 ["날짜", "총원 00명", "평균 00세"] 형태로 반환하면 줄바꿈 처리됨
+                                    const summaryLines = myChart.summaryData[index].split('\n');
+                                    return [label, ...summaryLines];
+                                }
+                            }
+                            return label;
+                        },
+                        font: {
+                            size: 11
+                        }
+                    },
+                    afterFit: function(scaleInstance) {
+                        // Increase the height of the x-axis to accommodate two lines
+                        //scaleInstance.height = 50;
+                    }
                 }
             },
             plugins: {
@@ -160,12 +183,50 @@ function loadData() {
                 });
             }
             myChart.data.datasets = datasets;
+            
+            // Add summary data to x-axis labels if groupBy is 'age'
+            if (groupBy === 'age') {
+                const summaryData = [];
+                data.labels.forEach((date, index) => {
+                    let total = 0;
+                    let weightedSum = 0;
+                    let count = 0;
+                    
+                    myChart.data.datasets.forEach(ds => {
+                        const v = ds.data[index];
+                        if (typeof v === 'number') {
+                            total += v;
+                            count += v;
+                            const mid = getAgeMidpoint(ds.rawKey);
+                            weightedSum += v * mid;
+                        }
+                    });
+                    
+                    const avgAge = count > 0 ? Math.round(weightedSum / count) : 0;
+                    summaryData.push(`총원 ${total}명\n평균 ${avgAge}세`);
+                });
+                myChart.summaryData = summaryData;
+            } else {
+                myChart.summaryData = [];
+            }
+            
             myChart.update();
         })
         .catch(error => console.error('Error loading chart data:', error))
         .finally(() => {
             if (overlay) overlay.style.display = 'none';
         });
+}
+
+function getAgeMidpoint(key) {
+    switch(key) {
+        case 'age_20': return 25;
+        case 'age_30': return 35;
+        case 'age_40': return 45;
+        case 'age_50': return 55;
+        case 'age_60': return 65;
+        default: return 0;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
