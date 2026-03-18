@@ -136,10 +136,10 @@ function showDetailModal(date, key, label) {
 const colorPalette = {
     male: { border: 'rgb(54, 162, 235)', bg: 'rgba(54, 162, 235, 0.2)' },
     female: { border: 'rgb(255, 99, 132)', bg: 'rgba(255, 99, 132, 0.2)' },
-    age_20: { border: 'rgb(153, 102, 255)', bg: 'rgba(153, 102, 255, 0.2)' },
+    age_20: { border: 'rgb(255, 205, 86)', bg: 'rgba(255, 205, 86, 0.2)' },
     age_30: { border: 'rgb(255, 159, 64)', bg: 'rgba(255, 159, 64, 0.2)' },
-    age_40: { border: 'rgb(255, 205, 86)', bg: 'rgba(255, 205, 86, 0.2)' },
-    age_50: { border: 'rgb(201, 203, 207)', bg: 'rgba(201, 203, 207, 0.2)' },
+    age_40: { border: 'rgb(54, 162, 235)', bg: 'rgba(54, 162, 235, 0.2)' },
+    age_50: { border: 'rgb(153, 102, 255)', bg: 'rgba(153, 102, 255, 0.2)' },
     age_60: { border: 'rgb(0, 0, 0)', bg: 'rgba(0, 0, 0, 0.2)' }
 };
 

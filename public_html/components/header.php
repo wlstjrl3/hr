@@ -164,7 +164,7 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                     <hr>
                 </li>
                 <li>
-                    <a class="fs5" href="#">통계
+                    <a class="fs5" href="#">통계/자료
                         <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
                     </a>
                     <ul>
@@ -181,6 +181,11 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/statWorkTypeGraph">
                                 └&nbsp;고용형태 그래프
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?php echo DIR_ROOT; ?>/statPsnlTable">
+                                └&nbsp;인사관리 대상 현황
                             </a>
                         </li>
                     </ul>
