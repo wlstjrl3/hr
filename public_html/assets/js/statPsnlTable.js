@@ -1,13 +1,29 @@
 (function () {
+    const tableArea = document.getElementById('statPsnlTableArea');
     const tableBody = document.getElementById('statPsnlTableBody');
+    const tableHead = document.querySelector('#statPsnlTable thead');
     const psnlKey = document.getElementById('psnlKey').value;
     const includeDomesticCheck = document.getElementById('includeDomestic');
     const statBaseDateInput = document.getElementById('statBaseDate');
     const sortOrderSelect = document.getElementById('sortOrder');
     const shortenPosCheck = document.getElementById('shortenPos');
+    const showExtCheck = document.getElementById('showExt');
+    const showTelCheck = document.getElementById('showTel');
+    const showBaptCheck = document.getElementById('showBapt');
+    const showWorkTypeCheck = document.getElementById('showWorkType');
+
+    function getColspan() {
+        let cols = 4; // 기본: 번호, 지구, 본당명, 성명
+        if (showExtCheck.checked) cols++;
+        if (showTelCheck.checked) cols++;
+        if (showBaptCheck.checked) cols++;
+        if (showWorkTypeCheck.checked) cols++;
+        return cols;
+    }
 
     async function loadData() {
-        tableBody.innerHTML = '<tr><td colspan="6" class="txtCenter pddS">데이터를 불러오는 중입니다...</td></tr>';
+        const colspan = getColspan();
+        tableBody.innerHTML = `<tr><td colspan="${colspan}" class="txtCenter pddS">데이터를 불러오는 중입니다...</td></tr>`;
 
         try {
             const baseUrl = `${DIR_ROOT}/sys/statPsnlTable.php?key=${psnlKey}`;
@@ -22,7 +38,7 @@
             const data = result.data;
 
             if (!data || data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6" class="txtCenter pddS">데이터가 없습니다.</td></tr>';
+                tableBody.innerHTML = `<tr><td colspan="${colspan}" class="txtCenter pddS">데이터가 없습니다.</td></tr>`;
                 return;
             }
 
@@ -30,7 +46,7 @@
 
         } catch (error) {
             console.error('Data fetch error:', error);
-            tableBody.innerHTML = '<tr><td colspan="6" class="txtCenter pddS">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>';
+            tableBody.innerHTML = `<tr><td colspan="${colspan}" class="txtCenter pddS">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
         }
     }
 
@@ -38,26 +54,37 @@
     loadData();
 
     // 필터 변경 시 새로고침
-    includeDomesticCheck.addEventListener('change', loadData);
-    statBaseDateInput.addEventListener('change', loadData);
-    sortOrderSelect.addEventListener('change', loadData);
-    shortenPosCheck.addEventListener('change', loadData);
+    const filters = [includeDomesticCheck, statBaseDateInput, sortOrderSelect, shortenPosCheck, showExtCheck, showTelCheck, showBaptCheck, showWorkTypeCheck];
+    filters.forEach(f => f.addEventListener('change', loadData));
 
     function renderTable(rawData) {
-        let html = '';
-        let parishGlobalCounter = 0; // 전역 본당 순번
+        const showExt = showExtCheck.checked;
+        const showTel = showTelCheck.checked;
+        const showBapt = showBaptCheck.checked;
+        const showWorkType = showWorkTypeCheck.checked;
         const useShortenPos = shortenPosCheck.checked;
 
-        // 1. 성지 분리 및 데이터 재구성
+        // 1. 헤더 렌더링
+        let headerHtml = '<tr>';
+        headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">번호</th>';
+        headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">지구</th>';
+        headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">본당 및 기관명</th>';
+        if (showExt) headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">내선</th>';
+        if (showTel) headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">국번</th>';
+        headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">성명</th>';
+        if (showBapt) headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">세례명</th>';
+        if (showWorkType) headerHtml += '<th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">고용형태</th>';
+        headerHtml += '</tr>';
+        tableHead.innerHTML = headerHtml;
+
+        // 2. 데이터 재구성 (성지 분리)
         const regular = rawData.filter(r => !(r.ORG_NM || '').endsWith('성지'));
         const holySites = rawData.filter(r => (r.ORG_NM || '').endsWith('성지'));
-
-        // 성지들의 지구명을 '성지'로 통일
-        holySites.forEach(r => {
-            r.UPPR_ORG_NM = '성지';
-        });
+        holySites.forEach(r => r.UPPR_ORG_NM = '성지');
 
         const data = [...regular, ...holySites];
+        let html = '';
+        let parishGlobalCounter = 0;
         let districtStartIdx = 0;
 
         while (districtStartIdx < data.length) {
@@ -69,7 +96,6 @@
 
             const districtRowCount = districtEndIdx - districtStartIdx;
             const districtPersonnelCount = districtRowCount;
-
             let parishStartIdx = districtStartIdx;
             let isFirstRowOfDistrict = true;
 
@@ -82,9 +108,8 @@
 
                 const parishRowCount = parishEndIdx - parishStartIdx;
                 let isFirstRowOfParish = true;
-                parishGlobalCounter++; // 본당이 바뀔 때마다 증가
+                parishGlobalCounter++;
 
-                // 동일 본당 내 직책별 카운트 추적
                 let posCounter = {};
                 let parishRows = data.slice(parishStartIdx, parishEndIdx);
 
@@ -95,24 +120,38 @@
 
                     html += `<tr class="${rowClass}" style="border: 1px solid #ddd;">`;
 
-                    // 1. 번호 (본당별 병합) - 전역 순번 사용
+                    // 번호
                     if (isFirstRowOfParish) {
                         html += `<td rowspan="${parishRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle;">${parishGlobalCounter}</td>`;
                     }
 
-                    // 2. 지구 (지구별 병합) - 인원수 포함
+                    // 지구
                     if (isFirstRowOfDistrict) {
                         html += `<td rowspan="${districtRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle; background-color: #fff;">${districtName}<br>(${districtPersonnelCount}명)</td>`;
                         isFirstRowOfDistrict = false;
                     }
 
-                    // 3. 본당 및 기관명 (본당별 병합)
+                    // 본당명
                     if (isFirstRowOfParish) {
                         html += `<td rowspan="${parishRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle;">${parishName}</td>`;
+                        
+                        let extension = '';
+                        if (row.ORG_IN_TEL) {
+                            const match = row.ORG_IN_TEL.match(/\d{4}/);
+                            if (match) extension = match[0];
+                        }
+                        const outTel = row.ORG_OUT_TEL || '';
+
+                        if (showExt) {
+                            html += `<td rowspan="${parishRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle;">${extension}</td>`;
+                        }
+                        if (showTel) {
+                            html += `<td rowspan="${parishRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle;">${outTel}</td>`;
+                        }
                         isFirstRowOfParish = false;
                     }
 
-                    // 4. 성명 (직책 포함 및 단축 로직)
+                    // 성명
                     let displayPos = row.POSITION;
                     if (useShortenPos) {
                         if (displayPos === '사무장') displayPos = '장';
@@ -120,11 +159,9 @@
                         else if (displayPos === '관리장' || displayPos === '관리원') displayPos = '관';
                         else if (displayPos === '가사사용인') displayPos = '가';
 
-                        // 같은 직책 카운트 처리
                         if (!posCounter[displayPos]) posCounter[displayPos] = 0;
                         posCounter[displayPos]++;
 
-                        // 해당 본당 내에서 이 직책이 여러 명인지 미리 확인
                         let totalSamePosInParish = parishRows.filter(r => {
                             let rPos = r.POSITION;
                             if (rPos === '사무장') rPos = '장';
@@ -134,26 +171,25 @@
                             return rPos === displayPos;
                         }).length;
 
-                        if (totalSamePosInParish > 1) {
-                            displayPos += posCounter[displayPos];
-                        }
+                        if (totalSamePosInParish > 1) displayPos += posCounter[displayPos];
                     }
-
                     html += `<td class="txtCenter" style="border: 1px solid #ddd; padding: 4px;">(${displayPos})${row.PSNL_NM}</td>`;
 
-                    // 5. 세례명
-                    html += `<td class="txtCenter" style="border: 1px solid #ddd; padding: 4px;">${row.BAPT_NM}</td>`;
-                    // 6. 고용형태
-                    html += `<td class="txtCenter" style="border: 1px solid #ddd; padding: 4px;">${row.WORK_TYPE}</td>`;
+                    // 세례명
+                    if (showBapt) {
+                        html += `<td class="txtCenter" style="border: 1px solid #ddd; padding: 4px;">${row.BAPT_NM}</td>`;
+                    }
+                    // 고용형태
+                    if (showWorkType) {
+                        html += `<td class="txtCenter" style="border: 1px solid #ddd; padding: 4px;">${row.WORK_TYPE}</td>`;
+                    }
 
                     html += `</tr>`;
                 }
                 parishStartIdx = parishEndIdx;
             }
-
             districtStartIdx = districtEndIdx;
         }
-
         tableBody.innerHTML = html;
     }
 })();

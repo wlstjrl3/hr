@@ -33,6 +33,8 @@ $sql = "SELECT
             C.POSITION,
             B.ORG_NM,
             B.ORG_CD,
+            B.ORG_IN_TEL,
+            B.ORG_OUT_TEL,
             D.ORG_NM AS UPPR_ORG_NM,
             D.ORG_CD AS UPPR_ORG_CD
         FROM PSNL_INFO A

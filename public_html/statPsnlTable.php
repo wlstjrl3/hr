@@ -12,6 +12,18 @@ include("./components/header.php");
                 <input type="checkbox" id="shortenPos" class="filter" checked> 직책단축표시
             </label>
             <label style="margin-right: 20px;">
+                <input type="checkbox" id="showExt" class="filter" checked> 내선 표시
+            </label>
+            <label style="margin-right: 20px;">
+                <input type="checkbox" id="showTel" class="filter" checked> 국번 표시
+            </label>
+            <label style="margin-right: 20px;">
+                <input type="checkbox" id="showBapt" class="filter" checked> 세례명 표시
+            </label>
+            <label style="margin-right: 20px;">
+                <input type="checkbox" id="showWorkType" class="filter" checked> 고용형태 표시
+            </label>
+            <label style="margin-right: 20px;">
                 <input type="checkbox" id="includeDomestic" class="filter"> 가사사용인 포함
             </label>
             <label style="margin-right: 20px;">
@@ -34,6 +46,7 @@ include("./components/header.php");
                         <th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">번호</th>
                         <th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">지구</th>
                         <th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">본당 및 기관명</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">[내선(국번)]</th>
                         <th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">성명</th>
                         <th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">세례명</th>
                         <th style="border: 1px solid #ddd; padding: 8px;background:#579;color:white;">고용형태</th>
@@ -41,7 +54,7 @@ include("./components/header.php");
                 </thead>
                 <tbody id="statPsnlTableBody">
                     <tr>
-                        <td colspan="6" class="txtCenter pddS">데이터를 불러오는 중입니다...</td>
+                        <td colspan="7" class="txtCenter pddS">데이터를 불러오는 중입니다...</td>
                     </tr>
                 </tbody>
             </table>
