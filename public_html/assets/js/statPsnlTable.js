@@ -11,6 +11,9 @@
     const showTelCheck = document.getElementById('showTel');
     const showBaptCheck = document.getElementById('showBapt');
     const showWorkTypeCheck = document.getElementById('showWorkType');
+    const btnPrint = document.getElementById('btnPrint');
+
+    let currentRawData = []; // 인쇄를 위한 데이터 저장용
 
     function getColspan() {
         let cols = 4; // 기본: 번호, 지구, 본당명, 성명
@@ -35,14 +38,14 @@
 
             const response = await fetch(url);
             const result = await response.json();
-            const data = result.data;
+            currentRawData = result.data || [];
 
-            if (!data || data.length === 0) {
+            if (currentRawData.length === 0) {
                 tableBody.innerHTML = `<tr><td colspan="${colspan}" class="txtCenter pddS">데이터가 없습니다.</td></tr>`;
                 return;
             }
 
-            renderTable(data);
+            renderTable(currentRawData);
 
         } catch (error) {
             console.error('Data fetch error:', error);
@@ -56,6 +59,15 @@
     // 필터 변경 시 새로고침
     const filters = [includeDomesticCheck, statBaseDateInput, sortOrderSelect, shortenPosCheck, showExtCheck, showTelCheck, showBaptCheck, showWorkTypeCheck];
     filters.forEach(f => f.addEventListener('change', loadData));
+
+    // 인쇄 버튼 이벤트
+    btnPrint.addEventListener('click', function () {
+        if (!currentRawData || currentRawData.length === 0) {
+            alert('인쇄할 데이터가 없습니다.');
+            return;
+        }
+        printTable(currentRawData);
+    });
 
     function renderTable(rawData) {
         const showExt = showExtCheck.checked;
@@ -134,7 +146,7 @@
                     // 본당명
                     if (isFirstRowOfParish) {
                         html += `<td rowspan="${parishRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle;">${parishName}</td>`;
-                        
+
                         let extension = '';
                         if (row.ORG_IN_TEL) {
                             const match = row.ORG_IN_TEL.match(/\d{4}/);
@@ -191,5 +203,170 @@
             districtStartIdx = districtEndIdx;
         }
         tableBody.innerHTML = html;
+    }
+
+    function printTable(rawData) {
+        const useShortenPos = shortenPosCheck.checked;
+        const baseDate = statBaseDateInput.value;
+
+        // 1. 데이터 재구성 (성지 분리) - renderTable과 동일한 순서 유지
+        const regular = rawData.filter(r => !(r.ORG_NM || '').endsWith('성지'));
+        const holySites = rawData.filter(r => (r.ORG_NM || '').endsWith('성지'));
+        holySites.forEach(r => r.UPPR_ORG_NM = '성지');
+        const sourceData = [...regular, ...holySites];
+
+        // 2. 출력용 플랫 데이터 생성 (rowspan 없이 단순화)
+        let printRows = [];
+        let parishCounter = 0;
+        let lastParishName = '';
+
+        // 동일 본당 내 직책 번호 매김을 위한 로직
+        let parishGroups = [];
+        let currentGroup = [];
+        sourceData.forEach((row, idx) => {
+            if (idx > 0 && row.ORG_NM !== sourceData[idx - 1].ORG_NM) {
+                parishGroups.push(currentGroup);
+                currentGroup = [];
+            }
+            currentGroup.push(row);
+            if (idx === sourceData.length - 1) parishGroups.push(currentGroup);
+        });
+
+        parishGroups.forEach(group => {
+            parishCounter++;
+            let posCounter = {};
+
+            group.forEach(row => {
+                // 내선 추출
+                let extension = '';
+                if (row.ORG_IN_TEL) {
+                    const match = row.ORG_IN_TEL.match(/\d{4}/);
+                    if (match) extension = match[0];
+                }
+                
+                // 내선이 없는 경우 국번(OUT_TEL)에서 앞자리 제거 후 표시
+                if (!extension && row.ORG_OUT_TEL) {
+                    extension = row.ORG_OUT_TEL.replace(/^031-/, '');
+                }
+
+                // 직책 단축 및 번호
+                let displayPos = row.POSITION;
+                if (useShortenPos) {
+                    if (displayPos === '사무장') displayPos = '장';
+                    else if (displayPos === '사무원') displayPos = '원';
+                    else if (displayPos === '관리장' || displayPos === '관리원') displayPos = '관';
+                    else if (displayPos === '가사사용인') displayPos = '가';
+
+                    if (!posCounter[displayPos]) posCounter[displayPos] = 0;
+                    posCounter[displayPos]++;
+
+                    // 해당 본당 내에서 이 직책이 여러 명인지 확인
+                    let totalSamePosInParish = group.filter(r => {
+                        let rPos = r.POSITION;
+                        if (rPos === '사무장') rPos = '장';
+                        else if (rPos === '사무원') rPos = '원';
+                        else if (rPos === '관리장' || rPos === '관리원') rPos = '관';
+                        else if (rPos === '가사사용인') rPos = '가';
+                        return rPos === displayPos;
+                    }).length;
+
+                    if (totalSamePosInParish > 1) displayPos += posCounter[displayPos];
+                }
+
+                printRows.push({
+                    district: row.UPPR_ORG_NM || '미지정',
+                    no: parishCounter,
+                    parish: row.ORG_NM,
+                    ext: extension,
+                    name: `(${displayPos})${row.PSNL_NM}`
+                });
+            });
+        });
+
+        // 3. 3단 분할
+        const totalRows = printRows.length;
+        const rowsPerBank = Math.ceil(totalRows / 3);
+        const banks = [
+            printRows.slice(0, rowsPerBank),
+            printRows.slice(rowsPerBank, rowsPerBank * 2),
+            printRows.slice(rowsPerBank * 2)
+        ];
+
+        // 4. HTML 생성
+        let printHtml = `
+            <div style="position: relative; margin-bottom: 20px; font-family: sans-serif; display: flex; justify-content: center; align-items: flex-end;">
+                <h2 style="margin: 0; font-size: 24px; text-align: center; width: 100%;">제1대리구 본당 내선 번호</h2>
+                <div style="position: absolute; right: 0; bottom: 0; font-size: 11px; color: #333;">(기준일: ${baseDate})</div>
+            </div>
+            <div>`;
+
+        banks.forEach((bankData, i) => {
+            printHtml += `<table class="print-bank">`;
+            printHtml += `<thead><tr>
+                <th>지구</th>
+                <th>번호</th>
+                <th style="width: 55px;">본당명</th>
+                <th style="width: 60px; white-space: nowrap;">내선</th>
+                <th>성명</th>
+            </tr></thead>`;
+            printHtml += `<tbody>`;
+
+            let dIdx = 0;
+            while (dIdx < bankData.length) {
+                let currentDistrict = bankData[dIdx].district;
+                let dCount = 1;
+                while (dIdx + dCount < bankData.length && bankData[dIdx + dCount].district === currentDistrict) {
+                    dCount++;
+                }
+
+                let endDIdx = dIdx + dCount;
+                let pIdx = dIdx;
+                let isFirstD = true;
+
+                while (pIdx < endDIdx) {
+                    let currentNo = bankData[pIdx].no;
+                    let pCount = 1;
+                    while (pIdx + pCount < endDIdx && bankData[pIdx + pCount].no === currentNo) {
+                        pCount++;
+                    }
+
+                    let endPIdx = pIdx + pCount;
+                    let isFirstP = true;
+
+                    for (let r = pIdx; r < endPIdx; r++) {
+                        let row = bankData[r];
+                        let trClass = (row.no % 2 === 0) ? "print-parish-even" : "";
+                        printHtml += `<tr class="${trClass}">`;
+
+                        if (isFirstD) {
+                            let verticalDist = currentDistrict.split('').join('<br>');
+                            printHtml += `<td rowspan="${dCount}" style="background-color: #fff !important; width: 1.5em; vertical-align: middle;">${verticalDist}</td>`;
+                            isFirstD = false;
+                        }
+
+                        if (isFirstP) {
+                            printHtml += `<td rowspan="${pCount}" style="vertical-align: middle;">${row.no}</td>`;
+                            printHtml += `<td rowspan="${pCount}" style="vertical-align: middle;">${row.parish}</td>`;
+                            printHtml += `<td rowspan="${pCount}" style="vertical-align: middle;">${row.ext}</td>`;
+                            isFirstP = false;
+                        }
+
+                        printHtml += `<td>${row.name}</td>`;
+                        printHtml += `</tr>`;
+                    }
+                    pIdx = endPIdx;
+                }
+                dIdx = endDIdx;
+            }
+
+            printHtml += `</tbody></table>`;
+        });
+
+        printHtml += '</div>';
+
+        const printArea = document.getElementById('printArea');
+        printArea.innerHTML = printHtml;
+
+        window.print();
     }
 })();

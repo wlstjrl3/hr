@@ -4,10 +4,27 @@ include("./components/header.php");
 <style>
     .parish-even { background-color: #f5f5f5; }
     /*#statPsnlTableBody tr:hover { background-color: #f1f1f1; }*/
+    
+    @media print {
+        @page { size: A3; margin: 10mm; }
+        body, html { background: #fff !important; }
+        body * { visibility: hidden; }
+        #contents { display: none !important; }
+        #printArea, #printArea * { visibility: visible; }
+        #printArea { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; }
+        .print-bank { float: left; width: 32%; margin-right: 1.3%; border-collapse: collapse; font-size: 10px; background: #fff !important; }
+        .print-bank:last-child { margin-right: 0; }
+        .print-bank th, .print-bank td { border: 1px solid #ccc; padding: 1px 2px; text-align: center; }
+        .print-bank th { background-color: #fff !important; -webkit-print-color-adjust: exact; font-weight: bold; }
+        .print-parish-even { background-color: #eaf4ff !important; -webkit-print-color-adjust: exact; }
+    }
+    #printArea { display: none; }
+    @media print { #printArea { display: block; } }
 </style>
 <div id="contents">
     <div class="pddS">
         <div class="rndCorner clBrC clBgW pddS" style="margin-bottom: 10px;">
+            <button id="btnPrint" class="clBtn" style="margin-right: 20px; padding: 4px 12px; cursor: pointer;">인쇄</button>
             <label style="margin-right: 20px;">
                 <input type="checkbox" id="shortenPos" class="filter" checked> 직책단축표시
             </label>
@@ -61,6 +78,9 @@ include("./components/header.php");
         </div>
     </div>
 </div>
+
+<!-- 인쇄용 영역 -->
+<div id="printArea"></div>
 
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statPsnlTable.js?ver=0.001'></script>
 
