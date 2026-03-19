@@ -305,7 +305,7 @@
             printHtml += `<thead><tr>
                 <th>지구</th>
                 <th>번호</th>
-                <th style="width: 55px;">본당명</th>
+                <th style="width: 65px;">본당명</th>
                 <th style="width: 60px; white-space: nowrap;">내선</th>
                 <th>성명</th>
             </tr></thead>`;

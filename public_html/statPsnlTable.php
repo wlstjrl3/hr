@@ -14,8 +14,8 @@ include("./components/header.php");
         #printArea { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; }
         .print-bank { float: left; width: 32%; margin-right: 1.3%; border-collapse: collapse; font-size: 10px; background: #fff !important; }
         .print-bank:last-child { margin-right: 0; }
-        .print-bank th, .print-bank td { border: 1px solid #ccc; padding: 1px 2px; text-align: center; }
-        .print-bank th { background-color: #fff !important; -webkit-print-color-adjust: exact; font-weight: bold; }
+        .print-bank th, .print-bank td { border: 0.5pt solid #ccc; padding: 1px 2px; text-align: center; } /* 표의 라인두께 */
+        .print-bank th { background-color: #eee !important; -webkit-print-color-adjust: exact; font-weight: bold; }
         .print-parish-even { background-color: #eaf4ff !important; -webkit-print-color-adjust: exact; }
     }
     #printArea { display: none; }
