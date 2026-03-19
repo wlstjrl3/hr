@@ -340,7 +340,12 @@
 
                         if (isFirstD) {
                             let verticalDist = currentDistrict.split('').join('<br>');
-                            printHtml += `<td rowspan="${dCount}" style="background-color: #fff !important; width: 1.5em; vertical-align: middle;">${verticalDist}</td>`;
+                            // 괄호(︵, ︶)만 회전된 유니코드를 사용하고 숫자는 수직으로 나열
+                            let verticalNum = String(dCount).split('').join('<br>');
+                            let countStr = `<div style="margin-top: 5px; line-height: 1;">︵<br>${verticalNum}<br>︶</div>`;
+                            printHtml += `<td rowspan="${dCount}" style="background-color: #fff !important; width: 1.5em; vertical-align: middle; line-height: 1.2;">
+                                ${verticalDist}<br>${countStr}
+                            </td>`;
                             isFirstD = false;
                         }
 
