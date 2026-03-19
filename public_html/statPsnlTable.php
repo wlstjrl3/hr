@@ -15,7 +15,7 @@ include("./components/header.php");
                 <input type="checkbox" id="showExt" class="filter" checked> 내선 표시
             </label>
             <label style="margin-right: 20px;">
-                <input type="checkbox" id="showTel" class="filter" checked> 국번 표시
+                <input type="checkbox" id="showTel" class="filter"> 국번 표시
             </label>
             <label style="margin-right: 20px;">
                 <input type="checkbox" id="showBapt" class="filter" checked> 세례명 표시
