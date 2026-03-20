@@ -31,7 +31,23 @@ $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A
             GROUP BY PSNL_CD
         ) C2_SUB ON C2_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C2 ON C2.TRS_CD = C2_SUB.MAX_TRS_CD
-        LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD   
+        LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD
+
+        LEFT OUTER JOIN (
+            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
+            FROM GRADE_HISTORY
+            {$grdCond}
+            GROUP BY PSNL_CD
+        ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD
+
+        LEFT OUTER JOIN (
+            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
+            FROM PSNL_PARTTIME
+            {$pttCond}
+            GROUP BY PSNL_CD
+        ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD
         ";
 //기본 쿼리 (전보로 사무장 전환 등의 정보를 반영하기 위하여 기존 C.TRS_TYPE / C.POSITION등의 데이터를 모두 C2로 교체함 20251128 양진석)
 $sql = "SELECT 
@@ -46,7 +62,9 @@ $sql = "SELECT
             SELECT PERSON_CNT FROM ORG_HISTORY WHERE B.ORG_CD = ORG_HISTORY.ORG_CD
             ORDER BY OH_DT DESC LIMIT 1
         ),0) AS PERSON_CNT
-        ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM,A.PHONE_NUM,LEFT(A.PSNL_NUM,14) AS PSNL_NUM
+        ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM
+        ,(YEAR(CURDATE()) - (CASE WHEN SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '2', '5', '6') THEN 1900 ELSE 2000 END + LEFT(A.PSNL_NUM, 2))) AS AGE
+        ,A.PHONE_NUM,LEFT(A.PSNL_NUM,14) AS PSNL_NUM
         ,TRUNCATE(DATEDIFF(CURDATE(), C.TRS_DT)/365,1) AS TRS_ELAPSE 
         ,CASE 
             WHEN D.ADVANCE_DT IS NOT NULL AND PTT.PTT_YEAR IS NOT NULL THEN 
@@ -173,9 +191,16 @@ if (@$_REQUEST['POSITION']) {
     $types .= "s";
 }
 if (@$_REQUEST['WORK_TYPE']) {
-    $whereSql .= " AND C2.WORK_TYPE LIKE ?";
-    $params[] = '%' . $_REQUEST['WORK_TYPE'] . '%';
-    $types .= "s";
+    $workTypes = array_filter(array_map('trim', explode(',', $_REQUEST['WORK_TYPE'])));
+    if (!empty($workTypes)) {
+        $wtConds = [];
+        foreach ($workTypes as $wt) {
+            $wtConds[] = "C2.WORK_TYPE LIKE ?";
+            $params[] = '%' . $wt . '%';
+            $types .= "s";
+        }
+        $whereSql .= " AND (" . implode(" OR ", $wtConds) . ")";
+    }
 }
 if (@$_REQUEST['EXCLUDE_POS']) {
     $whereSql .= " AND C2.POSITION NOT LIKE ?";
@@ -203,6 +228,43 @@ if (@$_REQUEST['GENDER']) {
     } else if ($_REQUEST['GENDER'] == 'F') {
         $whereSql .= " AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
     }
+}
+if (@$_REQUEST['GRD_GRADE']) {
+    $whereSql .= " AND D.GRD_GRADE = ?";
+    $params[] = $_REQUEST['GRD_GRADE'];
+    $types .= "s";
+}
+if (@$_REQUEST['GRD_GRADE_From']) {
+    $whereSql .= " AND CAST(D.GRD_GRADE AS UNSIGNED) >= ?";
+    $params[] = $_REQUEST['GRD_GRADE_From'];
+    $types .= "i";
+}
+if (@$_REQUEST['GRD_GRADE_To']) {
+    $whereSql .= " AND CAST(D.GRD_GRADE AS UNSIGNED) <= ?";
+    $params[] = $_REQUEST['GRD_GRADE_To'];
+    $types .= "i";
+}
+if (@$_REQUEST['GRD_PAY']) {
+    if ($_REQUEST['GRD_PAY'] == 'EMPTY') {
+        $whereSql .= " AND (D.GRD_PAY IS NULL OR D.GRD_PAY = '' OR D.GRD_PAY = '0')";
+    } else {
+        $whereSql .= " AND D.GRD_PAY = ?";
+        $params[] = $_REQUEST['GRD_PAY'];
+        $types .= "s";
+    }
+}
+if (@$_REQUEST['GRD_PAY_From']) {
+    $whereSql .= " AND CAST(D.GRD_PAY AS UNSIGNED) >= ?";
+    $params[] = $_REQUEST['GRD_PAY_From'];
+    $types .= "i";
+}
+if (@$_REQUEST['GRD_PAY_To']) {
+    $whereSql .= " AND CAST(D.GRD_PAY AS UNSIGNED) <= ?";
+    $params[] = $_REQUEST['GRD_PAY_To'];
+    $types .= "i";
+}
+if (@$_REQUEST['HAS_PAY'] == 'Y') {
+    $whereSql .= " AND (D.GRD_PAY IS NOT NULL AND D.GRD_PAY != '' AND D.GRD_PAY != '0')";
 }
 // PSNL_NUM에서 완전한 YYYY-MM-DD 형식의 생년월일을 동적으로 생성
 // 주민등록번호의 7번째 자리(성별/세기 구분)를 사용하여 연도 세기를 결정
@@ -252,22 +314,6 @@ if (@$_REQUEST['TRS_DT_To']) {
 
 // statWorkType 통계 연결 모드 필터
 if (@$_REQUEST['STAT_MODE'] == '1') {
-    $rowCntSql .= " LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
-            FROM PSNL_PARTTIME
-            {$pttCond}
-            GROUP BY PSNL_CD
-        ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
-        LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD 
-        
-        LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
-            FROM GRADE_HISTORY
-            {$grdCond}
-            GROUP BY PSNL_CD
-        ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
-        LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD ";
-
     $cat = @$_REQUEST['STAT_CAT'];
     $target = @$_REQUEST['STAT_TARGET'];
     $org_cd = @$_REQUEST['STAT_ORG_CD'];

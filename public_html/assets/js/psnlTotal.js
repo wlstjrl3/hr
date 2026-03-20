@@ -25,6 +25,7 @@ var mytbl = new hr_tbl({
         , { title: "소속조직", data: "ORG_NM", className: "" }
         , { title: "성명", data: "PSNL_NM", className: "" }
         , { title: "세례명", data: "BAPT_NM", className: "" }
+        , { title: "연령", data: "AGE", className: "" }
         , { title: "직책", data: "POSITION", className: "" }
         , { title: "고용형태", data: "WORK_TYPE", className: "" }
         , { title: "연락처", data: "PHONE_NUM", className: "hidden" }
@@ -282,6 +283,7 @@ const colGroups = [
     { title: "기본급", id: "grpPayInfo", keys: ["NORMAL_PAY", "LEGAL_PAY"], checked: "checked" },
     { title: "각종수당", id: "grpAdjPayInfo", keys: ["ADJUST_PAY1", "FAMILY_PAY", "ADJUST_PAY2", "ADJUST_PAY3", "ADJUST_PAY4"], checked: "checked" },
     { title: "개인정보", id: "grpPsnlInfo", keys: ["PHONE_NUM", "PSNL_NUM"], checked: "" },
+    { title: "연령", id: "AGE", keys: ["AGE"], checked: "checked" },
     { title: "예상급여", id: "EXPECT_PAY", keys: ["EXPECT_PAY"], checked: "checked" },
     { title: "신자수", id: "PERSON_CNT", keys: ["PERSON_CNT"], checked: "" },
     { title: "내선번호", id: "ORG_IN_TEL", keys: ["ORG_IN_TEL"], checked: "" }
@@ -341,7 +343,28 @@ window.onload = function () {
     //파라미터 중 셀렉트 파타미터값이 존재한다면 기초 세팅한다.
     const url = window.location.href; // 현재 URL을 가져온다.
     const params = new URLSearchParams(new URL(url).search); // URLSearchParams 객체 생성
-    document.getElementById("WORK_TYPE").value = params.get("WORK_TYPE") || "";
+    const workTypeParam = params.get("WORK_TYPE");
+    if (workTypeParam) {
+        const selWorkType = document.getElementById("WORK_TYPE");
+        let optionFound = false;
+        for (let i = 0; i < selWorkType.options.length; i++) {
+            if (selWorkType.options[i].value === workTypeParam) {
+                optionFound = true;
+                break;
+            }
+        }
+        if (!optionFound) {
+            const opt = document.createElement("option");
+            opt.value = workTypeParam;
+            opt.text = workTypeParam;
+            opt.style.display = "none";
+            selWorkType.add(opt);
+        }
+        selWorkType.value = workTypeParam;
+        mytbl.hrDt.xhr.where["WORK_TYPE"] = workTypeParam;
+    } else {
+        document.getElementById("WORK_TYPE").value = "";
+    }
     document.getElementById("TRS_TYPE").value = params.get("TRS_TYPE") !== null ? params.get("TRS_TYPE") : "1";
     
     if (params.get("POSITION")) document.getElementById("POSITION").value = params.get("POSITION");
@@ -356,6 +379,22 @@ window.onload = function () {
     if (params.get("GENDER")) {
         mytbl.hrDt.xhr.where["GENDER"] = params.get("GENDER");
     }
+    if (params.get("GRD_GRADE")) {
+        document.getElementById("GRD_GRADE_From").value = params.get("GRD_GRADE");
+        document.getElementById("GRD_GRADE_To").value = params.get("GRD_GRADE");
+    }
+    if (params.get("GRD_GRADE_From")) document.getElementById("GRD_GRADE_From").value = params.get("GRD_GRADE_From");
+    if (params.get("GRD_GRADE_To")) document.getElementById("GRD_GRADE_To").value = params.get("GRD_GRADE_To");
+
+    if (params.get("GRD_PAY")) {
+        document.getElementById("GRD_PAY_From").value = params.get("GRD_PAY");
+        document.getElementById("GRD_PAY_To").value = params.get("GRD_PAY");
+    }
+    if (params.get("GRD_PAY_From")) document.getElementById("GRD_PAY_From").value = params.get("GRD_PAY_From");
+    if (params.get("GRD_PAY_To")) document.getElementById("GRD_PAY_To").value = params.get("GRD_PAY_To");
+    if (params.get("HAS_PAY")) {
+        mytbl.hrDt.xhr.where["HAS_PAY"] = params.get("HAS_PAY");
+    }
 
     if (params.get("STAT_MODE")) {
         mytbl.hrDt.xhr.where["STAT_MODE"] = params.get("STAT_MODE");
@@ -367,7 +406,11 @@ window.onload = function () {
     //파라미터 기초세팅 종료
     setTimeout(function () { //뒤로가기에 값이 모두 바인딩 될때까지 딜레이가 존재하여 timeout을 추가함.
         document.querySelectorAll(".filter").forEach((f, key) => {
-            mytbl.hrDt.xhr.where[f.id] = f.value;
+            if (f.id === 'WORK_TYPE' && workTypeParam) {
+                // Keep the param value
+            } else {
+                mytbl.hrDt.xhr.where[f.id] = f.value;
+            }
         });
         mytbl.show('myTbl');
         mytbl.xportBind();

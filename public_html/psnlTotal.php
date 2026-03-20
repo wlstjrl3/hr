@@ -47,6 +47,10 @@
 
     <div class="searchArea">
         <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>기준일</b></span></div>
+            <div class="colBd"><input id="STAT_BASE_DATE" class="dateBox filter" value="<?php echo @$_REQUEST['STAT_BASE_DATE']; ?>"></div>
+        </div>
+        <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>소속</b></span></div>
             <div class="colBd"><input id="ORG_NM" class="filter" value="<?php echo @$_REQUEST['ORG_NM']; ?>"></div>
         </div>
@@ -67,6 +71,18 @@
             <div class="colBd"><select id="WORK_TYPE" class="filter">
                 <option value="">전체</option><option>정규</option><option>계약</option><option>기능</option>
             </select></div>
+        </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>급(Lv)</b></span></div>
+            <div class="colBd">
+                <input id="GRD_GRADE_From" class="dualDateBox filter" type="number" value="<?php echo @$_REQUEST['GRD_GRADE_From'] ?: @$_REQUEST['GRD_GRADE']; ?>"><span>~</span><input id="GRD_GRADE_To" class="dualDateBox filter" type="number" value="<?php echo @$_REQUEST['GRD_GRADE_To'] ?: @$_REQUEST['GRD_GRADE']; ?>">
+            </div>
+        </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>호</b></span></div>
+            <div class="colBd">
+                <input id="GRD_PAY_From" class="dualDateBox filter" type="number" value="<?php echo @$_REQUEST['GRD_PAY_From'] ?: @$_REQUEST['GRD_PAY']; ?>"><span>~</span><input id="GRD_PAY_To" class="dualDateBox filter" type="number" value="<?php echo @$_REQUEST['GRD_PAY_To'] ?: @$_REQUEST['GRD_PAY']; ?>">
+            </div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>재직구분</b></span></div>

@@ -184,6 +184,11 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                             </a>
                         </li>
                         <li>
+                            <a href="<?php echo DIR_ROOT; ?>/statWorkTypeGraph2">
+                                └&nbsp;직군별 상세 그래프
+                            </a>
+                        </li>
+                        <li>
                             <a href="<?php echo DIR_ROOT; ?>/statPsnlTable">
                                 └&nbsp;인사관리 대상 현황
                             </a>
