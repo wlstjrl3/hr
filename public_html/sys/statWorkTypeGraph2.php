@@ -8,7 +8,7 @@ $incDomestic = false; // Always exclude domestic workers
 $mode = @$_REQUEST['MODE'] ?: 'chart'; // 'chart' or 'detail'
 
 // Details parameters
-$targetKey = @$_REQUEST['TARGET_KEY']; // e.g., 'age_30_34', 'grade_4', 'lv_1_10'
+$targetKey = @$_REQUEST['TARGET_KEY']; 
 $isManagementTarget = @$_REQUEST['TARGET_GROUP'] == 'management'; // office or management
 
 if ($mode == 'detail' && $baseDate && $targetKey) {
@@ -87,7 +87,6 @@ if ($graphType == 'age') {
         'reg' => '정규직', 'cont' => '계약직', 'other' => '기타'
     ];
 } else if ($graphType == 'reg_grade_ratio') {
-    // Shared structure for Grade and Level
     $officeLabels = ['4급', '5급', '6급', '7급', '8급', '9급', '미분류'];
     $managementLabels = ['4급(101-120)', '5급(81-100)', '6급(61-80)', '7급(41-60)', '8급(21-40)', '9급(1-20)', '미분류'];
     $gradeKeys = ['grade_4', 'grade_5', 'grade_6', 'grade_7', 'grade_8', 'grade_9', 'grade_unknown'];
@@ -115,14 +114,11 @@ foreach ($psnlInfo as $psnlCd => $info) {
             else break;
         }
     }
-    
-    if($curT && $curT['TRS_TYPE'] != '2') { // Active Employee
+    if($curT && $curT['TRS_TYPE'] != '2') {
         $pos = $curT['POSITION'];
         $wkType = $curT['WORK_TYPE'];
-        
         if ($pos == '가사사용인') continue;
-
-        $isManagement = (strpos($pos, '관리') !== false) ? true : false;
+        $isManagement = (strpos($pos, '관리') !== false || strpos($pos, '사무장') !== false);
         
         if ($graphType == 'age') {
             $age = $currentYear - $info['birthYear'] + 1;
@@ -138,7 +134,6 @@ foreach ($psnlInfo as $psnlCd => $info) {
             else if ($age >= 60 && $age < 65) $mKey = 'age_60_64';
             else if ($age >= 65 && $age < 70) $mKey = 'age_65_69';
             else if ($age >= 70) $mKey = 'age_70';
-            
             if ($mKey) {
                 if ($isManagement) $countsManagementRegular[$mKey]++;
                 else $countsOffice[$mKey]++;
@@ -149,14 +144,12 @@ foreach ($psnlInfo as $psnlCd => $info) {
             $targetDt = new DateTime($baseDate);
             $diff = $enterDt->diff($targetDt);
             $years = $diff->y + ($diff->m / 12);
-            
             $mKey = '';
             if ($years < 1) $mKey = 'sy_1';
             else if ($years < 3) $mKey = 'sy_3';
             else if ($years < 5) $mKey = 'sy_5';
             else if ($years < 10) $mKey = 'sy_10';
             else $mKey = 'sy_over';
-            
             if ($mKey) {
                 if ($isManagement) $countsManagementRegular[$mKey]++;
                 else $countsOffice[$mKey]++;
@@ -166,7 +159,6 @@ foreach ($psnlInfo as $psnlCd => $info) {
             if (strpos($wkType, '정규직') !== false || strpos($wkType, '기능직') !== false) $mKey = 'reg';
             else if (strpos($wkType, '계약직') !== false) $mKey = 'cont';
             else $mKey = 'other';
-            
             if ($mKey) {
                 if ($isManagement) $countsManagementRegular[$mKey]++;
                 else $countsOffice[$mKey]++;
@@ -180,12 +172,10 @@ foreach ($psnlInfo as $psnlCd => $info) {
                 }
             }
             $gradeVal = $curG ? (int)$curG['GRD_GRADE'] : 0;
-
             if (strpos($wkType, '정규직') !== false || strpos($wkType, '기능직') !== false) {
-                $idx = 6; // 미분류
+                $idx = 6;
                 if ($gradeVal >= 4 && $gradeVal <= 9) $idx = $gradeVal - 4;
                 else if ($gradeVal > 0) $idx = 6;
-                
                 if ($isManagement) $countsManagementRegular[$idx]++;
                 else $countsOffice[$idx]++;
             } else if (strpos($wkType, '계약직') !== false) {
@@ -197,7 +187,6 @@ foreach ($psnlInfo as $psnlCd => $info) {
                     else if ($gradeVal >= 41 && $gradeVal <= 60) $idx = 3;
                     else if ($gradeVal >= 21 && $gradeVal <= 40) $idx = 4;
                     else if ($gradeVal >= 1 && $gradeVal <= 20) $idx = 5;
-                    
                     if ($idx >= 0) $countsManagementContract[$idx]++;
                 }
             }
@@ -223,18 +212,18 @@ $chartData = [
 ];
 
 if ($graphType == 'reg_grade_ratio') {
-     $chartData['management']['datasets'][] = [
-         'label' => '정규/기능직(급수)',
-         'data' => array_values($countsManagementRegular),
-         'backgroundColor' => 'rgba(255, 99, 132, 0.7)',
-         'keys' => $gradeKeys
-     ];
-     $chartData['management']['datasets'][] = [
-         'label' => '계약직(레벨)',
-         'data' => array_values($countsManagementContract),
-         'backgroundColor' => 'rgba(255, 205, 86, 0.7)',
-         'keys' => $lvKeys
-     ];
+    $chartData['management']['datasets'][] = [
+        'label' => '정규/기능직(급수)',
+        'data' => array_values($countsManagementRegular),
+        'backgroundColor' => 'rgba(255, 99, 132, 0.7)',
+        'keys' => $gradeKeys
+    ];
+    $chartData['management']['datasets'][] = [
+        'label' => '계약직(레벨)',
+        'data' => array_values($countsManagementContract),
+        'backgroundColor' => 'rgba(255, 205, 86, 0.7)',
+        'keys' => $lvKeys
+    ];
 } else {
     $chartData['management']['datasets'][] = [
         'label' => '인원',
@@ -246,12 +235,9 @@ if ($graphType == 'reg_grade_ratio') {
 
 jsonResponse($conn, $chartData);
 
-
-
 function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomestic, $isManagementTarget) {
     $safeDateStr = str_replace('-', '', $date);
     $currentYear = (int)substr($safeDateStr, 0, 4);
-
     $sqlPsnl = "SELECT PSNL_CD, PSNL_NUM FROM PSNL_INFO";
     $resPsnl = mysqli_query($conn, $sqlPsnl);
     $psnlInfo = [];
@@ -265,7 +251,6 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
             'birthYear' => (int)($yearPrefix . $y2)
         ];
     }
-
     $sqlTrs = "SELECT PSNL_CD, REPLACE(TRS_DT, '-', '') AS TRS_DT, TRS_CD, TRS_TYPE, WORK_TYPE, POSITION 
                FROM PSNL_TRANSFER 
                WHERE REPLACE(TRS_DT, '-', '') <= '{$safeDateStr}'
@@ -280,10 +265,9 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
             $minTrsDt[$psnlCd] = $row['TRS_DT'];
         }
     }
-
     $gradeHistory = [];
     if ($graphType == 'reg_grade_ratio') {
-        $sqlGrd = "SELECT PSNL_CD, GRD_GRADE, GRD_PAY, REPLACE(ADVANCE_DT, '-', '') AS ADVANCE_DT 
+        $sqlGrd = "SELECT PSNL_CD, GRD_GRADE, REPLACE(ADVANCE_DT, '-', '') AS ADVANCE_DT 
                    FROM GRADE_HISTORY 
                    WHERE REPLACE(ADVANCE_DT, '-', '') <= '{$safeDateStr}'
                    ORDER BY ADVANCE_DT ASC, GRD_CD ASC";
@@ -294,9 +278,7 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
             }
         }
     }
-
     $positions = [];
-    
     foreach ($psnlInfo as $psnlCd => $info) {
         $curT = null;
         if(isset($trsHistory[$psnlCd])) {
@@ -305,23 +287,17 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
                 else break;
             }
         }
-
         if($curT && $curT['TRS_TYPE'] != '2') {
             $pos = $curT['POSITION'];
             $wkType = $curT['WORK_TYPE'];
-            
             if ($pos == '가사사용인') continue;
-
-            $isMng = (strpos($pos, '관리') !== false) ? true : false;
-            
+            $isMng = (strpos($pos, '관리') !== false || strpos($pos, '사무장') !== false);
             if ($isManagementTarget && !$isMng) continue;
             if (!$isManagementTarget && $isMng) continue;
-            
             $matchKey = '';
-            
             if ($graphType == 'age') {
                 $age = $currentYear - $info['birthYear'] + 1;
-                if ($age >= 20 && $age < 25) $matchKey = 'age_20_24';
+                     if ($age >= 20 && $age < 25) $matchKey = 'age_20_24';
                 else if ($age >= 25 && $age < 30) $matchKey = 'age_25_29';
                 else if ($age >= 30 && $age < 35) $matchKey = 'age_30_34';
                 else if ($age >= 35 && $age < 40) $matchKey = 'age_35_39';
@@ -338,7 +314,6 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
                 $targetDt = new DateTime($date);
                 $diff = $enterDt->diff($targetDt);
                 $years = $diff->y + ($diff->m / 12);
-                
                 if ($years < 1) $matchKey = 'sy_1';
                 else if ($years < 3) $matchKey = 'sy_3';
                 else if ($years < 5) $matchKey = 'sy_5';
@@ -357,21 +332,19 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
                     }
                 }
                 $gradeVal = $curG ? (int)$curG['GRD_GRADE'] : 0;
-                
                 if (strpos($wkType, '정규직') !== false || strpos($wkType, '기능직') !== false) {
                     if ($gradeVal >= 4 && $gradeVal <= 9) $matchKey = 'grade_' . $gradeVal;
                     else if ($gradeVal > 0) $matchKey = 'grade_unknown';
                 } else if (strpos($wkType, '계약직') !== false) {
                     $lv = $gradeVal;
-                    if ($lv >= 1 && $lv <= 20) $matchKey = 'lv_1_20';
-                    else if ($lv >= 21 && $lv <= 40) $matchKey = 'lv_21_40';
-                    else if ($lv >= 41 && $lv <= 60) $matchKey = 'lv_41_60';
-                    else if ($lv >= 61 && $lv <= 80) $matchKey = 'lv_61_80';
+                         if ($lv >= 101 && $lv <= 120) $matchKey = 'lv_101_120';
                     else if ($lv >= 81 && $lv <= 100) $matchKey = 'lv_81_100';
-                    else if ($lv >= 101 && $lv <= 120) $matchKey = 'lv_101_120';
+                    else if ($lv >= 61 && $lv <= 80) $matchKey = 'lv_61_80';
+                    else if ($lv >= 41 && $lv <= 60) $matchKey = 'lv_41_60';
+                    else if ($lv >= 21 && $lv <= 40) $matchKey = 'lv_21_40';
+                    else if ($lv >= 1 && $lv <= 20) $matchKey = 'lv_1_20';
                 }
             }
-            
             if ($matchKey == $targetKey) {
                 $posName = $pos ?: '미지정';
                 $positions[$posName] = ($positions[$posName] ?? 0) + 1;
