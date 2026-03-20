@@ -372,6 +372,8 @@ window.onload = function () {
     if (params.get("AGE_MAX")) document.getElementById("AGE_MAX").value = params.get("AGE_MAX");
     if (params.get("PSNL_BIRTH_From")) document.getElementById("PSNL_BIRTH_From").value = params.get("PSNL_BIRTH_From");
     if (params.get("PSNL_BIRTH_To")) document.getElementById("PSNL_BIRTH_To").value = params.get("PSNL_BIRTH_To");
+    if (params.get("TRS_DT_From")) document.getElementById("TRS_DT_From").value = params.get("TRS_DT_From");
+    if (params.get("TRS_DT_To")) document.getElementById("TRS_DT_To").value = params.get("TRS_DT_To");
 
     if (params.get("STAT_BASE_DATE")) {
         mytbl.hrDt.xhr.where["STAT_BASE_DATE"] = params.get("STAT_BASE_DATE");

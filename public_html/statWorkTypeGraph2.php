@@ -34,7 +34,7 @@ include('./components/header.php');
     
     <div style="display:flex; justify-content:space-between; gap:20px;">
         <div class="chartContainer" style="position: relative; height:40vh; width:50%; border:1px solid #e0e0e0; border-radius:5px; padding:10px;">
-            <div style="text-align:center; font-weight:bold; padding:5px; background:#f5f5f5;">사무직</div>
+            <div id="chartTitleOffice" style="text-align:center; font-weight:bold; padding:5px; background:#f5f5f5;">사무직</div>
             <div id="loadingOverlayOffice" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:10; justify-content:center; align-items:center; flex-direction:column;">
                 <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
             </div>
@@ -42,7 +42,7 @@ include('./components/header.php');
         </div>
         
         <div class="chartContainer" style="position: relative; height:40vh; width:50%; border:1px solid #e0e0e0; border-radius:5px; padding:10px;">
-            <div style="text-align:center; font-weight:bold; padding:5px; background:#f5f5f5;">관리직</div>
+            <div id="chartTitleManagement" style="text-align:center; font-weight:bold; padding:5px; background:#f5f5f5;">관리직</div>
             <div id="loadingOverlayManagement" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:10; justify-content:center; align-items:center; flex-direction:column;">
                 <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
             </div>

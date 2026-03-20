@@ -134,6 +134,13 @@ function loadData() {
             chartManagement.data.labels = data.managementLabels || data.labels || [];
 
             if(data.office && data.office.datasets) {
+                if (data.officeTitle) {
+                    chartOffice.options.plugins.title.text = data.officeTitle;
+                    chartOffice.options.plugins.title.display = true;
+                    // Also update the card header title
+                    const el = document.getElementById('chartTitleOffice');
+                    if(el) el.innerText = data.officeTitle;
+                }
                 chartOffice.data.datasets = data.office.datasets.map(ds => ({
                     ...ds,
                     borderWidth: 1
@@ -142,6 +149,13 @@ function loadData() {
             }
 
             if(data.management && data.management.datasets) {
+                if (data.managementTitle) {
+                    chartManagement.options.plugins.title.text = data.managementTitle;
+                    chartManagement.options.plugins.title.display = true;
+                    // Also update the card header title
+                    const el = document.getElementById('chartTitleManagement');
+                    if(el) el.innerText = data.managementTitle;
+                }
                 chartManagement.data.datasets = data.management.datasets.map(ds => ({
                     ...ds,
                     borderWidth: 1
@@ -230,6 +244,40 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
                     } else if (graphType === 'reg_cont_ratio') {
                          if (targetKey === 'reg') url += '&WORK_TYPE=' + encodeURIComponent('정규,기능');
                          else if (targetKey === 'cont') url += '&WORK_TYPE=' + encodeURIComponent('계약');
+                    } else if (graphType === 'service_years') {
+                        const baseDateObj = new Date(baseDate);
+                        let fromDate = null;
+                        let toDate = new Date(baseDate);
+
+                        if (targetKey === 'sy_1') {
+                            fromDate = new Date(baseDateObj);
+                            fromDate.setFullYear(fromDate.getFullYear() - 1);
+                            fromDate.setDate(fromDate.getDate() + 1);
+                        } else if (targetKey === 'sy_3') {
+                            toDate = new Date(baseDateObj);
+                            toDate.setFullYear(toDate.getFullYear() - 1);
+                            fromDate = new Date(baseDateObj);
+                            fromDate.setFullYear(fromDate.getFullYear() - 3);
+                            fromDate.setDate(fromDate.getDate() + 1);
+                        } else if (targetKey === 'sy_5') {
+                            toDate = new Date(baseDateObj);
+                            toDate.setFullYear(toDate.getFullYear() - 3);
+                            fromDate = new Date(baseDateObj);
+                            fromDate.setFullYear(fromDate.getFullYear() - 5);
+                            fromDate.setDate(fromDate.getDate() + 1);
+                        } else if (targetKey === 'sy_10') {
+                            toDate = new Date(baseDateObj);
+                            toDate.setFullYear(toDate.getFullYear() - 5);
+                            fromDate = new Date(baseDateObj);
+                            fromDate.setFullYear(fromDate.getFullYear() - 10);
+                            fromDate.setDate(fromDate.getDate() + 1);
+                        } else if (targetKey === 'sy_over') {
+                            toDate = new Date(baseDateObj);
+                            toDate.setFullYear(toDate.getFullYear() - 10);
+                        }
+
+                        if (fromDate) url += `&TRS_DT_From=${fromDate.toISOString().split('T')[0]}`;
+                        if (toDate) url += `&TRS_DT_To=${toDate.toISOString().split('T')[0]}`;
                     } else if (graphType === 'reg_grade_ratio') {
                          if (targetKey.startsWith('grade_')) {
                              url += '&WORK_TYPE=' + encodeURIComponent('정규,기능');

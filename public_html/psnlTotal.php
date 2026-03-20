@@ -102,7 +102,7 @@
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>생년월일</b></span></div>
-            <div class="colBd"><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_From"><span>~</span><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_To"></div>
+            <div class="colBd"><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_From" value="<?php echo @$_REQUEST['PSNL_BIRTH_From']; ?>"><span>~</span><input class="dateBox dualDateBox filter" id="PSNL_BIRTH_To" value="<?php echo @$_REQUEST['PSNL_BIRTH_To']; ?>"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>주민번호</b></span></div>
@@ -111,7 +111,7 @@
 
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>입/퇴사일</b></span></div>
-            <div class="colBd"><input class="dateBox dualDateBox filter" id="TRS_DT_From"><span>~</span><input class="dateBox dualDateBox filter" id="TRS_DT_To"></div>
+            <div class="colBd"><input class="dateBox dualDateBox filter" id="TRS_DT_From" value="<?php echo @$_REQUEST['TRS_DT_From']; ?>"><span>~</span><input class="dateBox dualDateBox filter" id="TRS_DT_To" value="<?php echo @$_REQUEST['TRS_DT_To']; ?>"></div>
         </div>        
         <div class="colGrp clBg4">
             <div class="txtCenter" style="padding:5px 0 6px 0;">
