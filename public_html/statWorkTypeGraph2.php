@@ -74,6 +74,6 @@ include('./components/header.php');
 
 <link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statWorkTypeGraph2.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statWorkTypeGraph2.js?ver=2'></script>
 
 <?php include('components/footer.php'); ?>

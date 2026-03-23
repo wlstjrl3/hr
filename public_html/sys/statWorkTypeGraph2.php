@@ -85,8 +85,10 @@ if ($graphType == 'age') {
     ];
 } else if ($graphType == 'reg_cont_ratio') {
     $datasetKeys = [
-        'reg' => '정규직', 'cont' => '계약직', 'other' => '기타'
+        'reg' => '정규직', 'cont' => '계약직'
     ];
+    $officeLabels = ['정규직', '계약직'];
+    $managementLabels = ['기능직', '계약직'];
 } else if ($graphType == 'reg_grade_ratio') {
     $officeLabels = ['4급', '5급', '6급', '7급', '8급', '9급', '미분류'];
     $managementLabels = ['Lv 101-120', 'Lv 81-100', 'Lv 61-80', 'Lv 41-60', 'Lv 21-40', 'Lv 1-20'];
@@ -157,8 +159,11 @@ foreach ($psnlInfo as $psnlCd => $info) {
             }
 
             if ($mKey) {
-                if ($isManagement) $countsManagementRegular[$mKey]++;
-                else $countsOffice[$mKey]++;
+                if ($isManagement) {
+                    if (isset($countsManagementRegular[$mKey])) $countsManagementRegular[$mKey]++;
+                } else {
+                    if (isset($countsOffice[$mKey])) $countsOffice[$mKey]++;
+                }
             }
         } else if ($graphType == 'reg_grade_ratio') {
             $curG = null;

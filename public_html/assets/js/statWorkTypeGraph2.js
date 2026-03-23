@@ -17,13 +17,17 @@ const barPercentagePlugin = {
                 if (value <= 0) return;
                 
                 const percentage = ((value / total) * 100).toFixed(1) + '%';
+                const countLabel = `(${value}명)`;
                 
                 ctx.fillStyle = '#444';
                 ctx.font = 'bold 10px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
                 
-                ctx.fillText(percentage, bar.x, bar.y - 5);
+                // Draw percentage above count
+                ctx.fillText(percentage, bar.x, bar.y - 16);
+                ctx.font = 'normal 9px sans-serif';
+                ctx.fillText(countLabel, bar.x, bar.y - 5);
             });
         });
         ctx.restore();
@@ -185,6 +189,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('select.filter').forEach(f => {
         f.addEventListener('change', loadData);
     });
+
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('detailModal');
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 });
 
 function showDetailModal(categoryLabel, targetKey, label, group) {
@@ -213,9 +224,7 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
                 entries.forEach(([pos, count]) => {
                     let url = `${DIR_ROOT}/psnlTotal?STAT_BASE_DATE=${baseDate}&POSITION=${encodeURIComponent(pos)}`;
                     
-                    if (graphType === 'reg_grade_ratio') {
-                        // 정규직 비율일때는 무조건 정규직만
-                    }
+
 
                     // psnlTotal페이지는 statOrgHr나 statWorkType 등처럼 STAT_MODE 등의 처리를 받아줄 수 있도록 설계되어 있기 때문에 여기서는 단일 조건(직책)만 넘겨도 되긴 하지만
                     // 세부 필터를 다 넘기려면 STAT_MODE 1 방식이 편하거나, 지원되는 필터를 넘겨야 함 (예: GENDER, POSITION).
