@@ -222,7 +222,8 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
                 html += '<tr><td colspan="2" style="padding:20px; text-align:center; color:#888;">해당하는 인원이 없습니다.</td></tr>';
             } else {
                 entries.forEach(([pos, count]) => {
-                    let url = `${DIR_ROOT}/psnlTotal?STAT_BASE_DATE=${baseDate}&POSITION=${encodeURIComponent(pos)}`;
+                    let url = `${DIR_ROOT}/psnlTotal?STAT_BASE_DATE=${baseDate}&POSITION=${encodeURIComponent(pos)}&TRS_TYPE=1`;
+                    if (group === 'office') url += '&EXCLUDE_POS=' + encodeURIComponent('관리');
                     
 
 
@@ -247,8 +248,8 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
                         else if (targetKey === 'age_65_69') { minAge = 65; maxAge = 69; }
                         else if (targetKey === 'age_70') { minAge = 70; }
                         
-                        const earlyYear = year - maxAge;
-                        const lateYear = year - minAge;
+                        const earlyYear = year - maxAge + 1;
+                        const lateYear = year - minAge + 1;
                         url += `&PSNL_BIRTH_From=${earlyYear}-01-01&PSNL_BIRTH_To=${lateYear}-12-31`;
                     } else if (graphType === 'reg_cont_ratio') {
                          if (targetKey === 'reg') url += '&WORK_TYPE=' + encodeURIComponent('정규,기능');
