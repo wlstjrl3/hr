@@ -19,7 +19,7 @@ $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
-            WHERE TRS_TYPE IN (1,2) {$trsCond}
+            WHERE TRS_TYPE IN (1,2,3) {$trsCond}
             GROUP BY PSNL_CD
         ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
@@ -126,7 +126,7 @@ $sql = "SELECT
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
-            WHERE TRS_TYPE IN (1,2) {$trsCond}
+            WHERE TRS_TYPE IN (1,2,3) {$trsCond}
             GROUP BY PSNL_CD
         ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
@@ -285,13 +285,15 @@ if (@$_REQUEST['PSNL_BIRTH_From']) {
 if (@$_REQUEST['PSNL_BIRTH_To']) {
     $whereSql .= " AND " . $derivedBirthDateSql . " <= '" . $_REQUEST['PSNL_BIRTH_To'] . "'";
 }
+$trsDtCol = (@$_REQUEST['USE_FIRST_TRS'] == 'Y') ? "(SELECT MIN(TRS_DT) FROM PSNL_TRANSFER T_MIN WHERE T_MIN.PSNL_CD = A.PSNL_CD)" : "C.TRS_DT";
+
 if (@$_REQUEST['TRS_DT_From']) {
-    $whereSql .= " AND C.TRS_DT >= ?";
+    $whereSql .= " AND " . $trsDtCol . " >= ?";
     $params[] = $_REQUEST['TRS_DT_From'] . " 00:00:00";
     $types .= "s";
 }
 if (@$_REQUEST['TRS_DT_To']) {
-    $whereSql .= " AND C.TRS_DT <= ?";
+    $whereSql .= " AND " . $trsDtCol . " <= ?";
     $params[] = $_REQUEST['TRS_DT_To'] . " 23:59:59";
     $types .= "s";
 }

@@ -405,6 +405,10 @@ window.onload = function () {
         mytbl.hrDt.xhr.where["STAT_CAT"] = params.get("STAT_CAT");
     }
 
+    if (params.get("USE_FIRST_TRS")) {
+        mytbl.hrDt.xhr.where["USE_FIRST_TRS"] = params.get("USE_FIRST_TRS");
+    }
+
     //파라미터 기초세팅 종료
     setTimeout(function () { //뒤로가기에 값이 모두 바인딩 될때까지 딜레이가 존재하여 timeout을 추가함.
         document.querySelectorAll(".filter").forEach((f, key) => {

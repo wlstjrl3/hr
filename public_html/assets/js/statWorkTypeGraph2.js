@@ -306,6 +306,7 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
 
                         if (fromDate) url += `&TRS_DT_From=${fromDate.toISOString().split('T')[0]}`;
                         if (toDate) url += `&TRS_DT_To=${toDate.toISOString().split('T')[0]}`;
+                        url += '&USE_FIRST_TRS=Y';
                     } else if (graphType === 'reg_grade_ratio') {
                          if (targetKey.startsWith('grade_')) {
                              url += '&WORK_TYPE=' + encodeURIComponent('정규,기능');

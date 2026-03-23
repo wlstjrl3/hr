@@ -161,7 +161,7 @@
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/psnlTotal.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/psnlTotal.js?ver=1'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateForm.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/phoneForm.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/juminForm.js'></script>
