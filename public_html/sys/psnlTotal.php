@@ -19,7 +19,7 @@ $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
-            WHERE TRS_TYPE IN (1,2,3) {$trsCond}
+            WHERE 1=1 {$trsCond}
             GROUP BY PSNL_CD
         ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
@@ -126,7 +126,7 @@ $sql = "SELECT
         LEFT OUTER JOIN (
             SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
             FROM PSNL_TRANSFER
-            WHERE TRS_TYPE IN (1,2,3) {$trsCond}
+            WHERE 1=1 {$trsCond}
             GROUP BY PSNL_CD
         ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
@@ -209,7 +209,7 @@ if (@$_REQUEST['EXCLUDE_POS']) {
 }
 if (@$_REQUEST['TRS_TYPE']) {
     if ($_REQUEST['TRS_TYPE'] == 1) {
-        $whereSql = $whereSql . " AND C.TRS_TYPE IN ('1','3')";
+        $whereSql = $whereSql . " AND C.TRS_TYPE != '2' AND C.TRS_TYPE IS NOT NULL";
     }
     else {
         $whereSql .= " AND C.TRS_TYPE = ?";
@@ -285,32 +285,22 @@ if (@$_REQUEST['PSNL_BIRTH_From']) {
 if (@$_REQUEST['PSNL_BIRTH_To']) {
     $whereSql .= " AND " . $derivedBirthDateSql . " <= '" . $_REQUEST['PSNL_BIRTH_To'] . "'";
 }
-$trsDtCol = (@$_REQUEST['USE_FIRST_TRS'] == 'Y') ? "(SELECT MIN(TRS_DT) FROM PSNL_TRANSFER T_MIN WHERE T_MIN.PSNL_CD = A.PSNL_CD)" : "C.TRS_DT";
+$trsDtCol = (@$_REQUEST['USE_FIRST_TRS'] == 'Y') ? "(SELECT REPLACE(MIN(REPLACE(TRS_DT, '-', '')), '-', '') FROM PSNL_TRANSFER T_MIN WHERE T_MIN.PSNL_CD = A.PSNL_CD)" : "REPLACE(C.TRS_DT, '-', '')";
 
 if (@$_REQUEST['TRS_DT_From']) {
     $whereSql .= " AND " . $trsDtCol . " >= ?";
-    $params[] = $_REQUEST['TRS_DT_From'] . " 00:00:00";
+    $params[] = str_replace('-', '', $_REQUEST['TRS_DT_From']);
     $types .= "s";
 }
 if (@$_REQUEST['TRS_DT_To']) {
     $whereSql .= " AND " . $trsDtCol . " <= ?";
-    $params[] = $_REQUEST['TRS_DT_To'] . " 23:59:59";
+    $params[] = str_replace('-', '', $_REQUEST['TRS_DT_To']);
     $types .= "s";
 }
 // PSNL_NUM 자체를 검색하는 필터는 기존 위치 유지 (생년월일 필터와 독립적으로 작동)
 if (@$_REQUEST['PSNL_NUM']) {
     $whereSql .= " AND A.PSNL_NUM LIKE ?";
     $params[] = '%' . $_REQUEST['PSNL_NUM'] . '%';
-    $types .= "s";
-}
-if (@$_REQUEST['TRS_DT_From']) {
-    $whereSql .= " AND C.TRS_DT >= ?";
-    $params[] = $_REQUEST['TRS_DT_From'] . " 00:00:00";
-    $types .= "s";
-}
-if (@$_REQUEST['TRS_DT_To']) {
-    $whereSql .= " AND C.TRS_DT <= ?";
-    $params[] = $_REQUEST['TRS_DT_To'] . " 23:59:59";
     $types .= "s";
 }
 
