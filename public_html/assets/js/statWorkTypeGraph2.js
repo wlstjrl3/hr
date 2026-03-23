@@ -259,21 +259,39 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
                             fromDate = new Date(baseDateObj);
                             fromDate.setFullYear(fromDate.getFullYear() - 3);
                             fromDate.setDate(fromDate.getDate() + 1);
-                        } else if (targetKey === 'sy_5') {
+                        } else if (targetKey === 'sy_6') {
                             toDate = new Date(baseDateObj);
                             toDate.setFullYear(toDate.getFullYear() - 3);
                             fromDate = new Date(baseDateObj);
-                            fromDate.setFullYear(fromDate.getFullYear() - 5);
+                            fromDate.setFullYear(fromDate.getFullYear() - 6);
                             fromDate.setDate(fromDate.getDate() + 1);
                         } else if (targetKey === 'sy_10') {
                             toDate = new Date(baseDateObj);
-                            toDate.setFullYear(toDate.getFullYear() - 5);
+                            toDate.setFullYear(toDate.getFullYear() - 6);
                             fromDate = new Date(baseDateObj);
                             fromDate.setFullYear(fromDate.getFullYear() - 10);
                             fromDate.setDate(fromDate.getDate() + 1);
-                        } else if (targetKey === 'sy_over') {
+                        } else if (targetKey === 'sy_15') {
                             toDate = new Date(baseDateObj);
                             toDate.setFullYear(toDate.getFullYear() - 10);
+                            fromDate = new Date(baseDateObj);
+                            fromDate.setFullYear(fromDate.getFullYear() - 15);
+                            fromDate.setDate(fromDate.getDate() + 1);
+                        } else if (targetKey === 'sy_20') {
+                            toDate = new Date(baseDateObj);
+                            toDate.setFullYear(toDate.getFullYear() - 15);
+                            fromDate = new Date(baseDateObj);
+                            fromDate.setFullYear(fromDate.getFullYear() - 20);
+                            fromDate.setDate(fromDate.getDate() + 1);
+                        } else if (targetKey === 'sy_25') {
+                            toDate = new Date(baseDateObj);
+                            toDate.setFullYear(toDate.getFullYear() - 20);
+                            fromDate = new Date(baseDateObj);
+                            fromDate.setFullYear(fromDate.getFullYear() - 25);
+                            fromDate.setDate(fromDate.getDate() + 1);
+                        } else if (targetKey === 'sy_over') {
+                            toDate = new Date(baseDateObj);
+                            toDate.setFullYear(toDate.getFullYear() - 25);
                         }
 
                         if (fromDate) url += `&TRS_DT_From=${fromDate.toISOString().split('T')[0]}`;
