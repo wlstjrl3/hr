@@ -117,6 +117,7 @@ function loadData() {
 
     const baseDate = document.getElementById('BASE_DATE').value;
     const graphType = document.getElementById('GRAPH_TYPE').value;
+    const useKoreanAge = document.getElementById('USE_KOREAN_AGE') ? document.getElementById('USE_KOREAN_AGE').value : 'N';
     const key = document.getElementById('psnlKey') ? document.getElementById('psnlKey').value : '';
 
     const notice = document.getElementById('dateNotice');
@@ -130,7 +131,7 @@ function loadData() {
     if (overlayO) overlayO.style.display = 'flex';
     if (overlayM) overlayM.style.display = 'flex';
 
-    fetch(`${DIR_ROOT}/sys/statWorkTypeGraph2.php?key=${key}&BASE_DATE=${baseDate}&GRAPH_TYPE=${graphType}`)
+    fetch(`${DIR_ROOT}/sys/statWorkTypeGraph2.php?key=${key}&BASE_DATE=${baseDate}&GRAPH_TYPE=${graphType}&USE_KOREAN_AGE=${useKoreanAge}`)
         .then(response => response.json())
         .then(data => {
             // data format: { labels: [...], officeLabels: [...], managementLabels: [...], office: { datasets: [...] }, management: { datasets: [...] } }
@@ -178,6 +179,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initCharts();
     loadData();
 
+    document.getElementById('GRAPH_TYPE').addEventListener('change', (e) => {
+        let ageOptionsArea = document.getElementById('ageOptionsArea');
+        if (ageOptionsArea) ageOptionsArea.style.display = (e.target.value === 'age') ? 'block' : 'none';
+        // loadData is handled by the generic class select.filter listener below
+    });
+    
+    let ageOptionsArea = document.getElementById('ageOptionsArea');
+    if (ageOptionsArea) ageOptionsArea.style.display = (document.getElementById('GRAPH_TYPE').value === 'age') ? 'block' : 'none';
+
     document.querySelectorAll('input.filter').forEach(f => {
         let isTyping = false;
         f.addEventListener('keydown', (e) => { if (e.key === 'Enter') f.blur(); else isTyping = true; });
@@ -209,9 +219,10 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
     modal.style.display = 'flex';
 
     const graphType = document.getElementById('GRAPH_TYPE').value;
+    const useKoreanAge = document.getElementById('USE_KOREAN_AGE') ? document.getElementById('USE_KOREAN_AGE').value : 'N';
     const apiKey = document.getElementById('psnlKey').value;
 
-    fetch(`${DIR_ROOT}/sys/statWorkTypeGraph2.php?key=${apiKey}&MODE=detail&BASE_DATE=${baseDate}&TARGET_KEY=${targetKey}&GRAPH_TYPE=${graphType}&TARGET_GROUP=${group}`)
+    fetch(`${DIR_ROOT}/sys/statWorkTypeGraph2.php?key=${apiKey}&MODE=detail&BASE_DATE=${baseDate}&TARGET_KEY=${targetKey}&GRAPH_TYPE=${graphType}&TARGET_GROUP=${group}&USE_KOREAN_AGE=${useKoreanAge}`)
         .then(res => res.json())
         .then(json => {
             let html = '<table style="width:100%; border-collapse:collapse;">';
@@ -248,9 +259,7 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
                         else if (targetKey === 'age_65_69') { minAge = 65; maxAge = 69; }
                         else if (targetKey === 'age_70') { minAge = 70; }
                         
-                        const earlyYear = year - maxAge + 1;
-                        const lateYear = year - minAge + 1;
-                        url += `&PSNL_BIRTH_From=${earlyYear}-01-01&PSNL_BIRTH_To=${lateYear}-12-31`;
+                        url += `&AGE_MIN=${minAge}&AGE_MAX=${maxAge}&USE_KOREAN_AGE=${useKoreanAge}`;
                     } else if (graphType === 'reg_cont_ratio') {
                          if (targetKey === 'reg') url += '&WORK_TYPE=' + encodeURIComponent('정규,기능');
                          else if (targetKey === 'cont') url += '&WORK_TYPE=' + encodeURIComponent('계약');

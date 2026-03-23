@@ -29,8 +29,12 @@ while($row = mysqli_fetch_assoc($resPsnl)) {
     $g = substr($psnlNum, 6, 1);
     $y2 = substr($psnlNum, 0, 2);
     $yearPrefix = in_array($g, ['1', '2', '5', '6', '9', '0']) ? '19' : '20';
+    $m2 = substr($psnlNum, 2, 2);
+    $d2 = substr($psnlNum, 4, 2);
     $psnlInfo[$row['PSNL_CD']] = [
-        'birthYear' => (int)($yearPrefix . $y2)
+        'birthYear' => (int)($yearPrefix . $y2),
+        'birthMonth' => (int)$m2,
+        'birthDay' => (int)$d2
     ];
 }
 
@@ -126,7 +130,17 @@ foreach ($psnlInfo as $psnlCd => $info) {
         if ($graphType == 'age' || $graphType == 'service_years' || $graphType == 'reg_cont_ratio') {
             $mKey = '';
             if ($graphType == 'age') {
-                $age = $currentYear - $info['birthYear'] + 1;
+                $useKorean = (@$_REQUEST['USE_KOREAN_AGE'] == 'Y');
+                if ($useKorean) {
+                    $age = $currentYear - $info['birthYear'] + 1;
+                } else {
+                    $baseMonth = (int)substr($safeDateStr, 4, 2);
+                    $baseDay = (int)substr($safeDateStr, 6, 2);
+                    $age = $currentYear - $info['birthYear'];
+                    if ($baseMonth < $info['birthMonth'] || ($baseMonth == $info['birthMonth'] && $baseDay < $info['birthDay'])) {
+                        $age--;
+                    }
+                }
                 if ($age >= 20 && $age < 25) $mKey = 'age_20_24';
                 else if ($age >= 25 && $age < 30) $mKey = 'age_25_29';
                 else if ($age >= 30 && $age < 35) $mKey = 'age_30_34';
@@ -246,8 +260,12 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
         $g = substr($psnlNum, 6, 1);
         $y2 = substr($psnlNum, 0, 2);
         $yearPrefix = in_array($g, ['1', '2', '5', '6', '9', '0']) ? '19' : '20';
+        $m2 = substr($psnlNum, 2, 2);
+        $d2 = substr($psnlNum, 4, 2);
         $psnlInfo[$row['PSNL_CD']] = [
-            'birthYear' => (int)($yearPrefix . $y2)
+            'birthYear' => (int)($yearPrefix . $y2),
+            'birthMonth' => (int)$m2,
+            'birthDay' => (int)$d2
         ];
     }
     $sqlTrs = "SELECT PSNL_CD, REPLACE(TRS_DT, '-', '') AS TRS_DT, TRS_CD, TRS_TYPE, WORK_TYPE, POSITION 
@@ -308,7 +326,17 @@ function fetchDetailBreakdown2($conn, $date, $targetKey, $graphType, $incDomesti
             
             $matchKey = '';
             if ($graphType == 'age') {
-                $age = $currentYear - $info['birthYear'] + 1;
+                $useKorean = (@$_REQUEST['USE_KOREAN_AGE'] == 'Y');
+                if ($useKorean) {
+                    $age = $currentYear - $info['birthYear'] + 1;
+                } else {
+                    $baseMonth = (int)substr($safeDateStr, 4, 2);
+                    $baseDay = (int)substr($safeDateStr, 6, 2);
+                    $age = $currentYear - $info['birthYear'];
+                    if ($baseMonth < $info['birthMonth'] || ($baseMonth == $info['birthMonth'] && $baseDay < $info['birthDay'])) {
+                        $age--;
+                    }
+                }
                      if ($age >= 20 && $age < 25) $matchKey = 'age_20_24';
                 else if ($age >= 25 && $age < 30) $matchKey = 'age_25_29';
                 else if ($age >= 30 && $age < 35) $matchKey = 'age_30_34';

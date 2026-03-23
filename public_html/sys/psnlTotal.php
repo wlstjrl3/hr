@@ -14,6 +14,28 @@ if ($baseDate) {
     $grdCond = " WHERE REPLACE(ADVANCE_DT, '-', '') <= '{$baseDateStr}' ";
 }
 
+$useKoreanAge = @$_REQUEST['USE_KOREAN_AGE'] == 'Y';
+
+$derivedBirthDateSql = "CONCAT(
+        CASE 
+            WHEN SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '2', '5', '6') THEN '19'
+            WHEN SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('3', '4', '7', '8') THEN '20'
+            ELSE '19'
+        END,
+        SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 1, 2), '-',
+        SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 3, 2), '-',
+        SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 5, 2)
+    )";
+
+$baseDateAgeRef1 = $baseDate ? "'{$baseDateEsc}'" : "CURDATE()";
+$baseDateAgeRef2 = $baseDate ? "DATE_FORMAT('{$baseDateEsc}', '%m%d')" : "DATE_FORMAT(CURDATE(), '%m%d')";
+
+if ($useKoreanAge) {
+    $ageSql = "(YEAR({$baseDateAgeRef1}) - CAST(SUBSTR({$derivedBirthDateSql}, 1, 4) AS UNSIGNED) + 1)";
+} else {
+    $ageSql = "(YEAR({$baseDateAgeRef1}) - CAST(SUBSTR({$derivedBirthDateSql}, 1, 4) AS UNSIGNED) - IF({$baseDateAgeRef2} < SUBSTR(REPLACE({$derivedBirthDateSql}, '-', ''), 5, 4), 1, 0))";
+}
+
 //갯수 카운트 쿼리
 $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A 
         LEFT OUTER JOIN (
@@ -63,7 +85,7 @@ $sql = "SELECT
             ORDER BY OH_DT DESC LIMIT 1
         ),0) AS PERSON_CNT
         ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM
-        ,(YEAR(CURDATE()) - (CASE WHEN SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '2', '5', '6') THEN 1900 ELSE 2000 END + LEFT(A.PSNL_NUM, 2))) AS AGE
+        ,{$ageSql} AS AGE
         ,A.PHONE_NUM,LEFT(A.PSNL_NUM,14) AS PSNL_NUM
         ,TRUNCATE(DATEDIFF(CURDATE(), C.TRS_DT)/365,1) AS TRS_ELAPSE 
         ,CASE 
@@ -266,24 +288,17 @@ if (@$_REQUEST['GRD_PAY_To']) {
 if (@$_REQUEST['HAS_PAY'] == 'Y') {
     $whereSql .= " AND (D.GRD_PAY IS NOT NULL AND D.GRD_PAY != '' AND D.GRD_PAY != '0')";
 }
-// PSNL_NUM에서 완전한 YYYY-MM-DD 형식의 생년월일을 동적으로 생성
-// 주민등록번호의 7번째 자리(성별/세기 구분)를 사용하여 연도 세기를 결정
-$derivedBirthDateSql = "CONCAT(
-        CASE 
-            WHEN SUBSTR(A.PSNL_NUM, 7, 1) IN ('1', '2', '5', '6') THEN '19'
-            WHEN SUBSTR(A.PSNL_NUM, 7, 1) IN ('3', '4', '7', '8') THEN '20'
-            ELSE '19' -- 기본값 또는 오류 처리 (필요에 따라 조정)
-        END,
-        SUBSTR(A.PSNL_NUM, 1, 2), '-',
-        SUBSTR(A.PSNL_NUM, 3, 2), '-',
-        SUBSTR(A.PSNL_NUM, 5, 2)
-    )";
-
 if (@$_REQUEST['PSNL_BIRTH_From']) {
     $whereSql .= " AND " . $derivedBirthDateSql . " >= '" . $_REQUEST['PSNL_BIRTH_From'] . "'";
 }
 if (@$_REQUEST['PSNL_BIRTH_To']) {
     $whereSql .= " AND " . $derivedBirthDateSql . " <= '" . $_REQUEST['PSNL_BIRTH_To'] . "'";
+}
+if (@$_REQUEST['AGE_MIN']) {
+    $whereSql .= " AND {$ageSql} >= " . (int)$_REQUEST['AGE_MIN'];
+}
+if (@$_REQUEST['AGE_MAX']) {
+    $whereSql .= " AND {$ageSql} <= " . (int)$_REQUEST['AGE_MAX'];
 }
 $trsDtCol = (@$_REQUEST['USE_FIRST_TRS'] == 'Y') ? "(SELECT REPLACE(MIN(REPLACE(TRS_DT, '-', '')), '-', '') FROM PSNL_TRANSFER T_MIN WHERE T_MIN.PSNL_CD = A.PSNL_CD)" : "REPLACE(C.TRS_DT, '-', '')";
 

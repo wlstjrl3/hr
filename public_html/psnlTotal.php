@@ -95,9 +95,18 @@
             <div class="colBd"><input id="PHONE_NUM" class="phoneNumBox filter"></div>
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>나이</b></span></div>
+            <div class="colHd clBg5 cl2"><span><b>나이 유형</b></span></div>
             <div class="colBd">
-                <input type="number" id="AGE_MIN" class="dualDateBox"><span>~</span><input type="number" id="AGE_MAX" class="dualDateBox">
+                <select id="USE_KOREAN_AGE" class="filter">
+                    <option value="N">만나이(기본)</option>
+                    <option value="Y">한국나이</option>
+                </select>
+            </div>
+        </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>나이 범위</b></span></div>
+            <div class="colBd">
+                <input type="number" id="AGE_MIN" class="dualDateBox" style="width:40px;"><span>~</span><input type="number" id="AGE_MAX" class="dualDateBox" style="width:40px;">
             </div>
         </div>
         <div class="colGrp">

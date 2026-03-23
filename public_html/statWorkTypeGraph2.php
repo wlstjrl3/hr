@@ -24,6 +24,15 @@ include('./components/header.php');
                 </select>
             </div>
         </div>
+        <div class="colGrp" id="ageOptionsArea">
+            <div class="colHd clBg5 cl2"><span><b>나이 유형</b></span></div>
+            <div class="colBd">
+                <select id="USE_KOREAN_AGE" class="filter">
+                    <option value="N">만나이(기본)</option>
+                    <option value="Y">한국나이</option>
+                </select>
+            </div>
+        </div>
     </div>
     <div class="clearB"></div>
     <div id="dateNotice" style="display:none; color: #d9534f; background: #fff1f0; border: 1px solid #ffa39e; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 13px;">

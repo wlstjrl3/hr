@@ -11,6 +11,7 @@ var mytbl = new hr_tbl({
             BAPT_NM: document.getElementById("BAPT_NM").value,
             POSITION: document.getElementById("POSITION").value,
             PHONE_NUM: document.getElementById("PHONE_NUM").value,
+            USE_KOREAN_AGE: document.getElementById("USE_KOREAN_AGE") ? document.getElementById("USE_KOREAN_AGE").value : 'N',
         },
         order: {
             column: '1',
@@ -162,7 +163,11 @@ async function trDataXHR(idx) {
 //검색 필터링을 위한 코드
 document.querySelectorAll(".filter").forEach((f, key) => {
     f.addEventListener("change", () => {
-        mytbl.hrDt.xhr.where[f.id] = f.value;
+        if (f.type === 'checkbox') {
+            mytbl.hrDt.xhr.where[f.id] = f.checked ? 'Y' : 'N';
+        } else {
+            mytbl.hrDt.xhr.where[f.id] = f.value;
+        }
         mytbl.hrDt.xhr.page = 0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
         mytbl.show("myTbl");
     });
@@ -213,16 +218,15 @@ document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {
             let finalBirthFrom = '';
             let finalBirthTo = '';
 
-            // 나이가 많을수록 생년월일은 작아짐 (과거)
-            // 최대 나이(MAX)가 33이면, 생년월일 From은 (현재년도 - 33)년생부터가 됨.
+            let useKorean = document.getElementById("USE_KOREAN_AGE") ? (document.getElementById("USE_KOREAN_AGE").value === 'Y') : false;
+            let offset = useKorean ? 1 : 0;
+
             if (maxAgeVal !== "") {
-                finalBirthFrom = (currentYear - parseInt(maxAgeVal)) + "-01-01";
+                finalBirthFrom = (currentYear - parseInt(maxAgeVal) + offset) + "-01-01";
             }
 
-            // 나이가 적을수록 생년월일은 커짐 (최근)
-            // 최소 나이(MIN)가 60이면, 생년월일 To는 (현재년도 - 60)년생까지가 됨.
             if (minAgeVal !== "") {
-                finalBirthTo = (currentYear - parseInt(minAgeVal)) + "-12-31";
+                finalBirthTo = (currentYear - parseInt(minAgeVal) + offset) + "-12-31";
             }
 
             document.getElementById("PSNL_BIRTH_From").value = finalBirthFrom;
@@ -230,6 +234,8 @@ document.querySelectorAll("#AGE_MIN, #AGE_MAX").forEach(ageInput => {
 
             mytbl.hrDt.xhr.where["PSNL_BIRTH_From"] = finalBirthFrom;
             mytbl.hrDt.xhr.where["PSNL_BIRTH_To"] = finalBirthTo;
+            mytbl.hrDt.xhr.where["AGE_MIN"] = minAgeVal;
+            mytbl.hrDt.xhr.where["AGE_MAX"] = maxAgeVal;
 
             mytbl.hrDt.xhr.page = 0;
             mytbl.show("myTbl");
@@ -243,6 +249,10 @@ document.querySelectorAll(".quikSetBtn").forEach((q, key) => {
     q.addEventListener("click", () => {
         document.getElementById("PSNL_BIRTH_From").value = "";
         document.getElementById("PSNL_BIRTH_To").value = "";
+        document.getElementById("AGE_MIN").value = "";
+        document.getElementById("AGE_MAX").value = "";
+        mytbl.hrDt.xhr.where["AGE_MIN"] = "";
+        mytbl.hrDt.xhr.where["AGE_MAX"] = "";
         document.getElementById("TRS_DT_From").value = "";
         document.getElementById("TRS_DT_To").value = "";
         if (q.id == "setRetire") {
@@ -259,7 +269,11 @@ document.querySelectorAll(".quikSetBtn").forEach((q, key) => {
             document.getElementById("TRS_DT_To").value = dateFormat(dateCalc(dateCalc(new Date, "m", 6), "y", -30));
         }
         document.querySelectorAll(".filter").forEach((f, key) => {
-            mytbl.hrDt.xhr.where[f.id] = f.value;
+            if (f.type === 'checkbox') {
+                mytbl.hrDt.xhr.where[f.id] = f.checked ? 'Y' : 'N';
+            } else {
+                mytbl.hrDt.xhr.where[f.id] = f.value;
+            }
         });
         mytbl.hrDt.xhr.page = 0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
         mytbl.show("myTbl");
@@ -367,9 +381,23 @@ window.onload = function () {
     }
     document.getElementById("TRS_TYPE").value = params.get("TRS_TYPE") !== null ? params.get("TRS_TYPE") : "1";
     
+    if (params.get("USE_KOREAN_AGE")) {
+        let sel = document.getElementById("USE_KOREAN_AGE");
+        if (sel) {
+            sel.value = params.get("USE_KOREAN_AGE");
+            mytbl.hrDt.xhr.where["USE_KOREAN_AGE"] = sel.value;
+        }
+    }
+    
     if (params.get("POSITION")) document.getElementById("POSITION").value = params.get("POSITION");
-    if (params.get("AGE_MIN")) document.getElementById("AGE_MIN").value = params.get("AGE_MIN");
-    if (params.get("AGE_MAX")) document.getElementById("AGE_MAX").value = params.get("AGE_MAX");
+    if (params.get("AGE_MIN")) {
+        document.getElementById("AGE_MIN").value = params.get("AGE_MIN");
+        mytbl.hrDt.xhr.where["AGE_MIN"] = params.get("AGE_MIN");
+    }
+    if (params.get("AGE_MAX")) {
+        document.getElementById("AGE_MAX").value = params.get("AGE_MAX");
+        mytbl.hrDt.xhr.where["AGE_MAX"] = params.get("AGE_MAX");
+    }
     if (params.get("PSNL_BIRTH_From")) document.getElementById("PSNL_BIRTH_From").value = params.get("PSNL_BIRTH_From");
     if (params.get("PSNL_BIRTH_To")) document.getElementById("PSNL_BIRTH_To").value = params.get("PSNL_BIRTH_To");
     if (params.get("TRS_DT_From")) document.getElementById("TRS_DT_From").value = params.get("TRS_DT_From");
@@ -415,7 +443,11 @@ window.onload = function () {
             if (f.id === 'WORK_TYPE' && workTypeParam) {
                 // Keep the param value
             } else {
-                mytbl.hrDt.xhr.where[f.id] = f.value;
+                if (f.type === 'checkbox') {
+                    mytbl.hrDt.xhr.where[f.id] = f.checked ? 'Y' : 'N';
+                } else {
+                    mytbl.hrDt.xhr.where[f.id] = f.value;
+                }
             }
         });
         mytbl.show('myTbl');
