@@ -260,10 +260,10 @@ document.getElementById("psnlSerchPop").addEventListener('click', () => {
     window.open(DIR_ROOT + '/components/psnlPopup.php', '사원 검색', 'width=500, height=500');
 });
 
-// 성명 검색창 엔터 키 이벤트 추가
+// 성명 검색창 엔터 시 직원 검색 팝업 호출
 document.getElementById("PSNL_NM").addEventListener("keydown", (e) => {
     if (e.keyCode === 13) {
-        myTblRefresh();
+        document.getElementById("psnlSerchPop").click();
     }
 });
 
