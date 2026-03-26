@@ -31,31 +31,31 @@
                 </div>
             </div>
             
-            <input type="hidden" id="md_EMP_NO">
-            <input type="hidden" id="md_ISSUE_NO">
-            
-            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+            <div class="modalGrp" style="width:50% !important; margin-bottom:12px;">
                 <div class="modalHd">증명서 종류</div>
                 <div class="modalBd">
-                    <select id="md_CERT_TYPE" style="width:100%;">
+                    <select id="md_CERT_TYPE" style="width:calc(100% - 14px);">
                         <option value="재직">재직증명서</option>
                         <option value="경력">경력증명서</option>
                         <option value="퇴직">퇴직증명서</option>
                     </select>
                 </div>
             </div>            
-            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+            <div class="modalGrp" style="width:50% !important; margin-bottom:12px;">
                 <div class="modalHd">본적</div>
-                <div class="modalBd"><input id="md_ORIGIN_ADDR" placeholder="본적 주소를 입력하세요" autocomplete='off' style="width:calc(100% - 14px);"></div>
+                <div class="modalBd"><input id="md_ORIGIN_ADDR" placeholder="본적 주소 입력" autocomplete='off' style="width:calc(100% - 14px);"></div>
             </div>
-            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+            <div class="modalGrp" style="width:50% !important; margin-bottom:12px;">
                 <div class="modalHd">주소</div>
-                <div class="modalBd"><input id="md_CURR_ADDR" placeholder="현재 거주지 주소를 입력하세요" autocomplete='off' style="width:calc(100% - 14px);"></div>
+                <div class="modalBd"><input id="md_CURR_ADDR" placeholder="현재 거주지 주소 입력" autocomplete='off' style="width:calc(100% - 14px);"></div>
             </div>
-            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+            <div class="modalGrp" style="width:50% !important; margin-bottom:12px;">
                 <div class="modalHd">소속기관 주소</div>
-                <div class="modalBd"><input id="md_ORG_ADDR" placeholder="소속기관(본당/성지) 주소를 입력하세요" autocomplete='off' style="width:calc(100% - 14px);"></div>
+                <div class="modalBd"><input id="md_ORG_ADDR" placeholder="소속기관 주소 입력" autocomplete='off' style="width:calc(100% - 14px);"></div>
             </div>
+            
+            <input type="hidden" id="md_EMP_NO">
+            <input type="hidden" id="md_ISSUE_NO">
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
