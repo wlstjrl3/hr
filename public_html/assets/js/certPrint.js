@@ -260,6 +260,13 @@ document.getElementById("psnlSerchPop").addEventListener('click', () => {
     window.open(DIR_ROOT + '/components/psnlPopup.php', '사원 검색', 'width=500, height=500');
 });
 
+// 성명 검색창 엔터 키 이벤트 추가
+document.getElementById("PSNL_NM").addEventListener("keydown", (e) => {
+    if (e.keyCode === 13) {
+        myTblRefresh();
+    }
+});
+
 // 사원 검색 후 호출되는 글로벌 함수 (사원 팝업에서 사용)
 function myTblRefresh() {
     mytbl.hrDt.xhr.where['EMP_NM'] = document.getElementById("PSNL_NM").value;
