@@ -1,93 +1,220 @@
 <?php include('./components/header.php'); ?>
-<div class="modalForm">
+<!-- 1. 제증명 발급 입력/수정 모달 -->
+<div class="modalForm" id="certInputModal">
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>증명서 발급 정보 </b>
-            <button></button>
+            <b>제증명 발급 정보 입력</b>
+            <button onclick="modalClose()"></button>
         </div>
         <div class="modalBody">
-            <p>직원정보 : <b>조직 직책 성명</b></p>
-            <div class="modalGrp">
-                <div class="modalHd">일련번호</div>
-                <div class="modalBd"><input readonly style="background:#EEE;" autocomplete='off'></div>
-            </div>            
+            <p>발급 대상 : <b id="mdTargetText">사원을 선택해주세요</b></p>
+            <input type="hidden" id="md_EMP_NO">
+            <input type="hidden" id="md_ISSUE_NO">
+            
             <div class="modalGrp">
                 <div class="modalHd">증명서 종류</div>
-                <div class="modalBd"><select id="CERT_TYPE">
-                    <option value="">선택</option>
-                    <option>재직증명서</option>
-                    <option>경력증명서</option>
-                    <option>재직예정증명서</option>
-                    <option>퇴직증명서</option>
-                    <option>졸업증명서</option>
-                </select></div>
+                <div class="modalBd">
+                    <select id="md_CERT_TYPE">
+                        <option value="재직">재직증명서</option>
+                        <option value="경력">경력증명서</option>
+                        <option value="퇴직">퇴직증명서</option>
+                    </select>
+                </div>
+            </div>            
+            <div class="modalGrp">
+                <div class="modalHd">본적</div>
+                <div class="modalBd"><input id="md_ORIGIN_ADDR" placeholder="본적 주소를 입력하세요" autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">발급일자</div>
-                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+                <div class="modalHd">주소</div>
+                <div class="modalBd"><input id="md_CURR_ADDR" placeholder="현재 거주지 주소를 입력하세요" autocomplete='off'></div>
             </div>
             <div class="modalGrp">
-                <div class="modalHd">증명서 내용</div>
-                <div class="modalBd"><input autocomplete='off'></div>
+                <div class="modalHd">소속기관 주소</div>
+                <div class="modalBd"><input id="md_ORG_ADDR" placeholder="소속기관(본당/성지) 주소를 입력하세요" autocomplete='off'></div>
             </div>
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
-            <button id="modalEdtBtn" style="padding:5px 9px;">저장</button>
-            <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
+            <button id="modalSaveBtn" style="padding:5px 15px;" class="clBg2 clW rndCorner">저장</button>
+            <button id="modalDelBtn" style="padding:5px 15px;" class="clBg3 clW rndCorner">삭제</button>
         </div>
     </div>
 </div>
-<br><!--이 위로는 모달 팝업영역, 아래로는 페이지 코드-->
+
+<!-- 2. 인쇄용 미리보기 모달 -->
+<div class="modalForm" id="certPrintModal" style="z-index:100;">
+    <div class="modalBg"></div>
+    <div class="modalWindow" style="width:850px; max-width:90vw;">
+        <div class="modalHeader no-print">
+            <b id="printModalTitle">증명서 인쇄 미리보기</b>
+            <button onclick="document.getElementById('certPrintModal').style.visibility='hidden'; document.getElementById('certPrintModal').style.opacity='0';"></button>
+        </div>
+        <div class="modalBody" style="padding:0; background:#f0f0f0; overflow-y:auto; max-height:80vh;">
+            <div id="printArea" class="print-container">
+                <!-- 인쇄 레이아웃 (종류에 따라 클래스 동적 부여 필요) -->
+                <div id="certPaper" class="cert-paper">
+                    <!-- 외곽선 (시안 기준) -->
+                    <div class="cert-outer-border"></div>
+
+                    <!-- 배경 십자가 로고 -->
+                    <img id="certLogoCross" src="" class="cert-logo-cross">
+                    
+                    <!-- [1. 경력증명서 전용 레이아웃 - 초기 숨김] -->
+                    <div id="layout_career" class="cert-inner layout-career" style="display:none;">
+                        <div class="p_ISSUE_NO_wrap" style="top:25mm; left:15mm;">
+                             제 <span id="p_ISSUE_NO_C"></span> 호
+                        </div>
+                        <div class="p_TITLE_wrap_career" style="position:absolute; top:45mm; left:0; width:100%; text-align:center;">
+                            <span style="font-family:'Malgun Gothic', '맑은 고딕', sans-serif; font-size:35pt; font-weight:900; letter-spacing:15px; padding-left:15px;">경 력 증 명 서</span>
+                        </div>
+                        <div style="position:absolute; top:85mm; left:15mm; right:15mm;">
+                            <table class="career-table" style="width:100%; border-collapse:collapse; border:2px solid #555; text-align:center; font-size:13pt; line-height:1.5;">
+                                <tr>
+                                    <td class="lblBg" style="width:15%; font-weight:bold; letter-spacing:15px; padding-left:15px; border:1px solid #777; height:12mm;">성 명</td>
+                                    <td style="width:35%; border:1px solid #777; letter-spacing:10px;" id="p_PSNL_NM_C"></td>
+                                    <td class="lblBg" style="width:20%; font-weight:bold; letter-spacing:5px; border:1px solid #777;">생 년 월 일</td>
+                                    <td style="width:30%; border:1px solid #777;" id="p_BIRTH_DT_C"></td>
+                                </tr>
+                                <tr>
+                                    <td class="lblBg" style="font-weight:bold; letter-spacing:15px; padding-left:15px; border:1px solid #777; height:18mm;">주 소</td>
+                                    <td colspan="3" style="border:1px solid #777; text-align:left; padding-left:10mm;" id="p_ADDR_C"></td>
+                                </tr>
+                                <tr>
+                                    <td class="lblBg" style="font-weight:bold; letter-spacing:15px; padding-left:15px; border:1px solid #777; height:18mm;">본 적</td>
+                                    <td colspan="3" style="border:1px solid #777; text-align:left; padding-left:10mm;" id="p_ORIGIN_C"></td>
+                                </tr>
+                                <tr class="lblBg" style="height:10mm;">
+                                    <td colspan="2" style="font-weight:bold; letter-spacing:20px; padding-left:20px; border:1px solid #777; border-top:2px solid #555;">기 　 간</td>
+                                    <td colspan="2" style="font-weight:bold; letter-spacing:30px; padding-left:30px; border:1px solid #777; border-top:2px solid #555;">경 력 사 항</td>
+                                </tr>
+                                <tr class="lblBg" style="height:10mm; font-size:12pt; font-weight:bold;">
+                                    <td style="border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 터</td>
+                                    <td style="border:1px solid #777; letter-spacing:15px; padding-left:15px;">까 지</td>
+                                    <td style="border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 서</td>
+                                    <td style="border:1px solid #777; letter-spacing:5px;">직위 및 직급</td>
+                                </tr>
+                                <tr style="height:25mm;">
+                                    <td style="border:1px solid #777; font-family:sans-serif;" id="p_JOIN_DT_C"></td>
+                                    <td style="border:1px solid #777; font-family:sans-serif;" id="p_RETIRE_DT_C"></td>
+                                    <td style="border:1px solid #777;" id="p_ORG_NM_C"></td>
+                                    <td style="border:1px solid #777;" id="p_POS_C"></td>
+                                </tr>
+                                <tr style="height:20mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>
+                                <tr style="height:20mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>
+                            </table>
+                        </div>
+                        <div class="p_SECTION_FOOTER_C" style="position:absolute; top:225mm; left:0; width:100%; text-align:center;">
+                            <div style="font-size:16pt; margin-bottom:10mm; font-family:'Nanum Myeongjo', serif;">위 사실을 증명함</div>
+                            <div class="p_ISSUE_DT_wrap" id="p_ISSUE_DT_C" style="font-size:16pt; margin-bottom:10mm;"></div>
+                            <div class="p_ISSUER_wrap" style="position:relative; display:inline-block;">
+                                <span class="issuer-name" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif; font-size:22pt; font-weight:900; letter-spacing:4px; padding-right:20px;">천주교 수원교구 제1대리구장</span>
+                                <img src="" class="official-seal seal_C">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- [2. 재직/퇴직 공통 베이스 레이아웃] -->
+                    <div id="layout_standard" class="cert-inner layout-standard">
+                        <div class="p_ISSUE_NO_wrap">
+                            제 <span id="p_ISSUE_NO"></span> 호
+                        </div>
+                        <div class="p_TITLE_wrap">
+                            <span><span id="p_TITLE"></span>증명서</span>
+                        </div>
+                        <div class="p_SECTION_TOP">
+                            <div class="cert-row">
+                                <div class="lbl">본 적</div>
+                                <div class="val" id="p_ORIGIN_ADDR"></div>
+                            </div>
+                            <div class="cert-row" style="margin-top:15px;">
+                                <div class="lbl">주 소</div>
+                                <div class="val">
+                                    <div id="p_CURR_ADDR_1"></div>
+                                    <div id="p_CURR_ADDR_2" style="margin-top:6px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p_SECTION_MID">
+                            <div class="cert-row-mid">
+                                <div class="lbl">성 　 명</div>
+                                <div class="val" id="p_PSNL_NM"></div>
+                            </div>
+                            <div class="cert-row-mid">
+                                <div class="lbl">생년월일</div>
+                                <div class="val" id="p_BIRTH_DT"></div>
+                            </div>
+                        </div>
+                        <div class="p_SECTION_BODY" id="p_BODY_CONTENT"></div>
+                        <div class="p_SECTION_FOOTER">
+                            <div class="p_ISSUE_DT_wrap" id="p_ISSUE_DT"></div>
+                            <div class="p_ISSUER_wrap">
+                                <span class="issuer-name">천주교 수원교구 제1대리구장</span>
+                                <img id="certSeal" src="" class="official-seal">
+                            </div>
+                        </div>
+                        <div id="p_OUTSIDE_FOOTER" class="p_OUTSIDE_FOOTER" style="display:none;">
+                            천주교수원교구 제1대리구
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modalFooter no-print">
+            <button onclick="window.print()" style="padding:8px 20px;" class="clBg2 clW rndCorner">인쇄하기</button>
+            <button onclick="document.getElementById('certPrintModal').style.visibility='hidden'; document.getElementById('certPrintModal').style.opacity='0';" style="padding:8px 20px;" class="clBg3 clW rndCorner">닫기</button>
+        </div>
+    </div>
+</div>
+
 <div class="container">
+    <h4 class="cl3 pddS">제증명서 발급 대장</h4>
 
-    <h4 class="cl3 pddS">
-        증명서 발급 관리
-    </h4>
-
+    <!-- 상단 필터 영역 (fmlList 참조) -->
     <div class="searchArea">
         <div class="colGrp">
             <div class="colHd2L clBg5 cl2"><span><b>개인코드<br>/ 조직명</b></span></div>
             <div class="colBd">
                 <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;" value="<?php echo @$_REQUEST['PSNL_CD']; ?>"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;" value="<?php echo @$_REQUEST['ORG_NM']; ?>">
             </div>
-        </div>        
+        </div>
         <div class="colGrp">
-            <div class="colHd2L clBg5 cl2">
-                <span><b>직책<br>/ 직원성명</b></span><br>
-            </div>
-            <div class="colBd" style="">
-                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;" value="<?php echo @$_REQUEST['POSITION']; ?>">
-                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM']; ?>">
+            <div class="colHd2L clBg5 cl2"><span><b>직책<br>/ 직원성명</b></span></div>
+            <div class="colBd">
+                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;">
+                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명 검색">
                 <button id="psnlSerchPop" style="padding:3px;">검색</button>
             </div>    
         </div>
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>증명서 종류</b></span></div>
-            <div class="colBd"><select id="CERT_TYPE" class="filter">
-                <option value="">전체</option>
-                <option>재직증명서</option>
-                <option>경력증명서</option>
-                <option>재직예정증명서</option>
-                <option>퇴직증명서</option>
-                <option>졸업증명서</option>
-            </select></div>
+            <div class="colHd clBg5 cl2"><span><b>증명서종류</b></span></div>
+            <div class="colBd">
+                <select id="CERT_TYPE_SEARCH" class="filter">
+                    <option value="">전체</option>
+                    <option value="재직">재직증명서</option>
+                    <option value="경력">경력증명서</option>
+                    <option value="퇴직">퇴직증명서</option>
+                </select>
+            </div>
+        </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>발급번호</b></span></div>
+            <div class="colBd"><input id="ISSUE_NO_SEARCH" class="filter" placeholder="2026-001"></div>
         </div>
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>발급일자</b></span></div>
-            <div class="colBd"><input class="dualDateBox dateBox filter" id="ISSUE_DT_From"><span>~</span><input class="dualDateBox dateBox filter" id="ISSUE_DT_To"></div>
+            <div class="colBd">
+                <input class="dualDateBox dateBox filter" id="ISSUE_DT_STT" placeholder="시작일"><span>~</span><input class="dualDateBox dateBox filter" id="ISSUE_DT_END" placeholder="종료일">
+            </div>
         </div>
-        <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>증명서 내용</b></span></div>
-            <div class="colBd"><input id="CERT_DTL" class="filter"></div>
-        </div> 
-        <div class="clearB"></div>
     </div>
+    <div class="clearB"></div>
+
     <br>
     <div class="tableOutFrm">
         <div class="pddS floatL">
-            <a id="newCol" class="pddS clBg3 clW rndCorner pointer">신규</a>
+            <a id="newBtn" class="pddS clBg3 clW rndCorner pointer">신규발급</a>
             <a id="xport" class="pddS clBg3 clW rndCorner pointer">엑셀 다운로드</a>
         </div>
         <div class="pddS floatR">
@@ -105,17 +232,184 @@
     <br>
 </div>
 
-<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<style>
+/* 폰트 설정 */
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap');
+
+.print-container { width: 100%; display: flex; justify-content: center; padding: 20px 0; background: #555; }
+
+/* A4 크기 하드코딩 (1장 고정을 위해 296mm로 살짝 축소) */
+.cert-paper { 
+    width: 210mm; height: 296mm; 
+    background: white; position: relative; 
+    overflow: hidden; box-sizing: border-box;
+    font-family: 'Nanum Myeongjo', 'Batang', serif; color: #000; margin: 0 auto;
+}
+
+/* 외곽선 추가 */
+.cert-outer-border {
+    position: absolute;
+    top: 15mm; right: 15mm; bottom: 15mm; left: 15mm;
+    border: 2px solid #333;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* 십자가 배경 이미지 */
+.cert-logo-cross {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 350px;
+    opacity: 1;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* 내부 컨테이너 (절대 좌표 기준점) */
+.cert-inner {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2;
+}
+
+/* =====================================
+   절대 좌표(Absolute) 기반 컴포넌트 배치
+   - 높이 누적으로 인한 페이지 넘김을 원천 차단
+   ===================================== */
+
+/* 1. 발급번호 */
+.p_ISSUE_NO_wrap {
+    position: absolute; top: 25mm; left: 25mm;
+    font-size: 14pt;
+}
+
+/* 2. 제목 (재직증명서) */
+.p_TITLE_wrap {
+    position: absolute; top: 60mm; left: 0;
+    width: 100%; text-align: center;
+}
+.p_TITLE_wrap span {
+    letter-spacing: 25px;
+    padding-left: 25px;
+    font-size: 35pt;
+    font-weight: 800; 
+    display: inline-block; 
+}
+
+/* 3. 본적/주소 */
+.p_SECTION_TOP {
+    position: absolute; top: 100mm; left: 25mm;
+    font-size: 16pt; line-height: 1.6;
+}
+.cert-row { margin-bottom: 5mm; clear: both; overflow: hidden; }
+.cert-row .lbl {
+    float: left; width: 40mm; font-weight: bold;
+    letter-spacing: 15px; 
+}
+.cert-row .val {
+    float: left; width: 130mm;
+}
+
+/* 4. 성명/생년월일 (로고 중앙부) */
+.p_SECTION_MID {
+    position: absolute; top: 145mm; left: 270px;
+    width: 100%;
+    display: flex; flex-direction: column;
+    font-size: 17pt;
+}
+.cert-row-mid { 
+    display: flex; width: 140mm; margin-bottom: 7mm; 
+}
+.cert-row-mid .lbl {
+    width: 50mm; text-align: center; font-weight: bold;
+    letter-spacing: 10px;
+}
+.cert-row-mid .val {
+    width: 90mm; text-align: left;
+}
+
+/* 5. 본문 문구 */
+.p_SECTION_BODY {
+    position: absolute; top: 185mm; left: 0;
+    width: 100%; box-sizing: border-box;
+    text-align: center; font-size: 18pt; line-height: 2.2;
+    padding: 0 15mm; word-break: keep-all;
+}
+
+/* 6. 하단 발급일 및 발행처 */
+.p_SECTION_FOOTER {
+    position: absolute; top: 235mm; left: 0;
+    width: 100%; text-align: center;
+}
+.p_ISSUE_DT_wrap { font-size: 18pt; margin-bottom: 12mm; }
+
+.p_ISSUER_wrap { position: relative; display: inline-block; }
+
+.issuer-name { font-size: 16pt; font-weight: 900; letter-spacing: 3px; padding-right: 20px; }
+.official-seal { position: absolute; width: 100px; height: 100px; right: -20px; top: -30px; z-index: -1; }
+
+/* 인쇄 환경 최적화 (절대적 평탄화) */
+@media print {
+    /* 1. 여백 없는 A4 강제 */
+    @page { size: A4; margin: 0; }
+    
+    /* 2. 화면 전용 요소 숨김 */
+    body > *:not(#certPrintModal), 
+    .modalBg, .modalHeader, .modalFooter, .no-print { 
+        display: none !important; 
+    }
+    
+    /* 3. HTML/Body 초기화 */
+    html, body { 
+        margin: 0 !important; padding: 0 !important; 
+        width: 210mm !important; height: 297mm !important; 
+        background: #fff !important; 
+        overflow: hidden !important; 
+    }
+    
+    /* 4. 모달 및 래퍼들의 시각적 효과/위치값 완벽 해제 (Flatten) */
+    #certPrintModal, .modalWindow, .modalBody, .print-container { 
+        position: static !important;
+        transform: none !important;
+        width: auto !important; height: auto !important;
+        margin: 0 !important; padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        overflow: visible !important;
+        max-width: none !important;
+        max-height: none !important;
+    }
+    
+    /* 5. 실제 종이 컨테이너를 브라우저 최상단에 고정 */
+    .cert-paper { 
+        position: absolute !important; 
+        top: 0 !important; left: 0 !important;
+        width: 210mm !important; height: 297mm !important; 
+        margin: 0 !important; padding: 0 !important; 
+        border: none !important; 
+        box-shadow: none !important;
+        background: #fff !important;
+    }
+    
+    /* 6. 투명도 및 배경 옵션 */
+    .cert-logo-cross { opacity: 0.9 !important; }
+    * { 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+    }
+}
+</style>
+
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css" rel="stylesheet" />
+
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/certPrint.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateForm.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/certPrint.js'></script>
 
 <?php include('components/footer.php'); ?>
-
-<script>
-
-</script>

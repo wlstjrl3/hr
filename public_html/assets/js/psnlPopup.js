@@ -1,7 +1,8 @@
 // 부모 창에 작성된 #parentInput의 값 얻어오기
 // opener == 부모창
-const parentValue = opener.document.getElementById('PSNL_NM').value;
-document.querySelector('#PSNL_NM').value = parentValue;
+const parentValue = (opener && opener.document.getElementById('PSNL_NM')) ? opener.document.getElementById('PSNL_NM').value : "";
+const psnlNmLocal = document.querySelector('#PSNL_NM');
+if(psnlNmLocal) psnlNmLocal.value = parentValue;
 
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
@@ -9,19 +10,17 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/psnlPopSearch.php',
         columXHR: '',
-        //key : psnlKey.value, //api 호출할 보안 개인인증키
         where: {
-            PSNL_NM: parentValue, //filter의 값 변동이 생기면 여기에 즉시 추가 값을 더하고 xhr을 호출한다.
+            PSNL_NM: parentValue,
         },
         order: {
             column: '0',
             direction: 'desc',
         },
-        page: 0, //표시되는 페이지에서 1이 빠진 값이다 즉 page:0 = 1페이지
-        limit: 5, //만약 리미트가 0이라면 리미트 없이 전체 조회하는 것으로 처리 excel down등에서 0 처리해야 함!
+        page: 0, 
+        limit: 5, 
     },
     columns: [
-        //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
         { title: "직원코드", data: "PSNL_CD", className: "" }
         , { title: "조직명", data: "ORG_NM", className: "" }
         , { title: "성명", data: "PSNL_NM", className: "" }
@@ -29,23 +28,51 @@ var mytbl = new hr_tbl({
         , { title: "직책", data: "POSITION", className: "" }
     ],
 });
-mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
+mytbl.show('myTbl');
 
 //검색된 데이터가 하나라면 즉시 바인딩 한다.(로딩 시간이 걸리기에 지연로딩 처리)
 window.onload = function () {
-    document.getElementById("PSNL_NM").focus();
+    const psnlNmInput = document.getElementById("PSNL_NM");
+    if (psnlNmInput) psnlNmInput.focus();
+    
     setTimeout(() => {
-        let tmp = document.querySelector(".hr_tbl").children[1].children;
-        if (tmp.length == 1 && tmp[0].children[0].innerText != "데이터가 없습니다.") { //값이 있으면서 단 하나만 존재한다면 즉시 바인딩 처리한다.
-            opener.document.getElementById('PSNL_CD').value = tmp[0].children[1].innerText
-            opener.document.getElementById('ORG_NM').value = tmp[0].children[2].innerText;
-            opener.document.getElementById('PSNL_NM').value = tmp[0].children[3].innerText;
-            opener.document.getElementById('POSITION').value = tmp[0].children[5].innerText;
-            opener.document.getElementById('psnlSerchPop').parentElement.parentElement.nextElementSibling.querySelector("input").focus();
-            opener.myTblRefresh();
+        let table = document.querySelector(".hr_tbl");
+        if (!table) return;
+        
+        let tbody = table.querySelector("tbody");
+        if (!tbody) return;
+        
+        let rows = tbody.querySelectorAll("tr");
+        if (rows.length !== 1) return; // 단일 검색 결과일 때만 실행
+
+        let firstRowCells = rows[0].children;
+        if (!firstRowCells || firstRowCells.length < 6) return;
+
+        // "데이터가 없습니다." 메시지인 경우 제외
+        if (firstRowCells[0].innerText.includes("데이터가 없습니다") || (firstRowCells[1] && firstRowCells[1].innerText === "데이터가 없습니다.")) return;
+
+        // [0]반응형버튼 [1]직원코드 [2]조직명 [3]성명 [4]세례명 [5]직책
+        if (opener && opener.document) {
+            const setVal = (id, val) => {
+                let el = opener.document.getElementById(id);
+                if(el) el.value = val;
+            };
+            
+            setVal('PSNL_CD', firstRowCells[1].innerText);
+            setVal('ORG_NM', firstRowCells[2].innerText);
+            setVal('PSNL_NM', firstRowCells[3].innerText);
+            setVal('POSITION', firstRowCells[5].innerText);
+            
+            let searchPop = opener.document.getElementById('psnlSerchPop');
+            if (searchPop && searchPop.parentElement && searchPop.parentElement.parentElement && searchPop.parentElement.parentElement.nextElementSibling) {
+                let targetInput = searchPop.parentElement.parentElement.nextElementSibling.querySelector("input");
+                if (targetInput) targetInput.focus();
+            }
+            
+            if (typeof opener.myTblRefresh === 'function') opener.myTblRefresh();
             window.close();
         }
-    }, 400);
+    }, 800);
 };
 
 //검색 필터링을 위한 코드
@@ -55,18 +82,26 @@ document.querySelectorAll(".filter").forEach((f, key) => {
         mytbl.hrDt.xhr.page = 0; //필터가 바뀌면 페이지 수도 바뀌므로 첫장으로 돌려보낸다.
         mytbl.show("myTbl");
         setTimeout(() => {
-            let tmp = document.querySelector(".hr_tbl").children[1].children;
-            if (tmp.length == 1 && tmp[0].children[0].innerText != "데이터가 없습니다.") { //값이 있으면서 단 하나만 존재한다면 즉시 바인딩 처리한다.
-                opener.document.getElementById('PSNL_CD').value = tmp[0].children[1].innerText
+            let table = document.querySelector(".hr_tbl");
+            if (!table || !table.children[1]) return;
+
+            let tmp = table.children[1].children;
+            if (tmp.length == 1 && tmp[0].children[1] && tmp[0].children[1].innerText != "데이터가 없습니다.") {
+                opener.document.getElementById('PSNL_CD').value = tmp[0].children[1].innerText;
                 opener.document.getElementById('ORG_NM').value = tmp[0].children[2].innerText;
                 opener.document.getElementById('PSNL_NM').value = tmp[0].children[3].innerText;
                 opener.document.getElementById('POSITION').value = tmp[0].children[5].innerText;
-                //opener.document.getElementById('psnlSerchPop').focus();
-                opener.document.getElementById('psnlSerchPop').parentElement.parentElement.nextElementSibling.querySelector("input").focus();
+
+                let searchPop = opener.document.getElementById('psnlSerchPop');
+                if (searchPop && searchPop.parentElement && searchPop.parentElement.parentElement && searchPop.parentElement.parentElement.nextElementSibling) {
+                    let targetInput = searchPop.parentElement.parentElement.nextElementSibling.querySelector("input");
+                    if (targetInput) targetInput.focus();
+                }
+
                 opener.myTblRefresh();
                 window.close();
             }
-        }, 200);
+        }, 400);
     });
 });
 

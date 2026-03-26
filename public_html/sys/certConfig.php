@@ -1,0 +1,113 @@
+<?php
+include "sql_safe_helper.php";
+verifyApiKey($conn, @$_REQUEST['key']);
+
+// 권한 확인 (사용자 정보 테이블이 BONDANG_HR.USER_TB에 있음)
+$authData = executeQuery($conn, "SELECT USER_AUTH, USER_NM FROM BONDANG_HR.USER_TB WHERE USER_PASS = ? LIMIT 1", "s", [@$_REQUEST['key']]);
+$userAuth = $authData[0]['USER_AUTH'] ?? '';
+$userName = $authData[0]['USER_NM'] ?? '';
+
+if ($_REQUEST['CRUD'] == 'C') { // Create or Update
+    if ($userAuth != 'auth' && $userAuth != 'admin') {
+        die('권한이 없는 사용자 입니다.');
+    }
+
+    if (!@$_REQUEST['ISSUE_NO']) { // 신규 등록 및 채번
+        $year = date('Y');
+        $certType = $_REQUEST['CERT_TYPE'] ?? '재직';
+        
+        // 해당 연도 + 해당 증명서 종류의 마지막 채번 번호 조회 (PREFIX 방식 적용)
+        $lastNoData = executeQuery($conn, 
+            "SELECT ISSUE_NO FROM TB_CERT_PRINT WHERE ISSUE_NO LIKE ? ORDER BY ISSUE_NO DESC LIMIT 1", 
+            "s", ["{$certType}-{$year}-%"]
+        );
+        
+        $nextSeq = 1;
+        if (!empty($lastNoData)) {
+            // "재직-2026-001" 형식에서 마지막 번호(001) 추출
+            if (preg_match('/-(\d{3})$/', $lastNoData[0]['ISSUE_NO'], $matches)) {
+                $nextSeq = (int)$matches[1] + 1;
+            }
+        }
+        
+        // DB 저장용 발급번호 포맷: 예) 재직-2026-001
+        $newIssueNo = sprintf("%s-%d-%03d", $certType, $year, $nextSeq);
+        
+        // 데이터 삽입
+        executeUpdate($conn,
+            "INSERT INTO TB_CERT_PRINT (ISSUE_NO, EMP_NO, CERT_TYPE, ORIGIN_ADDR, CURR_ADDR, ORG_ADDR, ISSUE_DT, REG_EMP_NO) 
+             VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)",
+            "sssssss",
+            [$newIssueNo, $_REQUEST['EMP_NO'], $_REQUEST['CERT_TYPE'], $_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $userName]
+        );
+        
+        jsonResponse($conn, ["result" => "success", "ISSUE_NO" => $newIssueNo]);
+    } else { // 기존 데이터 수정
+        $oldIssueNo = $_REQUEST['ISSUE_NO'];
+        $newCertType = $_REQUEST['CERT_TYPE'];
+        
+        // 기존 데이터 조회 (종류가 바뀌었는지 확인)
+        $oldData = executeQuery($conn, "SELECT CERT_TYPE FROM TB_CERT_PRINT WHERE ISSUE_NO = ?", "s", [$oldIssueNo]);
+        
+        if (!empty($oldData) && $oldData[0]['CERT_TYPE'] != $newCertType) {
+            // [종류가 변경된 경우]: 기존 번호를 쓸 수 없으므로(PK 체계 때문) 삭제 후 새로 채번하여 삽입
+            executeUpdate($conn, "DELETE FROM TB_CERT_PRINT WHERE ISSUE_NO = ?", "s", [$oldIssueNo]);
+            
+            $year = date('Y');
+            $lastNoData = executeQuery($conn, 
+                "SELECT ISSUE_NO FROM TB_CERT_PRINT WHERE ISSUE_NO LIKE ? ORDER BY ISSUE_NO DESC LIMIT 1", 
+                "s", ["{$newCertType}-{$year}-%"]
+            );
+            $nextSeq = 1;
+            if (!empty($lastNoData)) {
+                if (preg_match('/-(\d{3})$/', $lastNoData[0]['ISSUE_NO'], $matches)) {
+                    $nextSeq = (int)$matches[1] + 1;
+                }
+            }
+            $finalIssueNo = sprintf("%s-%d-%03d", $newCertType, $year, $nextSeq);
+            
+            executeUpdate($conn,
+                "INSERT INTO TB_CERT_PRINT (ISSUE_NO, EMP_NO, CERT_TYPE, ORIGIN_ADDR, CURR_ADDR, ORG_ADDR, ISSUE_DT, REG_EMP_NO) 
+                 VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)",
+                "sssssss",
+                [$finalIssueNo, $_REQUEST['EMP_NO'], $newCertType, $_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $userName]
+            );
+        } else {
+            // [종류가 같은 경우]: 일반 업데이트
+            $finalIssueNo = $oldIssueNo;
+            executeUpdate($conn,
+                "UPDATE TB_CERT_PRINT SET ORIGIN_ADDR=?, CURR_ADDR=?, ORG_ADDR=? WHERE ISSUE_NO=?",
+                "ssss",
+                [$_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $oldIssueNo]
+            );
+        }
+        jsonResponse($conn, ["result" => "success", "ISSUE_NO" => $finalIssueNo]);
+    }
+}
+else if ($_REQUEST['CRUD'] == 'R') { // 단건 조회 (인쇄용 등)
+    $sql = "SELECT 
+                A.*, 
+                B.PSNL_NM,
+                B.PSNL_NUM,
+                (SELECT ORG_NM FROM ORG_INFO WHERE ORG_CD = (SELECT ORG_CD FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1)) AS ORG_NM,
+                (SELECT POSITION FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1) AS POSITION,
+                (SELECT MIN(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO) AS JOIN_DT,
+                (SELECT TRS_DT FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '2' ORDER BY TRS_DT DESC LIMIT 1) AS RETIRE_DT
+            FROM TB_CERT_PRINT A
+            LEFT JOIN PSNL_INFO B ON A.EMP_NO = B.PSNL_CD
+            WHERE A.ISSUE_NO = ? LIMIT 1";
+            
+    $data = executeQuery($conn, $sql, "s", [$_REQUEST['ISSUE_NO']]);
+    jsonResponse($conn, ["data" => $data[0] ?? null]);
+}
+else if ($_REQUEST['CRUD'] == 'D') { // 삭제
+    if ($userAuth != 'admin') {
+        die('삭제 권한이 없습니다.');
+    }
+    executeUpdate($conn, "DELETE FROM TB_CERT_PRINT WHERE ISSUE_NO = ?", "s", [$_REQUEST['ISSUE_NO']]);
+    jsonResponse($conn, ["result" => "success"]);
+}
+else {
+    die('잘못된 접근방식입니다.');
+}
+?>

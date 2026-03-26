@@ -154,6 +154,11 @@ class hr_tbl {
                 //테이블의 행 클릭 이벤트//
                 table.querySelectorAll("tr").forEach(tr => {                              //테이블의 모든 행을 tr이라고 지정한다.
                     tr.addEventListener("click", target => {                               //모든 행에 클릭 이벤트를 추가한다.
+                        // 버튼 클릭 시 행 전체 클릭 이벤트가 전파되는 것을 방지 (인쇄/수정/삭제 등)
+                        if (target.target.tagName === 'BUTTON' || target.target.closest('button')) {
+                            return; 
+                        }
+                        
                         if (target.target.className == 'colBtn') {                        //모바일 반응형 구성을 위해 추가한 colBtn을 눌렀다면
                             if (target.target.innerHTML == "＋") {                          //아직 열려있지 않다면
                                 target.target.innerHTML = "－";                         //반응형 버튼의 txt를 - 로 변경하고
@@ -191,12 +196,20 @@ class hr_tbl {
                             }
                             //debugger;
                         } else if (this.hrDt.tblType == "psnlPopup") {   //개인검색 팝업창에서의 행클릭 이벤트
-                            opener.document.getElementById('PSNL_CD').value = target.currentTarget.children[1].innerText;
-                            opener.document.getElementById('ORG_NM').value = target.currentTarget.children[2].innerText;
-                            opener.document.getElementById('PSNL_NM').value = target.currentTarget.children[3].innerText;
-                            opener.document.getElementById('POSITION').value = target.currentTarget.children[5].innerText;
-                            opener.document.getElementById('psnlSerchPop').parentElement.parentElement.nextElementSibling.querySelector("input").focus();
-                            opener.myTblRefresh();
+                            if (opener && opener.document) {
+                                opener.document.getElementById('PSNL_CD').value = target.currentTarget.children[1].innerText;
+                                opener.document.getElementById('ORG_NM').value = target.currentTarget.children[2].innerText;
+                                opener.document.getElementById('PSNL_NM').value = target.currentTarget.children[3].innerText;
+                                opener.document.getElementById('POSITION').value = target.currentTarget.children[5].innerText;
+                                
+                                let searchPop = opener.document.getElementById('psnlSerchPop');
+                                if (searchPop && searchPop.parentElement && searchPop.parentElement.parentElement && searchPop.parentElement.parentElement.nextElementSibling) {
+                                    let targetInput = searchPop.parentElement.parentElement.nextElementSibling.querySelector("input");
+                                    if (targetInput) targetInput.focus();
+                                }
+                                
+                                if (typeof opener.myTblRefresh === 'function') opener.myTblRefresh();
+                            }
                             window.close();
                         } else if (this.hrDt.tblType == "orgPopup") {   //조직검색 팝업창에서의 행클릭 이벤트
                             opener.document.getElementById('orgCd').value = target.currentTarget.children[1].innerText
