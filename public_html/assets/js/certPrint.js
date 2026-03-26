@@ -48,15 +48,15 @@ mytbl.xportBind();
 
 // 2. 신규 발급 업무 처리
 document.getElementById("newBtn").addEventListener("click", () => {
-    if (document.getElementById("PSNL_CD").value.length < 1) {
-        alert("먼저 사원 검색을 통해 대상 직원을 선택해주세요.");
-        return false;
-    }
-    
     // 모달 필드 초기화
     document.getElementById("md_ISSUE_NO").value = "";
-    document.getElementById("md_EMP_NO").value = document.getElementById("PSNL_CD").value;
-    document.getElementById("mdTargetText").innerText = document.getElementById("ORG_NM").value + " " + document.getElementById("POSITION").value + " " + document.getElementById("PSNL_NM").value;
+    document.getElementById("md_EMP_NO").value = "";
+    document.getElementById("md_PSNL_CD").value = "";
+    document.getElementById("md_ORG_NM").value = "";
+    document.getElementById("md_POSITION").value = "";
+    document.getElementById("md_PSNL_NM").value = "";
+
+    document.getElementById("md_PSNL_NM_SEARCH").closest('.modalGrp').style.display = 'block'; 
     document.getElementById("md_CERT_TYPE").value = "재직";
     document.getElementById("md_ORIGIN_ADDR").value = "";
     document.getElementById("md_CURR_ADDR").value = "";
@@ -76,6 +76,10 @@ document.getElementById("modalSaveBtn").addEventListener("click", () => {
     let currAddr = document.getElementById("md_CURR_ADDR").value;
     let orgAddr = document.getElementById("md_ORG_ADDR").value;
 
+    if (!empNo) {
+        alert("먼저 사원 검색을 통해 대상 직원을 선택해주세요.");
+        return;
+    }
     if (!currAddr) {
         alert("주소를 입력해주세요.");
         return;
@@ -104,7 +108,13 @@ function openEditModal(issueNo) {
             const d = json.data;
             document.getElementById("md_ISSUE_NO").value = d.ISSUE_NO;
             document.getElementById("md_EMP_NO").value = d.EMP_NO;
-            document.getElementById("mdTargetText").innerText = d.ORG_NM + " " + d.POSITION + " " + d.PSNL_NM;
+            document.getElementById("md_PSNL_NM_SEARCH").closest('.modalGrp').style.display = 'none'; // 수정 시 검색 숨김
+            
+            document.getElementById("md_PSNL_CD").value = d.EMP_NO;
+            document.getElementById("md_ORG_NM").value = d.ORG_NM;
+            document.getElementById("md_POSITION").value = d.POSITION;
+            document.getElementById("md_PSNL_NM").value = d.PSNL_NM;
+
             document.getElementById("md_CERT_TYPE").value = d.CERT_TYPE;
             document.getElementById("md_ORIGIN_ADDR").value = d.ORIGIN_ADDR;
             document.getElementById("md_CURR_ADDR").value = d.CURR_ADDR;
@@ -270,21 +280,32 @@ document.querySelectorAll(".filter").forEach(f => {
     });
 });
 
-// 8. 직원 검색 팝업
-document.getElementById("psnlSerchPop").addEventListener('click', () => {
-    window.open(DIR_ROOT + '/components/psnlPopup.php', '사원 검색', 'width=500, height=500');
-});
-
-// 성명 검색창 엔터 시 직원 검색 팝업 호출
+// 성명 검색창 엔터 시 테이블 필터링
 document.getElementById("PSNL_NM").addEventListener("keydown", (e) => {
     if (e.keyCode === 13) {
-        document.getElementById("psnlSerchPop").click();
+        myTblRefresh();
     }
 });
 
-// 사원 검색 후 호출되는 글로벌 함수 (사원 팝업에서 사용)
+// [모달 내 검색] 성명 검색창 엔터 이벤트
+document.getElementById("md_PSNL_NM_SEARCH").addEventListener("keydown", (e) => {
+    if (e.keyCode === 13) {
+        document.getElementById("md_PsnlSearchBtn").click();
+    }
+});
+
+// [모달 내 검색] 버튼 클릭 이벤트
+document.getElementById("md_PsnlSearchBtn").addEventListener("click", () => {
+    const searchVal = document.getElementById("md_PSNL_NM_SEARCH").value;
+    window.open(DIR_ROOT + `/components/psnlPopup.php?SEARCH_FROM=MODAL&VAL=${encodeURIComponent(searchVal)}`, '사원 검색', 'width=500, height=500');
+});
+
+// 8. 사원 검색 후 호출되는 글로벌 함수 (사원 팝업에서 사용)
 function myTblRefresh() {
-    mytbl.hrDt.xhr.where['EMP_NM'] = document.getElementById("PSNL_NM").value;
+    // 모달 데이터는 hr_tbl.js / psnlPopup.js 에서 모달 내 md_ 필드들로 직접 바인딩되므로 
+    // 여기서 메인 필터 값을 읽어와서 덮어쓰지 않습니다. (이중 바인딩 및 빈 값 초기화 방지)
+
+    // 메인 대장 테이블만 새로고침 (상단 성명 검색 필터는 절대 건드리지 않음)
     mytbl.show("myTbl");
 }
 

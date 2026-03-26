@@ -41,7 +41,8 @@ newCol.addEventListener("click", () => {
         alert("먼저 개인코드를 조회한 후 재시도 하시기 바랍니다.");
         return false;
     }
-    document.querySelector(".modalBody").querySelector("b").innerHTML = ORG_NM.value + " " + POSITION.value + " " + PSNL_NM.value;
+    let orgName = ORG_NM.value || "조직정보 없음";
+    document.querySelector(".modalBody").querySelector("b").innerHTML = orgName + " " + POSITION.value + " " + PSNL_NM.value;
     document.querySelector(".modalForm").style.visibility = "visible"; //모달창이 나타나게 한다.
     document.querySelector(".modalForm").style.opacity = "1";     //투명도 애니메이션 적용을 위해 opacity가 0에서 1로 변경된다.
     let query = window.location.search;
@@ -93,7 +94,8 @@ function trDataXHR(idx) {
                     }
                 });
 
-                document.querySelector(".modalBody").querySelector("b").innerHTML = res[0].ORG_NM + " " + res[0].POSITION + " " + res[0].PSNL_NM;
+                let orgName = res[0].ORG_NM || "조직정보 없음";
+                document.querySelector(".modalBody").querySelector("b").innerHTML = orgName + " " + res[0].POSITION + " " + res[0].PSNL_NM;
             }
         })
         .catch(error => {

@@ -197,16 +197,26 @@ class hr_tbl {
                             //debugger;
                         } else if (this.hrDt.tblType == "psnlPopup") {   //개인검색 팝업창에서의 행클릭 이벤트
                             if (opener && opener.document) {
-                                opener.document.getElementById('PSNL_CD').value = target.currentTarget.children[1].innerText;
-                                opener.document.getElementById('ORG_NM').value = target.currentTarget.children[2].innerText;
-                                opener.document.getElementById('PSNL_NM').value = target.currentTarget.children[3].innerText;
-                                opener.document.getElementById('POSITION').value = target.currentTarget.children[5].innerText;
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const isFromModal = urlParams.get('SEARCH_FROM') === 'MODAL';
+
+                                const setVal = (id, val) => {
+                                    if(isFromModal && id === 'PSNL_NM') return; // 모달에서 온 경우 메인 필터 성명은 건드리지 않음
+                                    let el = opener.document.getElementById(id);
+                                    if(el) el.value = val;
+                                };
                                 
-                                let searchPop = opener.document.getElementById('psnlSerchPop');
-                                if (searchPop && searchPop.parentElement && searchPop.parentElement.parentElement && searchPop.parentElement.parentElement.nextElementSibling) {
-                                    let targetInput = searchPop.parentElement.parentElement.nextElementSibling.querySelector("input");
-                                    if (targetInput) targetInput.focus();
-                                }
+                                setVal('PSNL_CD', target.currentTarget.children[1].innerText);
+                                setVal('ORG_NM', target.currentTarget.children[2].innerText);
+                                setVal('PSNL_NM', target.currentTarget.children[3].innerText);
+                                setVal('POSITION', target.currentTarget.children[5].innerText);
+
+                                // 모달 전용 필드들 추가 바인딩
+                                setVal('md_PSNL_CD', target.currentTarget.children[1].innerText);
+                                setVal('md_ORG_NM', target.currentTarget.children[2].innerText);
+                                setVal('md_POSITION', target.currentTarget.children[5].innerText);
+                                setVal('md_PSNL_NM', target.currentTarget.children[3].innerText);
+                                setVal('md_EMP_NO', target.currentTarget.children[1].innerText); // 발급용 EMP_NO
                                 
                                 if (typeof opener.myTblRefresh === 'function') opener.myTblRefresh();
                             }

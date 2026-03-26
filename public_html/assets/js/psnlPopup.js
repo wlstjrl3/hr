@@ -1,6 +1,13 @@
-// 부모 창에 작성된 #parentInput의 값 얻어오기
-// opener == 부모창
-const parentValue = (opener && opener.document.getElementById('PSNL_NM')) ? opener.document.getElementById('PSNL_NM').value : "";
+// URL 파라미터에서 값 추출 (모달에서 넘어온 경우 포함)
+const urlParams = new URLSearchParams(window.location.search);
+const modalVal = urlParams.get('VAL') || "";
+const searchFrom = urlParams.get('SEARCH_FROM') || "";
+
+// 부모 창의 #PSNL_NM 값 또는 URL에서 넘어온 VAL 중 우선순위 결정
+const parentValue = (searchFrom === 'MODAL') 
+    ? modalVal 
+    : (opener && opener.document.getElementById('PSNL_NM') ? opener.document.getElementById('PSNL_NM').value : "");
+
 const psnlNmLocal = document.querySelector('#PSNL_NM');
 if(psnlNmLocal) psnlNmLocal.value = parentValue;
 
@@ -53,22 +60,31 @@ window.onload = function () {
 
         // [0]반응형버튼 [1]직원코드 [2]조직명 [3]성명 [4]세례명 [5]직책
         if (opener && opener.document) {
+            const empNo = firstRowCells[1].innerText;
+            const orgNm = firstRowCells[2].innerText;
+            const psnlNm = firstRowCells[3].innerText;
+            const pos = firstRowCells[5].innerText;
+
             const setVal = (id, val) => {
                 let el = opener.document.getElementById(id);
                 if(el) el.value = val;
             };
-            
-            setVal('PSNL_CD', firstRowCells[1].innerText);
-            setVal('ORG_NM', firstRowCells[2].innerText);
-            setVal('PSNL_NM', firstRowCells[3].innerText);
-            setVal('POSITION', firstRowCells[5].innerText);
-            
-            let searchPop = opener.document.getElementById('psnlSerchPop');
-            if (searchPop && searchPop.parentElement && searchPop.parentElement.parentElement && searchPop.parentElement.parentElement.nextElementSibling) {
-                let targetInput = searchPop.parentElement.parentElement.nextElementSibling.querySelector("input");
-                if (targetInput) targetInput.focus();
+
+            // 1. 범용 페이지(fmlList 등) 연동 필드 바인딩
+            setVal('PSNL_CD', empNo);
+            setVal('ORG_NM', orgNm);
+            setVal('POSITION', pos);
+            if(searchFrom !== 'MODAL') { // 모달에서 온 게 아닐 때만 메인 성명 갱신
+                setVal('PSNL_NM', psnlNm);
             }
-            
+
+            // 2. 증명서 모달(certPrint) 전용 필드 바인딩
+            setVal('md_EMP_NO', empNo);
+            setVal('md_PSNL_CD', empNo);
+            setVal('md_ORG_NM', orgNm);
+            setVal('md_POSITION', pos);
+            setVal('md_PSNL_NM', psnlNm);
+
             if (typeof opener.myTblRefresh === 'function') opener.myTblRefresh();
             window.close();
         }
@@ -87,18 +103,32 @@ document.querySelectorAll(".filter").forEach((f, key) => {
 
             let tmp = table.children[1].children;
             if (tmp.length == 1 && tmp[0].children[1] && tmp[0].children[1].innerText != "데이터가 없습니다.") {
-                opener.document.getElementById('PSNL_CD').value = tmp[0].children[1].innerText;
-                opener.document.getElementById('ORG_NM').value = tmp[0].children[2].innerText;
-                opener.document.getElementById('PSNL_NM').value = tmp[0].children[3].innerText;
-                opener.document.getElementById('POSITION').value = tmp[0].children[5].innerText;
+                const empNo = tmp[0].children[1].innerText;
+                const orgNm = tmp[0].children[2].innerText;
+                const psnlNm = tmp[0].children[3].innerText;
+                const pos = tmp[0].children[5].innerText;
 
-                let searchPop = opener.document.getElementById('psnlSerchPop');
-                if (searchPop && searchPop.parentElement && searchPop.parentElement.parentElement && searchPop.parentElement.parentElement.nextElementSibling) {
-                    let targetInput = searchPop.parentElement.parentElement.nextElementSibling.querySelector("input");
-                    if (targetInput) targetInput.focus();
+                const setVal = (id, val) => {
+                    let el = opener.document.getElementById(id);
+                    if(el) el.value = val;
+                };
+
+                // 1. 범용 페이지(fmlList 등) 연동 필드 바인딩
+                setVal('PSNL_CD', empNo);
+                setVal('ORG_NM', orgNm);
+                setVal('POSITION', pos);
+                if(searchFrom !== 'MODAL') {
+                    setVal('PSNL_NM', psnlNm);
                 }
 
-                opener.myTblRefresh();
+                // 2. 증명서 모달(certPrint) 전용 필드 바인딩
+                setVal('md_EMP_NO', empNo);
+                setVal('md_PSNL_CD', empNo);
+                setVal('md_ORG_NM', orgNm);
+                setVal('md_POSITION', pos);
+                setVal('md_PSNL_NM', psnlNm);
+
+                if (typeof opener.myTblRefresh === 'function') opener.myTblRefresh();
                 window.close();
             }
         }, 400);

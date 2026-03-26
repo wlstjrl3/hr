@@ -8,31 +8,53 @@
             <button onclick="modalClose()"></button>
         </div>
         <div class="modalBody">
-            <p>발급 대상 : <b id="mdTargetText">사원을 선택해주세요</b></p>
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+                <div class="modalHd">사원 검색</div>
+                <div class="modalBd">
+                    <input id="md_PSNL_NM_SEARCH" style="width:calc(100% - 90px);" placeholder="성명 입력 후 엔터">
+                    <button id="md_PsnlSearchBtn" class="pddSS clBg3 clW rndCorner pointer" style="width:70px; margin-left:5px; height:32px; vertical-align:top;">검색</button>
+                </div>
+            </div>
+            <!-- 개인코드 / 조직명 박스 추가 -->
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+                <div class="modalHd">개인코드 / 조직</div>
+                <div class="modalBd">
+                    <input class="clBg5" id="md_PSNL_CD" readonly style="width:calc(30% - 10px); background:#EEE;" placeholder="코드">
+                    <input class="clBg5" id="md_ORG_NM" readonly style="width:calc(70% - 14px); background:#EEE;" placeholder="조직명">
+                </div>
+            </div>
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+                <div class="modalHd">직책 / 성명</div>
+                <div class="modalBd">
+                    <input class="clBg5" id="md_POSITION" readonly style="width:calc(30% - 10px); background:#EEE;" placeholder="직책">
+                    <input class="clBg5" id="md_PSNL_NM" readonly style="width:calc(70% - 14px); background:#EEE;" placeholder="성명">
+                </div>
+            </div>
+            
             <input type="hidden" id="md_EMP_NO">
             <input type="hidden" id="md_ISSUE_NO">
             
-            <div class="modalGrp">
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
                 <div class="modalHd">증명서 종류</div>
                 <div class="modalBd">
-                    <select id="md_CERT_TYPE">
+                    <select id="md_CERT_TYPE" style="width:100%;">
                         <option value="재직">재직증명서</option>
                         <option value="경력">경력증명서</option>
                         <option value="퇴직">퇴직증명서</option>
                     </select>
                 </div>
             </div>            
-            <div class="modalGrp">
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
                 <div class="modalHd">본적</div>
-                <div class="modalBd"><input id="md_ORIGIN_ADDR" placeholder="본적 주소를 입력하세요" autocomplete='off'></div>
+                <div class="modalBd"><input id="md_ORIGIN_ADDR" placeholder="본적 주소를 입력하세요" autocomplete='off' style="width:calc(100% - 14px);"></div>
             </div>
-            <div class="modalGrp">
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
                 <div class="modalHd">주소</div>
-                <div class="modalBd"><input id="md_CURR_ADDR" placeholder="현재 거주지 주소를 입력하세요" autocomplete='off'></div>
+                <div class="modalBd"><input id="md_CURR_ADDR" placeholder="현재 거주지 주소를 입력하세요" autocomplete='off' style="width:calc(100% - 14px);"></div>
             </div>
-            <div class="modalGrp">
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
                 <div class="modalHd">소속기관 주소</div>
-                <div class="modalBd"><input id="md_ORG_ADDR" placeholder="소속기관(본당/성지) 주소를 입력하세요" autocomplete='off'></div>
+                <div class="modalBd"><input id="md_ORG_ADDR" placeholder="소속기관(본당/성지) 주소를 입력하세요" autocomplete='off' style="width:calc(100% - 14px);"></div>
             </div>
             <div style="clear:both;"></div>
         </div>
@@ -164,22 +186,19 @@
 </div>
 
 <div class="container">
+    <!-- 팝업에서 데이터를 받기 위한 숨겨진 필드 (필터 영역에서 제거된 필드들의 버퍼 역할) -->
+    <input type="hidden" id="PSNL_CD">
+    <input type="hidden" id="ORG_NM">
+    <input type="hidden" id="POSITION">
+    
     <h4 class="cl3 pddS">제증명서 발급 대장</h4>
 
     <!-- 상단 필터 영역 (fmlList 참조) -->
     <div class="searchArea">
         <div class="colGrp">
-            <div class="colHd2L clBg5 cl2"><span><b>개인코드<br>/ 조직명</b></span></div>
+            <div class="colHd clBg5 cl2"><span><b>성명</b></span></div>
             <div class="colBd">
-                <input class="clBg5 dualDateBox" id="PSNL_CD" class="filter" readonly style="border:0;" value="<?php echo @$_REQUEST['PSNL_CD']; ?>"><span>/</span><input class="clBg5 dualDateBox" id="ORG_NM" class="" readonly style="border:0;" value="<?php echo @$_REQUEST['ORG_NM']; ?>">
-            </div>
-        </div>
-        <div class="colGrp">
-            <div class="colHd2L clBg5 cl2"><span><b>직책<br>/ 직원성명</b></span></div>
-            <div class="colBd">
-                <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;">
-                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명 검색">
-                <button id="psnlSerchPop" style="padding:3px;">검색</button>
+                <input id="PSNL_NM" class="filter" style="width:100%;" placeholder="">
             </div>    
         </div>
         <div class="colGrp">
