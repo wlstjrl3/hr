@@ -176,10 +176,25 @@ function openPrintModal(issueNo) {
                 document.getElementById("p_ADDR_C").innerText = d.CURR_ADDR || "";
                 document.getElementById("p_ORIGIN_C").innerText = d.ORIGIN_ADDR || "미 기 재";
                 
-                document.getElementById("p_JOIN_DT_C").innerText = formatDotDate(d.JOIN_DT);
-                document.getElementById("p_RETIRE_DT_C").innerText = formatDotDate(d.RETIRE_DT);
-                document.getElementById("p_ORG_NM_C").innerHTML = `천주교 수원교구<br>${d.ORG_NM}`;
-                document.getElementById("p_POS_C").innerText = d.POSITION;
+                // 경력 히스토리 동적 생성
+                let hHtml = "";
+                if(d.history && d.history.length > 0) {
+                    d.history.forEach(h => {
+                        hHtml += `
+                            <tr style="height:15mm;">
+                                <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.STT_DT)}</td>
+                                <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.END_DT || "")}</td>
+                                <td style="border:1px solid #777;">천주교 수원교구<br>${h.ORG_NM}</td>
+                                <td style="border:1px solid #777;">${h.POSITION}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                // 빈 행 추가 (최소 3행 보장)
+                for(let i=(d.history ? d.history.length : 0); i<4; i++){
+                    hHtml += `<tr style="height:15mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>`;
+                }
+                document.getElementById("p_CAREER_LIST").innerHTML = hHtml;
 
                 if(d.ISSUE_DT) {
                     const b = d.ISSUE_DT.split("-");

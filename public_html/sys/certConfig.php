@@ -85,20 +85,51 @@ if ($_REQUEST['CRUD'] == 'C') { // Create or Update
     }
 }
 else if ($_REQUEST['CRUD'] == 'R') { // 단건 조회 (인쇄용 등)
+    $issueNo = $_REQUEST['ISSUE_NO'];
+    
+    // 1. 기본 마스터 정보 조회
     $sql = "SELECT 
                 A.*, 
                 B.PSNL_NM,
                 B.PSNL_NUM,
                 (SELECT ORG_NM FROM ORG_INFO WHERE ORG_CD = (SELECT ORG_CD FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1)) AS ORG_NM,
                 (SELECT POSITION FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1) AS POSITION,
-                (SELECT MIN(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO) AS JOIN_DT,
-                (SELECT TRS_DT FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '2' ORDER BY TRS_DT DESC LIMIT 1) AS RETIRE_DT
+                
+                /* [JOIN_DT 로직]: 퇴직증명서일 경우 마지막 퇴직 직전의 입사일을 가져옴 */
+                CASE 
+                    WHEN A.CERT_TYPE = '퇴직' THEN 
+                        (SELECT MAX(TRS_DT) FROM PSNL_TRANSFER 
+                         WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '1' 
+                         AND TRS_DT <= (SELECT MAX(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '2'))
+                    ELSE (SELECT MIN(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO) 
+                END AS JOIN_DT,
+                
+                /* [RETIRE_DT 로직]: 마지막 퇴직일 */
+                (SELECT MAX(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '2') AS RETIRE_DT
             FROM TB_CERT_PRINT A
             LEFT JOIN PSNL_INFO B ON A.EMP_NO = B.PSNL_CD
             WHERE A.ISSUE_NO = ? LIMIT 1";
             
-    $data = executeQuery($conn, $sql, "s", [$_REQUEST['ISSUE_NO']]);
-    jsonResponse($conn, ["data" => $data[0] ?? null]);
+    $data = executeQuery($conn, $sql, "s", [$issueNo]);
+    $res = $data[0] ?? null;
+
+    if ($res) {
+        // 2. 경력증명서일 경우 전체 변동 이력(Transfer History) 추가 조회
+        if ($res['CERT_TYPE'] == '경력') {
+            $historySql = "SELECT 
+                                T.TRS_DT AS STT_DT,
+                                (SELECT MIN(T2.TRS_DT) FROM PSNL_TRANSFER T2 WHERE T2.PSNL_CD = T.PSNL_CD AND T2.TRS_DT > T.TRS_DT) AS END_DT,
+                                O.ORG_NM,
+                                T.POSITION
+                           FROM PSNL_TRANSFER T
+                           LEFT JOIN ORG_INFO O ON T.ORG_CD = O.ORG_CD
+                           WHERE T.PSNL_CD = ?
+                           ORDER BY T.TRS_DT ASC";
+            $res['history'] = executeQuery($conn, $historySql, "s", [$res['EMP_NO']]);
+        }
+    }
+
+    jsonResponse($conn, ["data" => $res]);
 }
 else if ($_REQUEST['CRUD'] == 'D') { // 삭제
     if ($userAuth != 'admin') {

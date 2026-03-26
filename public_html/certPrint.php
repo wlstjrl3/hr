@@ -95,14 +95,9 @@
                                     <td style="border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 서</td>
                                     <td style="border:1px solid #777; letter-spacing:5px;">직위 및 직급</td>
                                 </tr>
-                                <tr style="height:25mm;">
-                                    <td style="border:1px solid #777; font-family:sans-serif;" id="p_JOIN_DT_C"></td>
-                                    <td style="border:1px solid #777; font-family:sans-serif;" id="p_RETIRE_DT_C"></td>
-                                    <td style="border:1px solid #777;" id="p_ORG_NM_C"></td>
-                                    <td style="border:1px solid #777;" id="p_POS_C"></td>
-                                </tr>
-                                <tr style="height:20mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>
-                                <tr style="height:20mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>
+                                <tbody id="p_CAREER_LIST">
+                                    <!-- JS에서 동적 생성 -->
+                                </tbody>
                             </table>
                         </div>
                         <div class="p_SECTION_FOOTER_C" style="position:absolute; top:225mm; left:0; width:100%; text-align:center;">
