@@ -6,7 +6,7 @@ include "sql_safe_helper.php";
             LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
             SELECT TRS_CD FROM PSNL_TRANSFER AS P2
             WHERE P2.PSNL_CD = A.PSNL_CD
-            ORDER BY P2.REG_DT DESC
+            ORDER BY P2.TRS_DT DESC, P2.TRS_CD DESC
             LIMIT 1
         )
         LEFT OUTER JOIN ORG_INFO B ON P.ORG_CD = B.ORG_CD
@@ -16,7 +16,7 @@ include "sql_safe_helper.php";
         LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
             SELECT TRS_CD FROM PSNL_TRANSFER AS P2
             WHERE P2.PSNL_CD = A.PSNL_CD
-            ORDER BY P2.REG_DT DESC
+            ORDER BY P2.TRS_DT DESC, P2.TRS_CD DESC
             LIMIT 1
         )
         LEFT OUTER JOIN ORG_INFO B ON P.ORG_CD = B.ORG_CD        
