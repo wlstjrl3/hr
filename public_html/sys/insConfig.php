@@ -52,7 +52,7 @@ else if ($_REQUEST['CRUD'] == 'R') {
             LEFT OUTER JOIN PSNL_TRANSFER P ON P.TRS_CD = (
                 SELECT TRS_CD FROM PSNL_TRANSFER AS P2
                 WHERE P2.PSNL_CD = A.PSNL_CD
-                ORDER BY P2.REG_DT DESC
+                ORDER BY P2.TRS_DT DESC, P2.TRS_CD DESC
                 LIMIT 1
             )
             LEFT OUTER JOIN ORG_INFO C ON P.ORG_CD = C.ORG_CD
