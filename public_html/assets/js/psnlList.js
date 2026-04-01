@@ -97,7 +97,13 @@ modalEdtBtn.addEventListener("click", () => {
             }
             else if (key == 2) { writeUrl += "&BAPT_NM=" + input.value }
             else if (key == 3) { writeUrl += "&PHONE_NUM=" + input.value }
-            else if (key == 4) { writeUrl += "&PSNL_NUM=" + input.value }
+            else if (key == 4) {
+                if (input.value.replace(/[^0-9]/g, "").length !== 13) {
+                    alert("주민번호를 확인하세요");
+                    throw new Error("stop loop");
+                }
+                writeUrl += "&PSNL_NUM=" + input.value
+            }
         });
     } catch (e) {
         console.log("필수값 체크"); return false;

@@ -11,7 +11,7 @@ var mytbl = new hr_tbl({
             PSNM_NM: document.getElementById("PSNL_NM").value,
         },
         order: {
-            column: '8',
+            column: '7',
             direction: 'desc',
         },
         page: 0, //표시되는 페이지에서 1이 빠진 값이다 즉 page:0 = 1페이지
@@ -24,7 +24,6 @@ var mytbl = new hr_tbl({
         , { title: "직원명", data: "PSNL_NM", className: "" }
         , { title: "직책", data: "POSITION", className: "" }
         , { title: "재직구분", data: "WORK_TYPE", className: "" }
-        , { title: "직책", data: "POSITION", className: "" }
         , { title: "인사구분", data: "TRS_TYPE_KOR", className: "" }
         , { title: "상세정보", data: "TRS_DTL", className: "" }
         , { title: "발령일", data: "TRS_DT", className: "" }
