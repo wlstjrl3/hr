@@ -201,7 +201,7 @@ function openPrintModal(issueNo) {
                             <tr style="height:15mm;">
                                 <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.STT_DT)}</td>
                                 <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.END_DT || "")}</td>
-                                <td style="border:1px solid #777;">천주교 수원교구<br>${h.ORG_NM}</td>
+                                <td style="border:1px solid #777;">천주교 수원교구<br>${h.ORG_NM} 성당</td>
                                 <td style="border:1px solid #777;">${h.POSITION}</td>
                             </tr>
                         `;
@@ -236,8 +236,6 @@ function openPrintModal(issueNo) {
                 document.getElementById("p_ORIGIN_ADDR").innerText = d.ORIGIN_ADDR || "미 기 재";
                 document.getElementById("p_TITLE").innerText = d.CERT_TYPE;
                 
-                // 퇴직 시 외곽 푸터 표시
-                document.getElementById("p_OUTSIDE_FOOTER").style.display = (d.CERT_TYPE === '퇴직') ? "block" : "none";
 
                 // 주소 분리
                 const fullAddr = d.CURR_ADDR || "";
@@ -256,7 +254,7 @@ function openPrintModal(issueNo) {
                 const retireDtKr = formatKrDate(d.RETIRE_DT);
 
                 if(d.CERT_TYPE === '재직') {
-                    bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주<br>교 수원교구 ${d.ORG_NM} ${d.POSITION}으로 재직 중임을 증명함.`;
+                    bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주<br>교 수원교구 ${d.ORG_NM} 성당 ${d.POSITION}으로 재직 중임을 증명함.`;
                 } else {
                     bodyHtml = `위 사람은 ${joinDtKr} 입사하여 <br>${retireDtKr} 퇴직하였음을 증명함.`;
                 }

@@ -94,7 +94,7 @@
 
                     <!-- [1. 경력증명서 전용 레이아웃 - 초기 숨김] -->
                     <div id="layout_career" class="cert-inner layout-career" style="display:none;">
-                        <div class="p_ISSUE_NO_wrap" style="top:25mm; left:15mm;">
+                        <div class="p_ISSUE_NO_wrap" style="top:25mm; left:25mm;">
                             제 <span id="p_ISSUE_NO_C"></span> 호
                         </div>
                         <div class="p_TITLE_wrap_career"
@@ -105,17 +105,19 @@
                         </div>
                         <div style="position:absolute; top:85mm; left:15mm; right:15mm;">
                             <table class="career-table"
-                                style="width:100%; border-collapse:collapse; border:2px solid #555; text-align:center; font-size:13pt; line-height:1.5;">
+                                style="width:100%; table-layout:fixed; border-collapse:collapse; border:2px solid #555; text-align:center; font-size:13pt; line-height:1.5;">
                                 <tr>
                                     <td class="lblBg"
-                                        style="width:15%; font-weight:bold; letter-spacing:15px; padding-left:15px; border:1px solid #777; height:12mm;">
+                                        style="width:25%; font-weight:bold; letter-spacing:15px; padding-left:15px; border:1px solid #777; height:12mm;">
                                         성 명</td>
-                                    <td style="width:35%; border:1px solid #777; font-family:'NanumMyeongjo', serif; font-size:17pt;" id="p_PSNL_NM_C">
+                                    <td style="width:25%; border:1px solid #777; font-family:'NanumMyeongjo', serif; font-size:17pt;"
+                                        id="p_PSNL_NM_C">
                                     </td>
                                     <td class="lblBg"
-                                        style="width:20%; font-weight:bold; letter-spacing:5px; border:1px solid #777;">
+                                        style="width:25%; font-weight:bold; letter-spacing:5px; border:1px solid #777;">
                                         생 년 월 일</td>
-                                    <td style="width:30%; border:1px solid #777; font-family:'NanumMyeongjo', serif; font-size:17pt;" id="p_BIRTH_DT_C"></td>
+                                    <td style="width:25%; border:1px solid #777; font-family:'NanumMyeongjo', serif; font-size:17pt;"
+                                        id="p_BIRTH_DT_C"></td>
                                 </tr>
                                 <tr>
                                     <td class="lblBg"
@@ -140,10 +142,10 @@
                                         경 력 사 항</td>
                                 </tr>
                                 <tr class="lblBg" style="height:10mm; font-size:12pt; font-weight:bold;">
-                                    <td style="border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 터</td>
-                                    <td style="border:1px solid #777; letter-spacing:15px; padding-left:15px;">까 지</td>
-                                    <td style="border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 서</td>
-                                    <td style="border:1px solid #777; letter-spacing:5px;">직위 및 직급</td>
+                                    <td style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 터</td>
+                                    <td style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">까 지</td>
+                                    <td style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 서</td>
+                                    <td style="width:25%; border:1px solid #777; letter-spacing:5px;">직위 및 직급</td>
                                 </tr>
                                 <tbody id="p_CAREER_LIST">
                                     <!-- JS에서 동적 생성 -->
@@ -158,7 +160,7 @@
                             </div>
                             <div class="p_ISSUER_wrap" style="position:relative; display:inline-block;">
                                 <span class="issuer-name"
-                                    style="font-family:'CasuwonBold', 'Malgun Gothic','맑은 고딕',sans-serif; font-size:33pt; font-weight:900; letter-spacing:4px; padding-right:20px;">천주교
+                                    style="font-family:'CasuwonBold', 'Malgun Gothic','맑은 고딕',sans-serif; font-size:24pt; font-weight:900; letter-spacing:3px; padding-right:20px;">천주교
                                     수원교구 제1대리구장</span>
                                 <img src="" class="official-seal seal_C">
                             </div>
@@ -203,9 +205,6 @@
                                 <span class="issuer-name">천주교 수원교구 제1대리구장</span>
                                 <img id="certSeal" src="" class="official-seal">
                             </div>
-                        </div>
-                        <div id="p_OUTSIDE_FOOTER" class="p_OUTSIDE_FOOTER" style="display:none;">
-                            천주교수원교구 제1대리구
                         </div>
                     </div>
                 </div>
@@ -365,7 +364,7 @@
         position: absolute;
         top: 25mm;
         left: 25mm;
-        font-size: 14pt;
+        font-size: 18pt;
     }
 
     /* 2. 제목 (재직증명서) */
