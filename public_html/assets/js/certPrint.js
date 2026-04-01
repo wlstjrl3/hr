@@ -169,8 +169,8 @@ function openPrintModal(issueNo) {
                     let yy = d.PSNL_NUM.substring(0,2);
                     let mm = d.PSNL_NUM.substring(2,4);
                     let dd = d.PSNL_NUM.substring(4,6);
-                    let yearPrefix = (parseInt(yy) > 30) ? "19" : "20"; 
-                    return yearPrefix + yy + "년 " + parseInt(mm) + "월 " + parseInt(dd) + "일";
+                    let yearPrefix = (parseInt(yy) > 50) ? "19" : "20"; 
+                    return yearPrefix + yy + "." + mm + "." + dd + ".";
                 }
                 return "";
             })();
@@ -181,8 +181,15 @@ function openPrintModal(issueNo) {
                 layoutCareer.style.display = "block";
 
                 document.getElementById("p_ISSUE_NO_C").innerText = d.ISSUE_NO.split('-').pop(); // 순번만
-                document.getElementById("p_PSNL_NM_C").innerText = d.PSNL_NM;
-                document.getElementById("p_BIRTH_DT_C").innerText = birthStr;
+                // 성명 자간 처리 (경력)
+                const nmC = d.PSNL_NM || "";
+                const nmCLen = nmC.length;
+                let nmCSpacing = "0";
+                if(nmCLen === 2) nmCSpacing = "32pt";
+                else if(nmCLen === 3) nmCSpacing = "13pt";
+                else if(nmCLen === 4) nmCSpacing = "6pt";
+                document.getElementById("p_PSNL_NM_C").innerHTML = `<span style="letter-spacing:${nmCSpacing}; margin-right:-${nmCSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${nmC}</span>`;
+                document.getElementById("p_BIRTH_DT_C").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
                 document.getElementById("p_ADDR_C").innerText = d.CURR_ADDR || "";
                 document.getElementById("p_ORIGIN_C").innerText = d.ORIGIN_ADDR || "미 기 재";
                 
@@ -216,8 +223,16 @@ function openPrintModal(issueNo) {
 
                 // 표준 레이아웃 (재직/퇴직)
                 document.getElementById("p_ISSUE_NO").innerText = d.ISSUE_NO.split('-').pop();
-                document.getElementById("p_PSNL_NM").innerText = d.PSNL_NM;
-                document.getElementById("p_BIRTH_DT").innerText = birthStr;
+                // 성명 자간 처리
+                const p_PSNL_NM = d.PSNL_NM || "";
+                const nameLen = p_PSNL_NM.length;
+                let nameSpacing = "0";
+                if(nameLen === 2) nameSpacing = "32pt";
+                else if(nameLen === 3) nameSpacing = "13pt";
+                else if(nameLen === 4) nameSpacing = "6pt";
+                
+                document.getElementById("p_PSNL_NM").innerHTML = `<span style="letter-spacing:${nameSpacing}; margin-right:-${nameSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${p_PSNL_NM}</span>`;
+                document.getElementById("p_BIRTH_DT").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
                 document.getElementById("p_ORIGIN_ADDR").innerText = d.ORIGIN_ADDR || "미 기 재";
                 document.getElementById("p_TITLE").innerText = d.CERT_TYPE;
                 
@@ -248,8 +263,7 @@ function openPrintModal(issueNo) {
                 document.getElementById("p_BODY_CONTENT").innerHTML = bodyHtml;
 
                 if(d.ISSUE_DT) {
-                    const b = d.ISSUE_DT.split("-");
-                    document.getElementById("p_ISSUE_DT").innerText = b[0] + ". " + parseInt(b[1]) + ". " + parseInt(b[2]) + ".";
+                    document.getElementById("p_ISSUE_DT").innerText = d.ISSUE_DT.replace(/-/g, '.') + ".";
                 }
             }
 
