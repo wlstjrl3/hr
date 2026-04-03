@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if(e.type === 'keyup' && e.keyCode !== 13) {
                     return;
                 }
-                loadList();
+                loadList(e.type === 'keyup' && e.keyCode === 13);
             });
         });
     });
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
     loadList();
 });
 
-function loadList() {
+function loadList(isEnterTyped = false) {
     let psnlNm = document.getElementById('PSNL_NM').value;
     let fmlNm = document.getElementById('FML_NM').value;
     let orgNm = document.getElementById('ORG_NM').value;
@@ -33,6 +33,12 @@ function loadList() {
         currentData = res.data || [];
         document.getElementById('totalCntTxt').innerText = currentData.length;
         drawTable();
+
+        if (isEnterTyped && currentData.length === 0 && psnlNm.trim() !== '') {
+            if (confirm(psnlNm + " 직원의 등록된 자녀 정보가 없습니다. 가족정보 관리로 이동하여 자녀를 등록하시겠습니까?")) {
+                location.href = './fmlList.php?PSNL_NM=' + encodeURIComponent(psnlNm);
+            }
+        }
     })
     .catch(error => console.error('Error fetching list:', error));
 }
