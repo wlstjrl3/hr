@@ -97,10 +97,12 @@
         const data = [...regular, ...holySites];
         let html = '';
         let parishGlobalCounter = 0;
+        let districtGlobalCounter = 0;
         let districtStartIdx = 0;
 
         while (districtStartIdx < data.length) {
             const districtName = data[districtStartIdx].UPPR_ORG_NM || '미지정';
+            districtGlobalCounter++;
             let districtEndIdx = districtStartIdx;
             while (districtEndIdx < data.length && (data[districtEndIdx].UPPR_ORG_NM || '미지정') === districtName) {
                 districtEndIdx++;
@@ -110,6 +112,9 @@
             const districtPersonnelCount = districtRowCount;
             let parishStartIdx = districtStartIdx;
             let isFirstRowOfDistrict = true;
+
+            const isEvenDistrict = districtGlobalCounter % 2 === 0;
+            const rowClass = isEvenDistrict ? 'parish-even' : '';
 
             while (parishStartIdx < districtEndIdx) {
                 const parishName = data[parishStartIdx].ORG_NM;
@@ -127,8 +132,6 @@
 
                 for (let k = 0; k < parishRows.length; k++) {
                     const row = parishRows[k];
-                    const isEvenParish = parishGlobalCounter % 2 === 0;
-                    const rowClass = isEvenParish ? 'parish-even' : '';
 
                     html += `<tr class="${rowClass}" style="border: 1px solid #ddd;">`;
 
@@ -139,7 +142,7 @@
 
                     // 지구
                     if (isFirstRowOfDistrict) {
-                        html += `<td rowspan="${districtRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle; background-color: #fff;">${districtName}<br>(${districtPersonnelCount}명)</td>`;
+                        html += `<td rowspan="${districtRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle;">${districtName}<br>(${districtPersonnelCount}명)</td>`;
                         isFirstRowOfDistrict = false;
                     }
 
@@ -232,7 +235,16 @@
             if (idx === sourceData.length - 1) parishGroups.push(currentGroup);
         });
 
+        let districtIdx = 0;
+        let lastDistrictName = '';
+
         parishGroups.forEach(group => {
+            const currentDistrictName = group[0].UPPR_ORG_NM || '미지정';
+            if (currentDistrictName !== lastDistrictName) {
+                districtIdx++;
+                lastDistrictName = currentDistrictName;
+            }
+            
             parishCounter++;
             let posCounter = {};
 
@@ -274,7 +286,8 @@
                 }
 
                 printRows.push({
-                    district: row.UPPR_ORG_NM || '미지정',
+                    district: currentDistrictName,
+                    districtIdx: districtIdx,
                     no: parishCounter,
                     parish: row.ORG_NM,
                     ext: extension,
@@ -335,7 +348,7 @@
 
                     for (let r = pIdx; r < endPIdx; r++) {
                         let row = bankData[r];
-                        let trClass = (row.no % 2 === 0) ? "print-parish-even" : "";
+                        let trClass = (row.districtIdx % 2 === 0) ? "print-parish-even" : "";
                         printHtml += `<tr class="${trClass}">`;
 
                         if (isFirstD) {
@@ -343,7 +356,7 @@
                             // 괄호(︵, ︶)만 회전된 유니코드를 사용하고 숫자는 수직으로 나열
                             let verticalNum = String(dCount).split('').join('<br>');
                             let countStr = `<div style="margin-top: 5px; line-height: 1;">︵<br>${verticalNum}<br>︶</div>`;
-                            printHtml += `<td rowspan="${dCount}" style="background-color: #fff !important; width: 1.5em; vertical-align: middle; line-height: 1.2;">
+                            printHtml += `<td rowspan="${dCount}" style="width: 1.5em; vertical-align: middle; line-height: 1.2;">
                                 ${verticalDist}<br>${countStr}
                             </td>`;
                             isFirstD = false;
