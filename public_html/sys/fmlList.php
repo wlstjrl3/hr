@@ -2,7 +2,8 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
     //갯수 카운트 쿼리
-    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_FAMILY A";
+    $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM BONDANG_HR.PSNL_FAMILY A
+    LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD";
     //기본 쿼리
     $sql = "SELECT C.ORG_NM,B.PSNL_NM,A.*,D.POSITION FROM BONDANG_HR.PSNL_FAMILY A
     LEFT OUTER JOIN PSNL_INFO B ON A.PSNL_CD = B.PSNL_CD
