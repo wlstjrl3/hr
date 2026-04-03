@@ -31,7 +31,9 @@ verifyApiKey($conn, @$_REQUEST['key']);
         $types .= "s";
     }    
     if(@$_REQUEST['ORG_NM']){
-        $whereSql=$whereSql." AND ORG_NM LIKE '%".$_REQUEST['ORG_NM']."%'"; //조직 정보의 B테이블에서 가져온다.
+        $whereSql .= " AND ORG_NM LIKE ?";
+        $params[] = '%' . $_REQUEST['ORG_NM'] . '%';
+        $types .= "s";
     }
     if(@$_REQUEST['PSNL_NM']){
         $whereSql .= " AND PSNL_NM LIKE ?";

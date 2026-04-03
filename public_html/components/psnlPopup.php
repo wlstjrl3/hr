@@ -36,11 +36,11 @@
 		<br>
 		<div class="modalForm tblLimit" id="xport" style="hidden"></div>
 		
-		<link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=0.001" rel="stylesheet" />
-		<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-		<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+		<link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=1775259319" rel="stylesheet" />
+		<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=1775259319" rel="stylesheet" />
+		<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=1775259319" rel="stylesheet" />
 		<script type='text/javascript'>const DIR_ROOT = opener && opener.DIR_ROOT ? opener.DIR_ROOT : '<?php echo DIR_ROOT; ?>';</script>
-		<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
+		<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js?ver=1775259319'></script>
 		<script type='text/javascript' defer src='<?php echo DIR_ROOT; ?>/assets/js/psnlPopup.js'></script>
 	</div>
 </body>

@@ -9,7 +9,7 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/orgPopSearch.php',
         columXHR: '',
-        //key : psnlKey.value, //api 호출할 보안 개인인증키
+        //key : API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             ORG_NM: parentValue, //filter의 값 변동이 생기면 여기에 즉시 추가 값을 더하고 xhr을 호출한다.
         },

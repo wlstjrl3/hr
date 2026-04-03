@@ -3,7 +3,7 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/psnlTotal.php',
         columXHR: '',
-        key: psnlKey.value, //api 호출할 보안 개인인증키
+        key: API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             TRS_TYPE: '1', //filter 값 변동 전 초기조건값으로 재직구분이 '재직'인 데이터만
             ORG_NM: document.getElementById("ORG_NM").value,
@@ -84,7 +84,7 @@ async function trDataXHR(idx) {
 
     try {
         // 1. 기본 정보 조회
-        const res1 = await fetch(`${DIR_ROOT}/sys/psnlTotal.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        const res1 = await fetch(`${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
         const data1 = res1.data;
         if (!data1) return;
 
@@ -126,7 +126,7 @@ async function trDataXHR(idx) {
         document.getElementById("goPttListBtn").onclick = () => { location.href = DIR_ROOT + "/pttList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
 
         // 2. 가족 정보 조회
-        const res4 = await fetch(`${DIR_ROOT}/sys/fmlList.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        const res4 = await fetch(`${DIR_ROOT}/sys/fmlList.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
         if (res4.data) {
             let tmpStr = `<ul class="clBg5"><li class="th"><span>가족성명</span></li><li class="th"><span>관계</span></li><li class="th"><span>생년월일</span></li><li class="th"><span>상세정보</span></li><li class="clearB"></li></ul>`;
             res4.data.forEach(f => {
@@ -136,7 +136,7 @@ async function trDataXHR(idx) {
         }
 
         // 3. 제수당 정보 조회
-        const res5 = await fetch(`${DIR_ROOT}/sys/adjList.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        const res5 = await fetch(`${DIR_ROOT}/sys/adjList.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
         if (res5.data) {
             let tmpStr = `<ul class="clBg5"><li class="th"><span>수당타입</span></li><li class="th"><span>명칭</span></li><li class="th"><span>등급</span></li><li class="th"><span>수당금액</span></li><li class="clearB"></li></ul>`;
             res5.data.forEach(a => {
@@ -146,7 +146,7 @@ async function trDataXHR(idx) {
         }
 
         // 4. 상벌/평가 정보 조회
-        const res6 = await fetch(`${DIR_ROOT}/sys/opiList.php?key=${psnlKey.value}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
+        const res6 = await fetch(`${DIR_ROOT}/sys/opiList.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
         if (res6.data) {
             let tmpStr = `<ul class="clBg5"><li class="th"><span>타입</span></li><li class="th"><span>날짜</span></li><li class="th"><span>평가자</span></li><li class="th"><span>내용</span></li><li class="clearB"></li></ul>`;
             const opiTypes = { 1: "긍정", 2: "부정", 3: "포상", 4: "징계" };

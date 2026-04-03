@@ -10,7 +10,9 @@ verifyApiKey($conn, @$_REQUEST['key']);
     $params = [];
     $types = "";
     if(@$_REQUEST['SLR_YEAR']){
-        $whereSql=$whereSql." AND SLR_YEAR LIKE '%".$_REQUEST['SLR_YEAR']."%'"; //조직 정보의 B테이블에서 가져온다.
+        $whereSql .= " AND SLR_YEAR LIKE ?";
+        $params[] = '%' . $_REQUEST['SLR_YEAR'] . '%';
+        $types .= "s";
     }
     if(@$_REQUEST['SLR_TYPE']){
         $whereSql .= " AND SLR_TYPE LIKE ?";
@@ -28,16 +30,24 @@ verifyApiKey($conn, @$_REQUEST['key']);
         $types .= "s";
     }
     if(@$_REQUEST['NORMAL_PAY_From']){
-        $whereSql=$whereSql." AND (NORMAL_PAY >= ".$_REQUEST['NORMAL_PAY_From'].")";
+        $whereSql .= " AND NORMAL_PAY >= ?";
+        $params[] = $_REQUEST['NORMAL_PAY_From'];
+        $types .= "d";
     }
     if(@$_REQUEST['NORMAL_PAY_To']){
-        $whereSql=$whereSql." AND (NORMAL_PAY <= ".$_REQUEST['NORMAL_PAY_To'].")";
+        $whereSql .= " AND NORMAL_PAY <= ?";
+        $params[] = $_REQUEST['NORMAL_PAY_To'];
+        $types .= "d";
     }
     if(@$_REQUEST['LEGAL_PAY_From']){
-        $whereSql=$whereSql." AND (LEGAL_PAY >= ".$_REQUEST['LEGAL_PAY_From'].")";
+        $whereSql .= " AND LEGAL_PAY >= ?";
+        $params[] = $_REQUEST['LEGAL_PAY_From'];
+        $types .= "d";
     }
     if(@$_REQUEST['LEGAL_PAY_To']){
-        $whereSql=$whereSql." AND (LEGAL_PAY <= ".$_REQUEST['LEGAL_PAY_To'].")";
+        $whereSql .= " AND LEGAL_PAY <= ?";
+        $params[] = $_REQUEST['LEGAL_PAY_To'];
+        $types .= "d";
     }
     //정렬 기준 지정
     $orderSql = safeOrderBy(@$_REQUEST['ORDER'], []);

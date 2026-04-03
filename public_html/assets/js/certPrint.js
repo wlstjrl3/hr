@@ -2,7 +2,7 @@
 var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/certList.php',
-        key: psnlKey.value,
+        key: API_TOKEN,
         where: {
             EMP_NM: document.getElementById("PSNL_NM").value,
         },
@@ -33,7 +33,7 @@ function deleteCert(issueNo) {
     if(!issueNo) return;
     if(!confirm("해당 발급 내역을 삭제하시겠습니까? (출력된 원본과 번호 불일치 주의)")) return;
 
-    fetch(DIR_ROOT + `/sys/certConfig.php?key=${psnlKey.value}&CRUD=D&ISSUE_NO=${issueNo}`)
+    fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=D&ISSUE_NO=${issueNo}`)
         .then(res => res.json())
         .then(json => {
             if(json.result == "success") {
@@ -85,7 +85,7 @@ document.getElementById("modalSaveBtn").addEventListener("click", () => {
         return;
     }
 
-    let params = `key=${psnlKey.value}&CRUD=C&ISSUE_NO=${issueNo}&EMP_NO=${empNo}&CERT_TYPE=${certType}&ORIGIN_ADDR=${encodeURIComponent(originAddr)}&CURR_ADDR=${encodeURIComponent(currAddr)}&ORG_ADDR=${encodeURIComponent(orgAddr)}`;
+    let params = `key=${API_TOKEN}&CRUD=C&ISSUE_NO=${issueNo}&EMP_NO=${empNo}&CERT_TYPE=${certType}&ORIGIN_ADDR=${encodeURIComponent(originAddr)}&CURR_ADDR=${encodeURIComponent(currAddr)}&ORG_ADDR=${encodeURIComponent(orgAddr)}`;
     
     fetch(DIR_ROOT + "/sys/certConfig.php?" + params)
         .then(res => res.json())
@@ -102,7 +102,7 @@ document.getElementById("modalSaveBtn").addEventListener("click", () => {
 
 // 4. 발급 내역 수정 모달 열기
 function openEditModal(issueNo) {
-    fetch(DIR_ROOT + `/sys/certConfig.php?key=${psnlKey.value}&CRUD=R&ISSUE_NO=${issueNo}`)
+    fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=R&ISSUE_NO=${issueNo}`)
         .then(res => res.json())
         .then(json => {
             const d = json.data;
@@ -127,7 +127,7 @@ function openEditModal(issueNo) {
 
 // 5. 인쇄 모달 열기 및 데이터 매핑
 function openPrintModal(issueNo) {
-    fetch(DIR_ROOT + `/sys/certConfig.php?key=${psnlKey.value}&CRUD=R&ISSUE_NO=${issueNo}`)
+    fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=R&ISSUE_NO=${issueNo}`)
         .then(res => res.json())
         .then(json => {
             const d = json.data;

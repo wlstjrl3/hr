@@ -40,7 +40,7 @@ function hasScrolled() { //스크롤이 발생하면
         document.querySelector("#header").classList.add('nav-down');
         document.querySelector("#header").classList.remove('nav-up');
     }
-    //debugger;
+    ////debugger;
 
     lastScrollTop = st;
 }

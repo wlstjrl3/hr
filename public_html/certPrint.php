@@ -578,8 +578,8 @@
 <link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css" rel="stylesheet" />
 <link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css" rel="stylesheet" />
 
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js?ver=1775259319'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js?ver=1775259319'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateForm.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/certPrint.js'></script>

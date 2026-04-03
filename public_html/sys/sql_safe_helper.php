@@ -9,25 +9,35 @@
 
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
+session_start();
 include __DIR__ . "/../dbconn/dbconn.php";
 
 /**
- * API Key 보안 검증을 수행합니다.
+ * API Key 보안 검증을 수행합니다 (세션 기반).
  * 검증 실패 시 스크립트를 종료합니다.
  * 
  * @param mysqli $conn DB 연결 객체
- * @param string $key 검증할 API Key
+ * @param string $key (Deprecated) 이전 버전 호환성을 위해 남겨둠
  */
-function verifyApiKey($conn, $key)
+function verifyApiKey($conn, $key = "")
 {
-    $authStmt = $conn->prepare("SELECT 1 FROM BONDANG_HR.USER_TB WHERE USER_PASS = ? LIMIT 1");
-    $authStmt->bind_param("s", $key);
-    $authStmt->execute();
-    if ($authStmt->get_result()->num_rows < 1) {
-        $authStmt->close();
-        die;
+    if (!isset($_SESSION['API_TOKEN'])) {
+        die("Authentication Required");
     }
-    $authStmt->close();
+}
+
+/**
+ * 날짜 파라미터를 검증하여 안전한 YYYY-MM-DD 형식을 반환합니다.
+ * 
+ * @param string $date 날짜 문자열
+ * @return string 검증된 날짜 문자열 또는 오늘 날짜
+ */
+function safeDateParam($date)
+{
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        return $date;
+    }
+    return date('Y-m-d');
 }
 
 /**

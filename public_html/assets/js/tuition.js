@@ -22,7 +22,7 @@ function loadList() {
     let fmlNm = document.getElementById('FML_NM').value;
     let orgNm = document.getElementById('ORG_NM').value;
     
-    let apiUrl = './sys/tuitionList.php?key=' + document.getElementById('psnlKey').value;
+    let apiUrl = './sys/tuitionList.php?key=' + API_TOKEN;
     if(psnlNm) apiUrl += '&PSNL_NM=' + encodeURIComponent(psnlNm);
     if(fmlNm) apiUrl += '&FML_NM=' + encodeURIComponent(fmlNm);
     if(orgNm) apiUrl += '&ORG_NM=' + encodeURIComponent(orgNm);
@@ -130,7 +130,7 @@ function saveIssue() {
     }
 
     let formData = new URLSearchParams();
-    formData.append('key', document.getElementById('psnlKey').value);
+    formData.append('key', API_TOKEN);
     formData.append('CRUD', 'C');
     formData.append('FML_CD', fmlCd);
     formData.append('PSNL_CD', psnlCd);
@@ -151,7 +151,7 @@ function saveIssue() {
         alert('지급내역이 추가되었습니다.');
         
         // Reload history for this employee
-        let reloadUrl = './sys/tuitionList.php?key=' + document.getElementById('psnlKey').value + '&PSNL_CD=' + psnlCd;
+        let reloadUrl = './sys/tuitionList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd;
         fetch(reloadUrl)
         .then(res => res.json())
         .then(json => {
@@ -177,7 +177,7 @@ function deleteIssue(issueCd) {
     if (!confirm('정말 이 지급내역을 삭제하시겠습니까?')) return;
     
     let formData = new URLSearchParams();
-    formData.append('key', document.getElementById('psnlKey').value);
+    formData.append('key', API_TOKEN);
     formData.append('CRUD', 'D');
     formData.append('ISSUE_CD', issueCd);
 

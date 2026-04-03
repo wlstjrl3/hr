@@ -68,8 +68,8 @@ include('./components/header.php');
     <br>
 </div>
 
-<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=1775259319" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=1775259319" rel="stylesheet" />
 <style>
 .hr_tbl th {
     white-space: normal !important;
@@ -85,7 +85,7 @@ include('./components/header.php');
     width: auto !important;
 }
 </style>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js?ver=1775259319'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statWorkType.js'></script>
 

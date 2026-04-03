@@ -3,7 +3,7 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/slrList.php',
         columXHR: '',
-        key: psnlKey.value, //api 호출할 보안 개인인증키
+        key: API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             nothing: '', //filter의 값 변동이 생기면 여기에 즉시 추가 값을 더하고 xhr을 호출한다.
         },
@@ -48,7 +48,7 @@ newCol.addEventListener("click", () => {
 });
 //행을 클릭했을때 fetch로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx) {
-    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + "&SLR_CD=" + idx + "&CRUD=R";
+    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + API_TOKEN + "&SLR_CD=" + idx + "&CRUD=R";
     console.log(url);
     fetch(url)
         .then(response => {
@@ -115,7 +115,7 @@ modalEdtBtn.addEventListener("click", () => {
     } catch (e) {
         console.log("필수값 체크"); return false;
     }
-    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C";
+    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + API_TOKEN + writeUrl + "&CRUD=C";
     console.log(url);
 
     fetch(url)
@@ -145,7 +145,7 @@ modalDelBtn.addEventListener("click", () => {
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
         if (key == 0) { deleteUrl += "&SLR_CD=" + input.value }
     });
-    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D";
+    const url = DIR_ROOT + "/sys/slrConfig.php?key=" + API_TOKEN + deleteUrl + "&CRUD=D";
     console.log(url);
 
     fetch(url)
@@ -167,7 +167,7 @@ batchDel.addEventListener("click", () => {
         let regex = /^\d{4}-\d{2}-\d{2}$/;// YYYY-MM-DD 형식의 정규식
         // 정규식으로 확인
         if (regex.test(dateInput)) {
-            const url = DIR_ROOT + "/sys/slrConfig.php?key=" + psnlKey.value + "&CRUD=BD&REG_DT=" + dateInput;
+            const url = DIR_ROOT + "/sys/slrConfig.php?key=" + API_TOKEN + "&CRUD=BD&REG_DT=" + dateInput;
             fetch(url)
                 .then(response => response.text())
                 .then(text => {
@@ -205,7 +205,7 @@ document.querySelector("#file").addEventListener('change', target => {
                     alert("파일 구조가 잘못되었습니다.");
                     return false;
                 }
-                fetch(DIR_ROOT + '/sys/slrBatchInsert.php?key=' + psnlKey.value, {
+                fetch(DIR_ROOT + '/sys/slrBatchInsert.php?key=' + API_TOKEN, {
                     method: 'POST',
                     headers: { 'Content-type': 'application/json;charset=UTF-8' },
                     body: JSON.stringify(rows)

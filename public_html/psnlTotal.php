@@ -162,13 +162,13 @@
     <br>
 </div>
 
-<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/showColList.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/psnlTotal.css?ver=0.1" rel="stylesheet" />
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js'></script>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js'></script>
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=1775259319" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=1775259319" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=1775259319" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/showColList.css?ver=1775259319" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/psnlTotal.css?ver=1775259319.1" rel="stylesheet" />
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js?ver=1775259319'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js?ver=1775259319'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/psnlTotal.js?ver=1'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateForm.js'></script>

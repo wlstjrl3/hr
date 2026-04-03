@@ -5,7 +5,7 @@ var mytbl = new hr_tbl({
     xhr:{
         url:'/sys/lcsList.php',
         columXHR: '',
-        key : psnlKey.value, //api 호출할 보안 개인인증키
+        key : API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             PSNL_CD : document.getElementById("PSNL_CD").value,
             PSNM_NM : document.getElementById("PSNL_NM").value,
@@ -56,8 +56,8 @@ newCol.addEventListener("click",()=>{
 //행을 클릭했을때 xhr로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx){ 
     let xhr = new XMLHttpRequest();
-    xhr.open("GET", "/sys/lcsConfig.php?key="+psnlKey.value+"&LCS_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
-    console.log("/sys/lcsConfig.php?key="+psnlKey.value+"&LCS_CD="+idx+"&CRUD=R");
+    xhr.open("GET", "/sys/lcsConfig.php?key="+API_TOKEN+"&LCS_CD="+idx+"&CRUD=R"); xhr.send(); //XHR을 즉시 호출한다. API_TOKEN는 추후 암호화 하여 재적용 예정
+    console.log("/sys/lcsConfig.php?key="+API_TOKEN+"&LCS_CD="+idx+"&CRUD=R");
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.
@@ -130,8 +130,8 @@ modalEdtBtn.addEventListener("click",()=>{
         console.log("필수값 체크"); return false;
     }
     writeUrl+="&PSNL_CD="+document.getElementById("PSNL_CD").value;
-    console.log("/sys/lcsConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C");
-    xhr.open("GET", "/sys/lcsConfig.php?key="+psnlKey.value+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. psnlKey는 추후 암호화 하여 재적용 예정
+    console.log("/sys/lcsConfig.php?key="+API_TOKEN+writeUrl+"&CRUD=C");
+    xhr.open("GET", "/sys/lcsConfig.php?key="+API_TOKEN+writeUrl+"&CRUD=C"); xhr.send(); //XHR을 즉시 호출한다. API_TOKEN는 추후 암호화 하여 재적용 예정
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             var res = xhr.response; //응답 받은 JSON데이터를 파싱한다.
@@ -157,8 +157,8 @@ modalDelBtn.addEventListener("click",()=>{
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input,key)=>{
         if(key==0){deleteUrl+="&LCS_CD="+input.value}
     });
-    console.log("/sys/lcsConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D");
-    xhr.open("GET", "/sys/lcsConfig.php?key="+psnlKey.value+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
+    console.log("/sys/lcsConfig.php?key="+API_TOKEN+deleteUrl+"&CRUD=D");
+    xhr.open("GET", "/sys/lcsConfig.php?key="+API_TOKEN+deleteUrl+"&CRUD=D"); xhr.send(); //XHR을 즉시 호출한다.
     xhr.onload = () => {
         if (xhr.status === 200) { //XHR 응답이 존재한다면
             //var res = JSON.parse(xhr.response)['data']; //응답 받은 JSON데이터를 파싱한다.

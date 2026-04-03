@@ -17,7 +17,7 @@ document.querySelectorAll(".filter").forEach((f, key) => {
 
 //fetch를 이용한 실시간 정보로드
 async function xhrLoad() {
-    const url = DIR_ROOT + "/sys/mpayList.php?key=" + psnlKey.value + "&PSNL_CD=" + document.getElementById("PSNL_CD").value + "&MPAY_YEAR=" + document.getElementById("MPAY_YEAR").value;
+    const url = DIR_ROOT + "/sys/mpayList.php?key=" + API_TOKEN + "&PSNL_CD=" + document.getElementById("PSNL_CD").value + "&MPAY_YEAR=" + document.getElementById("MPAY_YEAR").value;
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(response.statusText);

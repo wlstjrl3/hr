@@ -82,7 +82,7 @@ include("./components/header.php");
 <!-- 인쇄용 영역 -->
 <div id="printArea"></div>
 
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statPsnlTable.js?ver=0.001'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/statPsnlTable.js?ver=1775259319.001'></script>
 
 <?php
 //footer logic if any, though header.php usually covers opening tags

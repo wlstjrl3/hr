@@ -79,7 +79,7 @@ function showDetailModal(date, key, label) {
 
     const workType = document.getElementById('WORK_TYPE_FILTER').value;
     const groupBy = document.getElementById('GROUP_BY').value;
-    const apiKey = document.getElementById('psnlKey').value;
+    const apiKey = API_TOKEN;
 
     fetch(`${DIR_ROOT}/sys/statWorkTypeGraph.php?key=${apiKey}&MODE=detail&TARGET_DATE=${date}&TARGET_KEY=${key}&GROUP_BY=${groupBy}&WORK_TYPE=${workType}`)
         .then(res => res.json())
@@ -153,7 +153,7 @@ function loadData() {
     const workType = document.getElementById('WORK_TYPE_FILTER').value;
     const interval = document.getElementById('INTERVAL').value;
     const groupBy = document.getElementById('GROUP_BY').value;
-    const key = document.getElementById('psnlKey').value;
+    const key = API_TOKEN;
 
     const notice = document.getElementById('dateNotice');
     if (notice) {

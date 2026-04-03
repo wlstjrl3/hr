@@ -118,7 +118,7 @@ function loadData() {
     const baseDate = document.getElementById('BASE_DATE').value;
     const graphType = document.getElementById('GRAPH_TYPE').value;
     const useKoreanAge = document.getElementById('USE_KOREAN_AGE') ? document.getElementById('USE_KOREAN_AGE').value : 'N';
-    const key = document.getElementById('psnlKey') ? document.getElementById('psnlKey').value : '';
+    const key = document.getElementById('API_TOKEN') ? API_TOKEN : '';
 
     const notice = document.getElementById('dateNotice');
     if (notice) {
@@ -220,7 +220,7 @@ function showDetailModal(categoryLabel, targetKey, label, group) {
 
     const graphType = document.getElementById('GRAPH_TYPE').value;
     const useKoreanAge = document.getElementById('USE_KOREAN_AGE') ? document.getElementById('USE_KOREAN_AGE').value : 'N';
-    const apiKey = document.getElementById('psnlKey').value;
+    const apiKey = API_TOKEN;
 
     fetch(`${DIR_ROOT}/sys/statWorkTypeGraph2.php?key=${apiKey}&MODE=detail&BASE_DATE=${baseDate}&TARGET_KEY=${targetKey}&GRAPH_TYPE=${graphType}&TARGET_GROUP=${group}&USE_KOREAN_AGE=${useKoreanAge}`)
         .then(res => res.json())

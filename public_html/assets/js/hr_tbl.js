@@ -23,7 +23,7 @@ class hr_tbl {
                 let totalCnt = json['totalCnt'];
                 let filterCnt = json['filterCnt'];
                 //let query = JSON.parse(xhr.response)['query'];
-                //debugger;
+                ////debugger;
                 //테이블 객체 생성 이벤트//
                 let table = document.querySelector('#' + tbNm) //외부에서 호출할때 적은 테이블 ID로 오브젝트를 준비한다.
                 table.classList.add('hr_tbl'); //해당 오브젝트에 hr_tbl이라는 클래스 명칭을 추가한다.
@@ -194,7 +194,7 @@ class hr_tbl {
                                     chk.checked = target.target.checked;
                                 });
                             }
-                            //debugger;
+                            ////debugger;
                         } else if (this.hrDt.tblType == "psnlPopup") {   //개인검색 팝업창에서의 행클릭 이벤트
                             if (opener && opener.document) {
                                 const urlParams = new URLSearchParams(window.location.search);
@@ -268,7 +268,7 @@ class hr_tbl {
             });
             if (this.hrDt.xhr.order != '') { /* 2025-01-14 정렬기준을 포함하도록 코드 추가 */
                 apiUrl += "&ORDER=" + this.hrDt.columns[this.hrDt.xhr.order.column].data + " " + this.hrDt.xhr.order.direction;
-                debugger;
+                //debugger;
             }
             //엑셀다운로드는 페이징과 무관하게 전체 데이터를 가져와야 하므로 limit 데이터를 풀고 별도 코드를 통해 가져와야 함!
             //apiUrl += "&LIMIT="+this.hrDt.xhr.page*this.hrDt.xhr.limit+","+this.hrDt.xhr.limit;

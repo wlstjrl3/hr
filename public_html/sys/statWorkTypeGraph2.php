@@ -2,7 +2,7 @@
 include_once "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
 
-$baseDate = @$_REQUEST['BASE_DATE'] ?: date('Y-m-d');
+$baseDate = safeDateParam(@$_REQUEST['BASE_DATE'] ?? '');
 $graphType = @$_REQUEST['GRAPH_TYPE'] ?: 'age'; 
 $incDomestic = false; // Always exclude domestic workers
 $mode = @$_REQUEST['MODE'] ?: 'chart'; // 'chart' or 'detail'

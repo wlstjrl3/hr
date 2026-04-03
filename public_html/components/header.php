@@ -3,7 +3,7 @@ include("./dbconn/dbconn.php");
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 session_start();
-if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.php' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/style.php') {
+if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.php' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/style.php') {
     echo "<script>document.location.href='" . DIR_ROOT . "/login.php';</script>";
     die('관리자로그인 필요');
 }
@@ -14,16 +14,19 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=0.001" rel="stylesheet" />
-    <link href="<?php echo DIR_ROOT; ?>/assets/css/header.css?ver=0.001" rel="stylesheet" />
+    <link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=1775259319" rel="stylesheet" />
+    <link href="<?php echo DIR_ROOT; ?>/assets/css/header.css?ver=1775259319" rel="stylesheet" />
     <script defer src="https://sinseiki.github.io/noIE.js/noIE.js" ></script><!--익스플로러 사용제한-->    
-    <script type='text/javascript'>const DIR_ROOT = '<?php echo DIR_ROOT; ?>';</script>
-    <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/header.js'></script>
+    <script type='text/javascript'>
+        const DIR_ROOT = '<?php echo DIR_ROOT; ?>';
+        const API_TOKEN = '<?php echo $_SESSION['API_TOKEN'] ?? ''; ?>';
+    </script>
+    <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/header.js?ver=1775259319'></script>
 
     <title>제1대리구 본당직원 인적 관리시스템</title>
 </head>
 <body>
-    <input type="hidden" id="psnlKey" value="<?php echo @$_SESSION["USER_PASS"]; ?>">
+    <!-- psnlKey hidden input removed for security -->
     <div id="closeNav" style="width:0%;height:0%;background:rgba(100,100,100,0.5);position:absolute;z-index:2;" onclick="toggleNav()"></div>
     <header id="header">
         <!-- Sidebar navigation {{{ --> 

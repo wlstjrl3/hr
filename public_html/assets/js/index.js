@@ -17,7 +17,7 @@ async function xhrLoad() {
         // 1. 퇴직 예정자 정보 (60세)
         const birthFrom = (new Date().getFullYear() - 60) + "-01-01";
         const birthTo = (new Date().getFullYear() - 60) + "-12-31";
-        const url1 = `${DIR_ROOT}/sys/psnlTotal.php?key=${psnlKey.value}&TRS_TYPE=1&ORDER=PSNL_NUM ASC&PSNL_BIRTH_From=${birthFrom}&PSNL_BIRTH_To=${birthTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
+        const url1 = `${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&TRS_TYPE=1&ORDER=PSNL_NUM ASC&PSNL_BIRTH_From=${birthFrom}&PSNL_BIRTH_To=${birthTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
 
         const res1 = await fetch(url1).then(r => r.json());
         let htmlTxt1 = `<ul><li>생년월일</li><li>성명</li><li>소속</li><li>직책</li><li>발령일</li><li>발령기간</li><li>근무형태</li><li>급</li><li>호</li></ul>`;
@@ -46,7 +46,7 @@ async function xhrLoad() {
         for (const year of years) {
             const dtFrom = dateFormat(dateCalc(dateCalc(new Date(), "m", 0), "y", -year));
             const dtTo = dateFormat(dateCalc(dateCalc(new Date(), "m", 6), "y", -year));
-            const url = `${DIR_ROOT}/sys/psnlTotal.php?key=${psnlKey.value}&TRS_TYPE=1&ORDER=PSNL_NUM ASC&TRS_DT_From=${dtFrom}&TRS_DT_To=${dtTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
+            const url = `${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&TRS_TYPE=1&ORDER=PSNL_NUM ASC&TRS_DT_From=${dtFrom}&TRS_DT_To=${dtTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
 
             const res = await fetch(url).then(r => r.json());
             if (res.data) {

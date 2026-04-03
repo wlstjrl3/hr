@@ -2,8 +2,8 @@
 include_once "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
 
-$sttDate = @$_REQUEST['STT_DATE'] ?: date('Y-01-01');
-$endDate = @$_REQUEST['END_DATE'] ?: date('Y-m-d');
+$sttDate = safeDateParam(@$_REQUEST['STT_DATE'] ?? date('Y-01-01'));
+$endDate = safeDateParam(@$_REQUEST['END_DATE'] ?? date('Y-m-d'));
 $workTypeFilter = @$_REQUEST['WORK_TYPE'] ?: 'ALL';
 $interval = @$_REQUEST['INTERVAL'] ?: 'month';
 $groupBy = @$_REQUEST['GROUP_BY'] ?: 'gender';

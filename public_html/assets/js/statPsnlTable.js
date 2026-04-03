@@ -2,7 +2,6 @@
     const tableArea = document.getElementById('statPsnlTableArea');
     const tableBody = document.getElementById('statPsnlTableBody');
     const tableHead = document.querySelector('#statPsnlTable thead');
-    const psnlKey = document.getElementById('psnlKey').value;
     const includeDomesticCheck = document.getElementById('includeDomestic');
     const statBaseDateInput = document.getElementById('statBaseDate');
     const sortOrderSelect = document.getElementById('sortOrder');
@@ -29,7 +28,7 @@
         tableBody.innerHTML = `<tr><td colspan="${colspan}" class="txtCenter pddS">데이터를 불러오는 중입니다...</td></tr>`;
 
         try {
-            const baseUrl = `${DIR_ROOT}/sys/statPsnlTable.php?key=${psnlKey}`;
+            const baseUrl = `${DIR_ROOT}/sys/statPsnlTable.php?key=${API_TOKEN}`;
             const includeDomestic = includeDomesticCheck.checked;
             const statBaseDate = statBaseDateInput.value;
             const sortOrder = sortOrderSelect.value;

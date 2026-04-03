@@ -2,16 +2,18 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
 
-$baseDate = @$_REQUEST['STAT_BASE_DATE'];
+$baseDate = safeDateParam(@$_REQUEST['BASE_DATE'] ?? '');
+$baseDateStr = str_replace('-', '', $baseDate);
 $trsCond = "";
 $pttCond = "";
 $grdCond = "";
 if ($baseDate) {
-    $baseDateEsc = mysqli_real_escape_string($conn, $baseDate);
-    $baseDateStr = str_replace('-', '', $baseDateEsc);
-    $trsCond = " AND REPLACE(TRS_DT, '-', '') <= '{$baseDateStr}' ";
-    $pttCond = " WHERE PTT_YEAR <= LEFT('{$baseDateStr}', 4) ";
-    $grdCond = " WHERE REPLACE(ADVANCE_DT, '-', '') <= '{$baseDateStr}' ";
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $baseDate)) {
+        // Condition strings for subqueries - these are safer as they are validated by regex
+        $trsCond = " AND REPLACE(TRS_DT, '-', '') <= '" . str_replace('-', '', $baseDate) . "' ";
+        $pttCond = " WHERE PTT_YEAR <= '" . substr($baseDate, 0, 4) . "' ";
+        $grdCond = " WHERE REPLACE(ADVANCE_DT, '-', '') <= '" . str_replace('-', '', $baseDate) . "' ";
+    }
 }
 
 $useKoreanAge = @$_REQUEST['USE_KOREAN_AGE'] == 'Y';
@@ -27,8 +29,8 @@ $derivedBirthDateSql = "CONCAT(
         SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 5, 2)
     )";
 
-$baseDateAgeRef1 = $baseDate ? "'{$baseDateEsc}'" : "CURDATE()";
-$baseDateAgeRef2 = $baseDate ? "DATE_FORMAT('{$baseDateEsc}', '%m%d')" : "DATE_FORMAT(CURDATE(), '%m%d')";
+$baseDateAgeRef1 = $baseDate ? "'{$baseDate}'" : "CURDATE()";
+$baseDateAgeRef2 = $baseDate ? "DATE_FORMAT('{$baseDate}', '%m%d')" : "DATE_FORMAT(CURDATE(), '%m%d')";
 
 if ($useKoreanAge) {
     $ageSql = "(YEAR({$baseDateAgeRef1}) - CAST(SUBSTR({$derivedBirthDateSql}, 1, 4) AS UNSIGNED) + 1)";
@@ -43,15 +45,8 @@ $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A
             FROM PSNL_TRANSFER
             WHERE 1=1 {$trsCond}
             GROUP BY PSNL_CD
-        ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
-        LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
-        
-        LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
-            FROM PSNL_TRANSFER
-            WHERE 1=1 {$trsCond}
-            GROUP BY PSNL_CD
         ) C2_SUB ON C2_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C2_SUB.MAX_TRS_CD
         LEFT OUTER JOIN PSNL_TRANSFER C2 ON C2.TRS_CD = C2_SUB.MAX_TRS_CD
         LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD
 
@@ -150,15 +145,8 @@ $sql = "SELECT
             FROM PSNL_TRANSFER
             WHERE 1=1 {$trsCond}
             GROUP BY PSNL_CD
-        ) C_SUB ON C_SUB.PSNL_CD = A.PSNL_CD
-        LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C_SUB.MAX_TRS_CD
-
-        LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
-            FROM PSNL_TRANSFER
-            WHERE 1=1 {$trsCond}
-            GROUP BY PSNL_CD
         ) C2_SUB ON C2_SUB.PSNL_CD = A.PSNL_CD
+        LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C2_SUB.MAX_TRS_CD
         LEFT OUTER JOIN PSNL_TRANSFER C2 ON C2.TRS_CD = C2_SUB.MAX_TRS_CD
 
         LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD            
@@ -194,7 +182,9 @@ if (@$_REQUEST['PSNL_CD']) {
     $types .= "s";
 }
 if (@$_REQUEST['ORG_NM']) {
-    $whereSql = $whereSql . " AND ORG_NM LIKE '%" . $_REQUEST['ORG_NM'] . "%'"; //조직 정보의 B테이블에서 가져온다.
+    $whereSql .= " AND ORG_NM LIKE ?";
+    $params[] = '%' . $_REQUEST['ORG_NM'] . '%';
+    $types .= "s";
 }
 if (@$_REQUEST['PSNL_NM']) {
     $whereSql .= " AND PSNL_NM LIKE ?";
@@ -289,16 +279,24 @@ if (@$_REQUEST['HAS_PAY'] == 'Y') {
     $whereSql .= " AND (D.GRD_PAY IS NOT NULL AND D.GRD_PAY != '' AND D.GRD_PAY != '0')";
 }
 if (@$_REQUEST['PSNL_BIRTH_From']) {
-    $whereSql .= " AND " . $derivedBirthDateSql . " >= '" . $_REQUEST['PSNL_BIRTH_From'] . "'";
+    $whereSql .= " AND " . $derivedBirthDateSql . " >= ?";
+    $params[] = $_REQUEST['PSNL_BIRTH_From'];
+    $types .= "s";
 }
 if (@$_REQUEST['PSNL_BIRTH_To']) {
-    $whereSql .= " AND " . $derivedBirthDateSql . " <= '" . $_REQUEST['PSNL_BIRTH_To'] . "'";
+    $whereSql .= " AND " . $derivedBirthDateSql . " <= ?";
+    $params[] = $_REQUEST['PSNL_BIRTH_To'];
+    $types .= "s";
 }
 if (@$_REQUEST['AGE_MIN']) {
-    $whereSql .= " AND {$ageSql} >= " . (int)$_REQUEST['AGE_MIN'];
+    $whereSql .= " AND {$ageSql} >= ?";
+    $params[] = (int)$_REQUEST['AGE_MIN'];
+    $types .= "i";
 }
 if (@$_REQUEST['AGE_MAX']) {
-    $whereSql .= " AND {$ageSql} <= " . (int)$_REQUEST['AGE_MAX'];
+    $whereSql .= " AND {$ageSql} <= ?";
+    $params[] = (int)$_REQUEST['AGE_MAX'];
+    $types .= "i";
 }
 $trsDtCol = (@$_REQUEST['USE_FIRST_TRS'] == 'Y') ? "(SELECT REPLACE(MIN(REPLACE(TRS_DT, '-', '')), '-', '') FROM PSNL_TRANSFER T_MIN WHERE T_MIN.PSNL_CD = A.PSNL_CD)" : "REPLACE(C.TRS_DT, '-', '')";
 

@@ -3,9 +3,9 @@ include("./dbconn/dbconn.php");
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 session_start();
-if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.php' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/style.php') {
-    echo "<script>document.location.href='" . DIR_ROOT . "/login.php';</script>";
-    die('관리자로그인 필요');
+if (!empty($_SESSION["USER_ID"])) {
+    header("Location: " . DIR_ROOT . "/");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -14,17 +14,17 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
     <meta charset='utf8' />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=0.001" rel="stylesheet" />
-    <link href="<?php echo DIR_ROOT; ?>/assets/css/header.css?ver=0.001" rel="stylesheet" />
+    <link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=1775259319" rel="stylesheet" />
+    <link href="<?php echo DIR_ROOT; ?>/assets/css/header.css?ver=1775259319" rel="stylesheet" />
     <script defer src="https://sinseiki.github.io/noIE.js/noIE.js" ></script><!--익스플로러 사용제한-->    
-    <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/header.js'></script>
+    <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/header.js?ver=1775259319'></script>
 
     <title>제1대리구 통합사목허브 관리시스템</title>
 </head>
 <body>
 
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/login.js'></script>
-<link href="<?php echo DIR_ROOT; ?>/assets/css/login.css?ver=0.001" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/login.css?ver=1775259319" rel="stylesheet" />
 
 <div id="loginBg" class="clBg2">
     <div id="loginFrm">

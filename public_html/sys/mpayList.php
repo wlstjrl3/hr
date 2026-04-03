@@ -2,7 +2,7 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
     $psnlCd = @$_REQUEST['PSNL_CD'];
-    $year = @$_REQUEST['MPAY_YEAR'];
+    $year = (int)(@$_REQUEST['MPAY_YEAR'] ?? date('Y'));
 
     if (!$psnlCd || !$year) {
         jsonResponse($conn, ["data" => [], "error" => "Required parameters missing"]);
@@ -14,10 +14,14 @@ verifyApiKey($conn, @$_REQUEST['key']);
     $types = "";
 
     for ($i = 1; $i <= 12; $i++) {
-        $loopMonth = substr(('0' . $i), -2);
+        $loopMonth = sprintf('%02d', $i);
         $monthStr = $year . "-" . $loopMonth;
         $sttDt = $monthStr . "-01";
-        $endDt = $monthStr . "-31";
+        // 해당 월의 마지막 날짜 계산
+        $lastDay = date("t", strtotime($sttDt));
+        $endDt = $monthStr . "-" . $lastDay;
+        
+        // 작년 동일 시점 (비교용 또는 검색 범위 제한용)
         $prevYearSttDt = ($year - 1) . "-" . $loopMonth . "-01";
 
         $sqlParts[] = "
@@ -46,22 +50,21 @@ verifyApiKey($conn, @$_REQUEST['key']);
         WHERE A.PSNL_CD = ?
             AND A.ADVANCE_DT > ? AND A.ADVANCE_DT <= ? LIMIT 1)";
 
-        // 22 parameters per subquery
-        array_push($params, $monthStr, $psnlCd, $endDt, $sttDt, $psnlCd, $endDt, $sttDt, $psnlCd, $endDt, $sttDt, $psnlCd, $endDt, $sttDt, $psnlCd, $endDt, $sttDt, $psnlCd, $endDt, $sttDt, $psnlCd, $endDt, $sttDt, $psnlCd, $endDt, $year, $psnlCd, $prevYearSttDt, $sttDt);
+        // Total 28 markers per subquery
+        array_push($params, 
+            $monthStr, // 1
+            $psnlCd, $endDt, $sttDt, // 2, 3, 4 (POSI)
+            $psnlCd, $endDt, $sttDt, // 5, 6, 7 (FML)
+            $psnlCd, $endDt, $sttDt, // 8, 9, 10 (LCS)
+            $psnlCd, $endDt, $sttDt, // 11, 12, 13 (DIS)
+            $psnlCd, $endDt, $sttDt, // 14, 15, 16 (ADJ)
+            $psnlCd, $endDt, $sttDt, // 17, 18, 19 (TOTAL FML)
+            $psnlCd, $endDt, $sttDt, // 20, 21, 22 (TOTAL ADJ)
+            $psnlCd, $endDt,         // 23, 24 (TRANS)
+            $year,                   // 25 (SALARY YEAR)
+            $psnlCd, $prevYearSttDt, $sttDt // 26, 27, 28 (WHERE)
+        );
     }
-    
-    // Correction: Let's count properly.
-    // 1:YEAR_MON, 2:PSNL_CD, 3:endDt, 4:sttDt (POSI)
-    // 5:PSNL_CD, 6:endDt, 7:sttDt (FML)
-    // 8:PSNL_CD, 9:endDt, 10:sttDt (LCS)
-    // 11:PSNL_CD, 12:endDt, 13:sttDt (DIS)
-    // 14:PSNL_CD, 15:endDt, 16:sttDt (ADJ)
-    // 17:PSNL_CD, 18:endDt, 19:sttDt (SUB FML)
-    // 20:PSNL_CD, 21:endDt, 22:sttDt (SUB ADJ)
-    // 23:PSNL_CD, 24:endDt (A2)
-    // 25:year (B)
-    // 26:PSNL_CD, 27:prevYearSttDt, 28:sttDt (WHERE)
-    // Total 28 markers.
     
     $types = str_repeat("s", count($params));
     $sql = implode(" UNION ", $sqlParts);

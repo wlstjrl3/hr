@@ -126,9 +126,9 @@ include('./components/header.php');
     </div>
 </div>
 
-<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=0" rel="stylesheet" />
-<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=0" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/hr_tbl.css?ver=1775259319" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/modal.css?ver=1775259319" rel="stylesheet" />
+<link href="<?php echo DIR_ROOT; ?>/assets/css/searchArea.css?ver=1775259319" rel="stylesheet" />
 
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/tuition.js'></script>
 

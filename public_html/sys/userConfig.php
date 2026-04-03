@@ -1,9 +1,8 @@
 <?php
 include "sql_safe_helper.php";
-verifyApiKey($conn, @$_REQUEST['key']);
-
-$authData = executeQuery($conn, "SELECT USER_AUTH FROM BONDANG_HR.USER_TB WHERE USER_PASS = ? LIMIT 1", "s", [@$_REQUEST['key']]);
-$userAuth = $authData[0]['USER_AUTH'] ?? '';
+verifyApiKey($conn);
+$userAuth = $_SESSION['USER_AUTH'] ?? '';
+$userName = $_SESSION['USER_NM'] ?? '';
 
 if ($_REQUEST['CRUD'] == 'C') {
     if ($userAuth != 'auth' && $userAuth != 'admin') {
@@ -15,7 +14,7 @@ if ($_REQUEST['CRUD'] == 'C') {
             executeUpdate($conn,
                 "INSERT INTO BONDANG_HR.USER_TB(USER_ID,USER_NM,USER_PASS,USER_AUTH,EMAIL,POSITION,ORG_NM,REG_DT,MEMO) VALUES (?,?,?,?,?,?,?,?,?)",
                 "sssssssss",
-            [$_REQUEST['USER_ID'], $_REQUEST['USER_NM'], MD5($_REQUEST['USER_PASS']), $_REQUEST['USER_AUTH'],
+            [$_REQUEST['USER_ID'], $_REQUEST['USER_NM'], password_hash($_REQUEST['USER_PASS'], PASSWORD_DEFAULT), $_REQUEST['USER_AUTH'],
                 $_REQUEST['EMAIL'], $_REQUEST['POSITION'], $_REQUEST['ORG_NM'], $regDt, $_REQUEST['MEMO']]
             );
         }
@@ -27,7 +26,7 @@ if ($_REQUEST['CRUD'] == 'C') {
             if (strlen(@$_REQUEST['USER_PASS']) > 1) {
                 $setSql .= ", USER_PASS=?";
                 $types .= "s";
-                $params[] = MD5($_REQUEST['USER_PASS']);
+                $params[] = password_hash($_REQUEST['USER_PASS'], PASSWORD_DEFAULT);
             }
 
             $setSql .= ", USER_AUTH=?, EMAIL=?, POSITION=?, ORG_NM=?, MEMO=?";

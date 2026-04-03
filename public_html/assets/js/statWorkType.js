@@ -2,7 +2,7 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/statWorkType.php',
         columXHR: '',
-        key: psnlKey.value,
+        key: API_TOKEN,
         where: {
             TARGET_TYPE: 'ALL',
             BASE_DATE: document.getElementById("BASE_DATE") ? document.getElementById("BASE_DATE").value : new Date().toISOString().split('T')[0],

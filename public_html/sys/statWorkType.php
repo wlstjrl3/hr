@@ -2,9 +2,8 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
 
-$baseDate = @$_REQUEST['BASE_DATE'] ?: date('Y-m-d');
-$safeBaseDate = mysqli_real_escape_string($conn, $baseDate);
-$safeBaseDateStr = str_replace('-', '', $safeBaseDate);
+$baseDate = safeDateParam(@$_REQUEST['BASE_DATE'] ?? '');
+$safeBaseDateStr = str_replace('-', '', $baseDate);
 
 $subqueryC = "SELECT 
                     T.ORG_CD,

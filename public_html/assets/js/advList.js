@@ -5,7 +5,7 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/advList.php',
         columXHR: '',
-        key: psnlKey.value, //api 호출할 보안 개인인증키
+        key: API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             TMP: "tmp",
         },

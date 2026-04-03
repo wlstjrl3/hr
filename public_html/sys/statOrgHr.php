@@ -66,7 +66,10 @@ $params = [];
 $types = "";
 
 if (@$_REQUEST['UUPR_ORG']) {
-    $whereSql = $whereSql . " AND (B.UPPR_ORG_CD = '" . $_REQUEST['UUPR_ORG'] . "' OR A.UPPR_ORG_CD = '" . $_REQUEST['UUPR_ORG'] . "')";
+    $whereSql .= " AND (B.UPPR_ORG_CD = ? OR A.UPPR_ORG_CD = ?)";
+    $params[] = $_REQUEST['UUPR_ORG'];
+    $params[] = $_REQUEST['UUPR_ORG'];
+    $types .= "ss";
 }
 if (@$_REQUEST['UPR_ORG']) {
     $whereSql .= " AND A.UPPR_ORG_CD = ?";

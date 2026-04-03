@@ -6,7 +6,7 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/grdBatchList.php',
         columXHR: '',
-        key: psnlKey.value, //api 호출할 보안 개인인증키
+        key: API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             sample: "sample",
         },
@@ -78,7 +78,7 @@ batchInsert.addEventListener("click", () => {
                     date: userInputDt,
                     psnlCd: chkedBoxes,
                 }
-                const url = DIR_ROOT + '/sys/grdBatchConfig.php?key=' + psnlKey.value + '&CRUD=C';
+                const url = DIR_ROOT + '/sys/grdBatchConfig.php?key=' + API_TOKEN + '&CRUD=C';
                 fetch(url, {
                     method: 'POST',
                     headers: { 'Content-type': 'application/json;charset=UTF-8' },
@@ -119,7 +119,7 @@ batchDel.addEventListener("click", () => {
         const jsonDate = {
             grdCd: chkedBoxes,
         }
-        const url = DIR_ROOT + '/sys/grdBatchConfig.php?key=' + psnlKey.value + '&CRUD=D';
+        const url = DIR_ROOT + '/sys/grdBatchConfig.php?key=' + API_TOKEN + '&CRUD=D';
         fetch(url, {
             method: 'POST',
             headers: { 'Content-type': 'application/json;charset=UTF-8' },

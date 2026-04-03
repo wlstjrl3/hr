@@ -2,7 +2,7 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
 
-$baseDate = @$_REQUEST['STAT_BASE_DATE'] ?: date('Y-m-d');
+$baseDate = safeDateParam(@$_REQUEST['STAT_BASE_DATE'] ?? '');
 $includeDomestic = @$_REQUEST['INCLUDE_DOMESTIC'] == 'true' ? true : false;
 
 $wherePos = "";
@@ -41,15 +41,15 @@ $sql = "SELECT
         JOIN PSNL_TRANSFER C ON C.TRS_CD = (
             SELECT TRS_CD FROM PSNL_TRANSFER T2
             WHERE T2.PSNL_CD = A.PSNL_CD
-            AND TRS_DT <= '{$baseDate}'
+            AND TRS_DT <= ?
             ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1
         )
         LEFT OUTER JOIN ORG_INFO B ON C.ORG_CD = B.ORG_CD
         LEFT OUTER JOIN ORG_INFO D ON B.UPPR_ORG_CD = D.ORG_CD
-        WHERE (C.TRS_TYPE IN ('1', '3') OR (C.TRS_TYPE = '2' AND C.TRS_DT = '{$baseDate}')) {$wherePos}
+        WHERE (C.TRS_TYPE IN ('1', '3') OR (C.TRS_TYPE = '2' AND C.TRS_DT = ?)) {$wherePos}
         ORDER BY D.ORG_NM ASC, B.ORG_NM ASC, {$orderClause}";
 
-$data = executeQuery($conn, $sql, "", []);
+$data = executeQuery($conn, $sql, "ss", [$baseDate, $baseDate]);
 
 jsonResponse($conn, ["data" => $data ?: null]);
 ?>

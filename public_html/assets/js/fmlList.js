@@ -5,7 +5,7 @@ var mytbl = new hr_tbl({
     xhr: {
         url: DIR_ROOT + '/sys/fmlList.php',
         columXHR: '',
-        key: psnlKey.value, //api 호출할 보안 개인인증키
+        key: API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             PSNL_CD: document.getElementById("PSNL_CD").value,
             PSNM_NM: document.getElementById("PSNL_NM").value,
@@ -55,7 +55,7 @@ newCol.addEventListener("click", () => {
 });
 //행을 클릭했을때 fetch로 다시 끌어올 데이터는 각 페이지마다 다르기에 여기에서 지정
 function trDataXHR(idx) {
-    const url = DIR_ROOT + "/sys/fmlConfig.php?key=" + psnlKey.value + "&FML_CD=" + idx + "&CRUD=R";
+    const url = DIR_ROOT + "/sys/fmlConfig.php?key=" + API_TOKEN + "&FML_CD=" + idx + "&CRUD=R";
     console.log(url);
     fetch(url)
         .then(response => {
@@ -113,7 +113,7 @@ modalEdtBtn.addEventListener("click", () => {
     }
     writeUrl += "&FML_RELATION=" + document.querySelector(".modalBody").querySelector("select").value;
     writeUrl += "&PSNL_CD=" + document.getElementById("PSNL_CD").value;
-    const url = DIR_ROOT + "/sys/fmlConfig.php?key=" + psnlKey.value + writeUrl + "&CRUD=C";
+    const url = DIR_ROOT + "/sys/fmlConfig.php?key=" + API_TOKEN + writeUrl + "&CRUD=C";
     console.log(url);
 
     fetch(url)
@@ -143,7 +143,7 @@ modalDelBtn.addEventListener("click", () => {
     document.querySelector(".modalForm").querySelectorAll("input").forEach((input, key) => {
         if (key == 0) { deleteUrl += "&FML_CD=" + input.value }
     });
-    const url = DIR_ROOT + "/sys/fmlConfig.php?key=" + psnlKey.value + deleteUrl + "&CRUD=D";
+    const url = DIR_ROOT + "/sys/fmlConfig.php?key=" + API_TOKEN + deleteUrl + "&CRUD=D";
     console.log(url);
 
     fetch(url)
