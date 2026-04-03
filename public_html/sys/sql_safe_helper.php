@@ -8,7 +8,8 @@
  */
 
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);   // 실서버: PHP 오류가 JSON 응답을 오염시키지 않도록 화면 출력 비활성화
+ini_set("log_errors", 1);       // 대신 PHP 에러 로그에 기록
 session_start();
 include __DIR__ . "/../dbconn/dbconn.php";
 

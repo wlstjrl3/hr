@@ -1,7 +1,8 @@
 <?php
 include("./dbconn/dbconn.php");
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);   // 실서버: 화면 오류 출력 비활성화
+ini_set("log_errors", 1);       // PHP 에러 로그에 기록
 session_start();
 if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.php' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/style.php') {
     echo "<script>document.location.href='" . DIR_ROOT . "/login.php';</script>";
