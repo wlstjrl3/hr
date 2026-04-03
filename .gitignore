@@ -1,7 +1,9 @@
 ## 
 *.test
+readFirst.md
 
 ## 
+readFirst/
 test/
 .aider*
 .env

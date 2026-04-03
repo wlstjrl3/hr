@@ -133,6 +133,11 @@ if (@$_SESSION["USER_PASS"] == '' && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.
                             </a>
                         </li>
                         <li>
+                            <a href="<?php echo DIR_ROOT; ?>/tuition.php">
+                                └&nbsp;자녀학비 보조금
+                            </a>
+                        </li>
+                        <li>
                             <a href="<?php echo DIR_ROOT; ?>/mpayList.php">
                                 └&nbsp;월별 개인급여
                             </a>
