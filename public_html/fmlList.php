@@ -71,7 +71,7 @@
             </div>
             <div class="colBd" style="">
                 <input class="clBg5" id="POSITION" readonly style="width:calc(40%);border:0;" value="<?php echo @$_REQUEST['POSITION']; ?>">
-                <input id="PSNL_NM" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM']; ?>">
+                <input id="PSNL_NM" class="filter" style="width:calc(60% - 45px);" placeholder="성명" value="<?php echo @$_REQUEST['PSNL_NM']; ?>">
                 <button id="psnlSerchPop" style="padding:3px;">검색</button>
             </div>    
         </div>

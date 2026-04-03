@@ -8,7 +8,7 @@ var mytbl = new hr_tbl({
         key: API_TOKEN, //api 호출할 보안 개인인증키
         where: {
             PSNL_CD: document.getElementById("PSNL_CD").value,
-            PSNM_NM: document.getElementById("PSNL_NM").value,
+            PSNL_NM: document.getElementById("PSNL_NM").value,
         },
         order: {
             column: '0',

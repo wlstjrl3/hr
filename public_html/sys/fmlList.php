@@ -23,6 +23,11 @@ verifyApiKey($conn, @$_REQUEST['key']);
         $params[] = @$_REQUEST['PSNL_CD'];
         $types .= "s";
     }
+    if(@$_REQUEST['PSNL_NM']){
+        $whereSql .= " AND B.PSNL_NM LIKE ?";
+        $params[] = '%'.@$_REQUEST['PSNL_NM'].'%';
+        $types .= "s";
+    }
     if(@$_REQUEST['FML_NM']){
         $whereSql .= " AND FML_NM LIKE ?";
         $params[] = '%'.$_REQUEST['FML_NM'].'%';
