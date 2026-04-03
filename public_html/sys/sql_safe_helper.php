@@ -8,9 +8,28 @@
  */
 
 error_reporting(E_ALL);
-ini_set("display_errors", 0);   // 실서버: PHP 오류가 JSON 응답을 오염시키지 않도록 화면 출력 비활성화
-ini_set("log_errors", 1);       // 대신 PHP 에러 로그에 기록
+ini_set("display_errors", 0);
+ini_set("log_errors", 1);
 session_start();
+
+// Fatal Error 발생 시에도 JSON 형태로 에러 반환 (진단용)
+ob_start();
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        ob_clean();
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'error' => true,
+            'message' => $error['message'],
+            'file' => basename($error['file']),
+            'line' => $error['line']
+        ], JSON_UNESCAPED_UNICODE);
+    } else {
+        ob_end_flush();
+    }
+});
 include __DIR__ . "/../dbconn/dbconn.php";
 
 /**
