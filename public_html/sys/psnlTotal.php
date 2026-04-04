@@ -41,28 +41,34 @@ if ($useKoreanAge) {
 //갯수 카운트 쿼리
 $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A 
         LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
-            FROM PSNL_TRANSFER
-            WHERE 1=1 {$trsCond}
-            GROUP BY PSNL_CD
+            SELECT PSNL_CD, TRS_CD AS MAX_TRS_CD
+            FROM (
+                SELECT PSNL_CD, TRS_CD, ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY TRS_DT DESC, TRS_CD DESC) as rn
+                FROM PSNL_TRANSFER
+                WHERE 1=1 {$trsCond}
+            ) t WHERE rn = 1
         ) C2_SUB ON C2_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C2_SUB.MAX_TRS_CD
         LEFT OUTER JOIN PSNL_TRANSFER C2 ON C2.TRS_CD = C2_SUB.MAX_TRS_CD
         LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD
 
         LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
-            FROM GRADE_HISTORY
-            {$grdCond}
-            GROUP BY PSNL_CD
+            SELECT PSNL_CD, GRD_CD AS MAX_GRD_CD
+            FROM (
+                SELECT PSNL_CD, GRD_CD, ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC) as rn
+                FROM GRADE_HISTORY
+                {$grdCond}
+            ) t WHERE rn = 1
         ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD
 
         LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
-            FROM PSNL_PARTTIME
-            {$pttCond}
-            GROUP BY PSNL_CD
+            SELECT PSNL_CD, PTT_CD AS MAX_PTT_CD
+            FROM (
+                SELECT PSNL_CD, PTT_CD, ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC) as rn
+                FROM PSNL_PARTTIME
+                {$pttCond}
+            ) t WHERE rn = 1
         ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD
         ";
@@ -75,10 +81,7 @@ $sql = "SELECT
         END AS TRS_TYPE
         ,C2.POSITION,C2.WORK_TYPE
         ,C2.TRS_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
-        ,IFNULL((
-            SELECT PERSON_CNT FROM ORG_HISTORY WHERE B.ORG_CD = ORG_HISTORY.ORG_CD
-            ORDER BY OH_DT DESC LIMIT 1
-        ),0) AS PERSON_CNT
+        ,IFNULL(OH_V.PERSON_CNT, 0) AS PERSON_CNT
         ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM
         ,{$ageSql} AS AGE
         ,A.PHONE_NUM,LEFT(A.PSNL_NUM,14) AS PSNL_NUM
@@ -113,10 +116,12 @@ $sql = "SELECT
         ,B.ORG_IN_TEL, B.ORG_OUT_TEL
         FROM PSNL_INFO A
         LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(TRS_CD ORDER BY TRS_DT DESC, TRS_CD DESC), ',', 1) AS MAX_TRS_CD
-            FROM PSNL_TRANSFER
-            WHERE 1=1 {$trsCond}
-            GROUP BY PSNL_CD
+            SELECT PSNL_CD, TRS_CD AS MAX_TRS_CD
+            FROM (
+                SELECT PSNL_CD, TRS_CD, ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY TRS_DT DESC, TRS_CD DESC) as rn
+                FROM PSNL_TRANSFER
+                WHERE 1=1 {$trsCond}
+            ) t WHERE rn = 1
         ) C2_SUB ON C2_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_TRANSFER C ON C.TRS_CD = C2_SUB.MAX_TRS_CD
         LEFT OUTER JOIN PSNL_TRANSFER C2 ON C2.TRS_CD = C2_SUB.MAX_TRS_CD
@@ -124,25 +129,44 @@ $sql = "SELECT
         LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD            
         
         LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(GRD_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC), ',', 1) AS MAX_GRD_CD
-            FROM GRADE_HISTORY
-            {$grdCond}
-            GROUP BY PSNL_CD
+            SELECT PSNL_CD, GRD_CD AS MAX_GRD_CD
+            FROM (
+                SELECT PSNL_CD, GRD_CD, ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY ADVANCE_DT DESC, GRD_CD DESC) as rn
+                FROM GRADE_HISTORY
+                {$grdCond}
+            ) t WHERE rn = 1
         ) D_SUB ON D_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN GRADE_HISTORY D ON D.GRD_CD = D_SUB.MAX_GRD_CD
 
         LEFT OUTER JOIN (
-            SELECT PSNL_CD, SUBSTRING_INDEX(GROUP_CONCAT(PTT_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC), ',', 1) AS MAX_PTT_CD
-            FROM PSNL_PARTTIME
-            {$pttCond}
-            GROUP BY PSNL_CD
+            SELECT PSNL_CD, PTT_CD AS MAX_PTT_CD
+            FROM (
+                SELECT PSNL_CD, PTT_CD, ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY PTT_YEAR DESC, PTT_CD DESC) as rn
+                FROM PSNL_PARTTIME
+                {$pttCond}
+            ) t WHERE rn = 1
         ) PTT_SUB ON PTT_SUB.PSNL_CD = A.PSNL_CD
         LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD
 
-        /* C2의 최근고용형태 참조 & 계약직+무기 계약직 동시 조건에 들어가도록 join 조건에 concat을 이용한 like 조건을 적용함.*/
-        LEFT OUTER JOIN SALARY_TB E ON C2.WORK_TYPE LIKE CONCAT('%',E.SLR_TYPE) AND  D.GRD_GRADE = E.SLR_GRADE AND D.GRD_PAY = E.SLR_PAY AND SLR_YEAR = NULLIF(GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000')), '0000')
+        /* [최적화] 조직별 최근 인원수 뷰 미리 집계 JOIN */
+        LEFT OUTER JOIN (
+            SELECT ORG_CD, PERSON_CNT
+            FROM (
+                SELECT ORG_CD, PERSON_CNT, ROW_NUMBER() OVER (PARTITION BY ORG_CD ORDER BY OH_DT DESC) as rn
+                FROM ORG_HISTORY
+            ) t WHERE rn = 1
+        ) OH_V ON B.ORG_CD = OH_V.ORG_CD
 
-        LEFT OUTER JOIN SALARY_TB E_MIN ON PTT.PTT_YEAR = E_MIN.SLR_YEAR AND E_MIN.SLR_TYPE = '최저시급'
+        /* C2의 최근고용형태 참조 & 계약직+무기 계약직 동시 조건에 들어가도록 join 조건에 concat을 이용한 like 조건을 적용함.*/
+        LEFT OUTER JOIN SALARY_TB E 
+            ON E.SLR_YEAR = NULLIF(GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000')), '0000')
+            AND D.GRD_GRADE = E.SLR_GRADE 
+            AND D.GRD_PAY = E.SLR_PAY 
+            AND C2.WORK_TYPE LIKE CONCAT('%', E.SLR_TYPE)
+
+        LEFT OUTER JOIN SALARY_TB E_MIN 
+            ON E_MIN.SLR_YEAR = PTT.PTT_YEAR 
+            AND E_MIN.SLR_TYPE = '최저시급'
 
         /* [N+1 최적화 - 카테시안 곱 방지 완벽 해결] 연도별 기준 사전 집계 뷰 */
         LEFT OUTER JOIN (
