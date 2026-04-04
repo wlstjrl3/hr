@@ -24,6 +24,7 @@ verifyApiKey($conn, @$_REQUEST['key']);
         // 작년 동일 시점 (비교용 또는 검색 범위 제한용)
         $prevYearSttDt = ($year - 1) . "-" . $loopMonth . "-01";
 
+        // [N+1 최적화 v2] 인라인 뷰 내 미리 집계 → Cartesian product(데이터 뻥튀기) 방지
         $sqlParts[] = "
         (SELECT 
             ? AS YEAR_MON
@@ -33,36 +34,45 @@ verifyApiKey($conn, @$_REQUEST['key']);
             ,A.GRD_PAY
             ,B.NORMAL_PAY
             ,B.LEGAL_PAY
-            ,IFNULL((SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE 
-                PSNL_CD = ? 
-                AND ADJ_TYPE = '직책' 
-                AND ADJ_STT_DT <= ? 
-                AND (ADJ_END_DT >= ? OR ADJ_END_DT is null)),0) AS POSI_PAY
-
-            ,IFNULL((SELECT SUM(FML_PAY) FROM PSNL_FAMILY WHERE PSNL_CD = ? AND FML_STT_DT <= ? AND (FML_END_DT >= ? OR FML_END_DT is null)),0) AS FML_PAY
-            ,IFNULL((SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE PSNL_CD = ? AND ADJ_TYPE = '자격' AND ADJ_STT_DT <= ? AND (ADJ_END_DT >= ? OR ADJ_END_DT is null)),0) AS LCS_PAY
-            ,IFNULL((SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE PSNL_CD = ? AND ADJ_TYPE = '장애' AND ADJ_STT_DT <= ? AND (ADJ_END_DT >= ? OR ADJ_END_DT is null)),0) AS DIS_PAY
-            ,IFNULL((SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE PSNL_CD = ? AND ADJ_TYPE = '조정' AND ADJ_STT_DT <= ? AND (ADJ_END_DT >= ? OR ADJ_END_DT is null)),0) AS ADJ_PAY
-            ,B.NORMAL_PAY+B.LEGAL_PAY+IFNULL((SELECT SUM(FML_PAY) FROM PSNL_FAMILY WHERE PSNL_CD = ? AND FML_STT_DT <= ? AND (FML_END_DT >= ? OR FML_END_DT is null)),0)+IFNULL((SELECT SUM(ADJ_PAY) FROM PSNL_ADJUST WHERE PSNL_CD = ? AND ADJ_STT_DT <= ? AND (ADJ_END_DT >= ? OR ADJ_END_DT is null)),0) AS TOTAL_PAY
+            ,IFNULL(ADJ_M.POSI_PAY, 0) AS POSI_PAY
+            ,IFNULL(FML_M.FML_PAY, 0) AS FML_PAY
+            ,IFNULL(ADJ_M.LCS_PAY, 0) AS LCS_PAY
+            ,IFNULL(ADJ_M.DIS_PAY, 0) AS DIS_PAY
+            ,IFNULL(ADJ_M.ADJ_PAY, 0) AS ADJ_PAY
+            ,B.NORMAL_PAY + B.LEGAL_PAY + IFNULL(FML_M.FML_PAY, 0) + IFNULL(ADJ_M.TOTAL_ADJ, 0) AS TOTAL_PAY
             FROM GRADE_HISTORY A
             LEFT OUTER JOIN PSNL_TRANSFER A2 ON TRS_CD = (SELECT TRS_CD FROM PSNL_TRANSFER WHERE PSNL_CD=? AND TRS_DT <= ? ORDER BY TRS_DT DESC LIMIT 1)
             LEFT OUTER JOIN SALARY_TB B ON GRD_GRADE = SLR_GRADE AND GRD_PAY = SLR_PAY AND SLR_YEAR = ? AND A2.WORK_TYPE LIKE CONCAT('%',SLR_TYPE)
+            LEFT OUTER JOIN (
+                SELECT PSNL_CD
+                      ,SUM(CASE WHEN ADJ_TYPE='직책' THEN ADJ_PAY ELSE 0 END) AS POSI_PAY
+                      ,SUM(CASE WHEN ADJ_TYPE='자격' THEN ADJ_PAY ELSE 0 END) AS LCS_PAY
+                      ,SUM(CASE WHEN ADJ_TYPE='장애' THEN ADJ_PAY ELSE 0 END) AS DIS_PAY
+                      ,SUM(CASE WHEN ADJ_TYPE='조정' THEN ADJ_PAY ELSE 0 END) AS ADJ_PAY
+                      ,SUM(ADJ_PAY) AS TOTAL_ADJ
+                FROM PSNL_ADJUST
+                WHERE PSNL_CD = ? AND ADJ_STT_DT <= ? AND (ADJ_END_DT >= ? OR ADJ_END_DT IS NULL)
+                GROUP BY PSNL_CD
+            ) ADJ_M ON ADJ_M.PSNL_CD = A.PSNL_CD
+            LEFT OUTER JOIN (
+                SELECT PSNL_CD
+                      ,SUM(FML_PAY) AS FML_PAY
+                FROM PSNL_FAMILY
+                WHERE PSNL_CD = ? AND FML_STT_DT <= ? AND (FML_END_DT >= ? OR FML_END_DT IS NULL)
+                GROUP BY PSNL_CD
+            ) FML_M ON FML_M.PSNL_CD = A.PSNL_CD
         WHERE A.PSNL_CD = ?
-            AND A.ADVANCE_DT > ? AND A.ADVANCE_DT <= ? LIMIT 1)";
+            AND A.ADVANCE_DT > ? AND A.ADVANCE_DT <= ?
+        LIMIT 1)";
 
-        // Total 28 markers per subquery
-        array_push($params, 
-            $monthStr, // 1
-            $psnlCd, $endDt, $sttDt, // 2, 3, 4 (POSI)
-            $psnlCd, $endDt, $sttDt, // 5, 6, 7 (FML)
-            $psnlCd, $endDt, $sttDt, // 8, 9, 10 (LCS)
-            $psnlCd, $endDt, $sttDt, // 11, 12, 13 (DIS)
-            $psnlCd, $endDt, $sttDt, // 14, 15, 16 (ADJ)
-            $psnlCd, $endDt, $sttDt, // 17, 18, 19 (TOTAL FML)
-            $psnlCd, $endDt, $sttDt, // 20, 21, 22 (TOTAL ADJ)
-            $psnlCd, $endDt,         // 23, 24 (TRANS)
-            $year,                   // 25 (SALARY YEAR)
-            $psnlCd, $prevYearSttDt, $sttDt // 26, 27, 28 (WHERE)
+        // 파라미터: 13개/월 (인라인뷰 내 WHERE 포함)
+        array_push($params,
+            $monthStr,                        // 1  (YEAR_MON)
+            $psnlCd, $endDt,                  // 2, 3  (TRANS: PSNL_CD=?, TRS_DT<=?)
+            $year,                            // 4  (SLR_YEAR=?)
+            $psnlCd, $endDt, $sttDt,          // 5, 6, 7  (ADJ_M 인라인뷰 WHERE)
+            $psnlCd, $endDt, $sttDt,          // 8, 9, 10 (FML_M 인라인뷰 WHERE)
+            $psnlCd, $prevYearSttDt, $sttDt   // 11,12,13 (메인 WHERE)
         );
     }
     
