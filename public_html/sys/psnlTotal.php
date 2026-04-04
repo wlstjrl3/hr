@@ -160,8 +160,8 @@ $sql = "SELECT
                 UNION
                 SELECT PSNL_CD, '0000' AS T_YEAR FROM PSNL_INFO
             ) YEARS ON YEARS.PSNL_CD = ADJ.PSNL_CD
-            WHERE LEFT(ADJ.ADJ_STT_DT, 4) <= YEARS.T_YEAR
-              AND (LEFT(ADJ.ADJ_END_DT, 4) >= YEARS.T_YEAR OR ADJ.ADJ_END_DT IS NULL)
+            WHERE ADJ.ADJ_STT_DT <= CONCAT(YEARS.T_YEAR, '-12-31')
+              AND (ADJ.ADJ_END_DT >= CONCAT(YEARS.T_YEAR, '-01-01') OR ADJ.ADJ_END_DT IS NULL)
             GROUP BY ADJ.PSNL_CD, YEARS.T_YEAR
         ) ADJ_V ON ADJ_V.PSNL_CD = A.PSNL_CD
                AND ADJ_V.T_YEAR = GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000'))
@@ -178,8 +178,8 @@ $sql = "SELECT
                 UNION
                 SELECT PSNL_CD, '0000' AS T_YEAR FROM PSNL_INFO
             ) YEARS ON YEARS.PSNL_CD = FML.PSNL_CD
-            WHERE LEFT(FML.FML_STT_DT, 4) <= YEARS.T_YEAR
-              AND (LEFT(FML.FML_END_DT, 4) >= YEARS.T_YEAR OR FML.FML_END_DT IS NULL)
+            WHERE FML.FML_STT_DT <= CONCAT(YEARS.T_YEAR, '-12-31')
+              AND (FML.FML_END_DT >= CONCAT(YEARS.T_YEAR, '-01-01') OR FML.FML_END_DT IS NULL)
             GROUP BY FML.PSNL_CD, YEARS.T_YEAR
         ) FML_V ON FML_V.PSNL_CD = A.PSNL_CD
                AND FML_V.T_YEAR = GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000'))
@@ -234,8 +234,7 @@ if (@$_REQUEST['EXCLUDE_POS']) {
 if (@$_REQUEST['TRS_TYPE']) {
     if ($_REQUEST['TRS_TYPE'] == 1) {
         $whereSql = $whereSql . " AND C.TRS_TYPE != '2' AND C.TRS_TYPE IS NOT NULL";
-    }
-    else {
+    } else {
         $whereSql .= " AND C.TRS_TYPE = ?";
         $params[] = $_REQUEST['TRS_TYPE'];
         $types .= "s";
@@ -302,12 +301,12 @@ if (@$_REQUEST['PSNL_BIRTH_To']) {
 }
 if (@$_REQUEST['AGE_MIN']) {
     $whereSql .= " AND {$ageSql} >= ?";
-    $params[] = (int)$_REQUEST['AGE_MIN'];
+    $params[] = (int) $_REQUEST['AGE_MIN'];
     $types .= "i";
 }
 if (@$_REQUEST['AGE_MAX']) {
     $whereSql .= " AND {$ageSql} <= ?";
-    $params[] = (int)$_REQUEST['AGE_MAX'];
+    $params[] = (int) $_REQUEST['AGE_MAX'];
     $types .= "i";
 }
 $trsDtCol = (@$_REQUEST['USE_FIRST_TRS'] == 'Y') ? "(SELECT REPLACE(MIN(REPLACE(TRS_DT, '-', '')), '-', '') FROM PSNL_TRANSFER T_MIN WHERE T_MIN.PSNL_CD = A.PSNL_CD)" : "REPLACE(C.TRS_DT, '-', '')";
@@ -340,36 +339,28 @@ if (@$_REQUEST['STAT_MODE'] == '1') {
 
     if ($cat == 'REG_MALE') {
         $whereSql .= " AND (C2.WORK_TYPE = '정규직' OR C2.WORK_TYPE = '기능직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9')";
-    }
-    else if ($cat == 'REG_FEMALE') {
+    } else if ($cat == 'REG_FEMALE') {
         $whereSql .= " AND (C2.WORK_TYPE = '정규직' OR C2.WORK_TYPE = '기능직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
-    }
-    else if ($cat == 'CONT_MALE') {
+    } else if ($cat == 'CONT_MALE') {
         $whereSql .= " AND (C2.WORK_TYPE LIKE '%계약직%' OR C2.WORK_TYPE = '무기계약직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9')";
-    }
-    else if ($cat == 'CONT_FEMALE') {
+    } else if ($cat == 'CONT_FEMALE') {
         $whereSql .= " AND (C2.WORK_TYPE LIKE '%계약직%' OR C2.WORK_TYPE = '무기계약직') AND (PTT.PTT_HOUR >= 40 OR PTT.PTT_HOUR IS NULL) AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
-    }
-    else if ($cat == 'SHORT_MALE') {
+    } else if ($cat == 'SHORT_MALE') {
         $whereSql .= " AND PTT.PTT_HOUR < 40 AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('1', '3', '5', '7', '9')";
-    }
-    else if ($cat == 'SHORT_FEMALE') {
+    } else if ($cat == 'SHORT_FEMALE') {
         $whereSql .= " AND PTT.PTT_HOUR < 40 AND SUBSTR(REPLACE(A.PSNL_NUM, '-', ''), 7, 1) IN ('2', '4', '6', '8', '0')";
-    }
-    else if ($cat == 'TOTAL_CNT') {
+    } else if ($cat == 'TOTAL_CNT') {
         // 총계의 경우 별도의 성별/근무형태 필터링 없음
     }
 
     if ($target == 'ALL') {
         $whereSql .= " AND (B.UPPR_ORG_CD = '13061001' OR B.UPPR_ORG_CD IN (SELECT ORG_CD FROM ORG_INFO WHERE UPPR_ORG_CD = '13061001') OR B.ORG_CD = '13061001')";
-    }
-    else if ($target == 'DISTRICT') {
+    } else if ($target == 'DISTRICT') {
         $whereSql .= " AND (B.UPPR_ORG_CD = ? OR B.ORG_CD = ?)";
         $params[] = $org_cd;
         $params[] = $org_cd;
         $types .= "ss";
-    }
-    else if ($target == 'HOLY' || $target == 'PARISH') {
+    } else if ($target == 'HOLY' || $target == 'PARISH') {
         $whereSql .= " AND (B.ORG_CD = ?)";
         $params[] = $org_cd;
         $types .= "s";
