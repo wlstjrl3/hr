@@ -67,8 +67,8 @@
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
-            <button id="modalSaveBtn" style="padding:5px 9px;">저장</button>
-            <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
+            <button id="modalSaveBtn" style="padding:5px 15px;" class="clBg3 clW rndCorner">저장</button>
+            <button id="modalDelBtn" style="padding:5px 15px;" class="clBg5 cl2 rndCorner">삭제</button>
         </div>
     </div>
 </div>
@@ -142,9 +142,15 @@
                                         경 력 사 항</td>
                                 </tr>
                                 <tr class="lblBg" style="height:10mm; font-size:12pt; font-weight:bold;">
-                                    <td style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 터</td>
-                                    <td style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">까 지</td>
-                                    <td style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">부 서</td>
+                                    <td
+                                        style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">
+                                        부 터</td>
+                                    <td
+                                        style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">
+                                        까 지</td>
+                                    <td
+                                        style="width:25%; border:1px solid #777; letter-spacing:15px; padding-left:15px;">
+                                        부 서</td>
                                     <td style="width:25%; border:1px solid #777; letter-spacing:5px;">직위 및 직급</td>
                                 </tr>
                                 <tbody id="p_CAREER_LIST">
@@ -211,10 +217,10 @@
             </div>
         </div>
         <div class="modalFooter no-print">
-            <button onclick="window.print()" style="padding:5px 9px;">인쇄하기</button>
+            <button onclick="window.print()" style="padding:8px 20px;" class="clBg3 clW rndCorner">인쇄하기</button>
             <button
                 onclick="document.getElementById('certPrintModal').style.visibility='hidden'; document.getElementById('certPrintModal').style.opacity='0';"
-                style="padding:5px 9px;">닫기</button>
+                style="padding:8px 20px;" class="clBg5 cl2 rndCorner">닫기</button>
         </div>
     </div>
 </div>
@@ -458,7 +464,7 @@
         text-align: center;
         font-size: 18pt;
         line-height: 2.2;
-        padding: 0 15mm;
+        padding: 0 100px;
         word-break: keep-all;
         font-family: 'NanumMyeongjo', serif;
     }

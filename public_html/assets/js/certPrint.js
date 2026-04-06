@@ -16,10 +16,10 @@ var mytbl = new hr_tbl({
         , { title: "대상자", data: "PSNL_NM", className: "" }
         , { title: "소속", data: "ORG_NM", className: "" }
         , { title: "발급일자", data: "ISSUE_DT", className: "" }
-        , { 
-            title: "관리", 
-            data: "ISSUE_NO", 
-            render: function(data, type, row) {
+        , {
+            title: "관리",
+            data: "ISSUE_NO",
+            render: function (data, type, row) {
                 return `<button onclick="openPrintModal('${data}')" style="padding:5px 9px;">인쇄</button>
                         <button onclick="deleteCert('${data}')" style="padding:5px 9px;">삭제</button>`;
             }
@@ -29,13 +29,13 @@ var mytbl = new hr_tbl({
 
 // 삭제 처리 함수
 function deleteCert(issueNo) {
-    if(!issueNo) return;
-    if(prompt("해당 발급 내역을 삭제하시려면 '삭제'라고 입력해주세요. \n(출력된 원본과 번호 불일치 주의)") !== "삭제") return;
+    if (!issueNo) return;
+    if (prompt("해당 발급 내역을 삭제하시려면 '삭제'라고 입력해주세요. \n(출력된 원본과 번호 불일치 주의)") !== "삭제") return;
 
     fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=D&ISSUE_NO=${issueNo}`)
         .then(res => res.json())
         .then(json => {
-            if(json.result == "success") {
+            if (json.result == "success") {
                 mytbl.show('myTbl');
             } else {
                 alert("삭제 실패: " + json.message);
@@ -60,12 +60,12 @@ document.getElementById("newBtn").addEventListener("click", () => {
     document.getElementById("md_POSITION").value = "";
     document.getElementById("md_PSNL_NM").value = "";
 
-    document.getElementById("md_PSNL_NM_SEARCH").closest('.modalGrp').style.display = 'block'; 
+    document.getElementById("md_PSNL_NM_SEARCH").closest('.modalGrp').style.display = 'block';
     document.getElementById("md_CERT_TYPE").value = "재직";
     document.getElementById("md_ORIGIN_ADDR").value = "";
     document.getElementById("md_CURR_ADDR").value = "";
     document.getElementById("md_ORG_ADDR").value = "";
-    
+
     // 모달 표시
     document.getElementById("certInputModal").style.visibility = "visible";
     document.getElementById("certInputModal").style.opacity = "1";
@@ -90,7 +90,7 @@ document.getElementById("modalSaveBtn").addEventListener("click", () => {
     }
 
     let params = `key=${API_TOKEN}&CRUD=C&ISSUE_NO=${issueNo}&EMP_NO=${empNo}&CERT_TYPE=${certType}&ORIGIN_ADDR=${encodeURIComponent(originAddr)}&CURR_ADDR=${encodeURIComponent(currAddr)}&ORG_ADDR=${encodeURIComponent(orgAddr)}`;
-    
+
     fetch(DIR_ROOT + "/sys/certConfig.php?" + params)
         .then(res => res.json())
         .then(json => {
@@ -113,7 +113,7 @@ function openEditModal(issueNo) {
             document.getElementById("md_ISSUE_NO").value = d.ISSUE_NO;
             document.getElementById("md_EMP_NO").value = d.EMP_NO;
             document.getElementById("md_PSNL_NM_SEARCH").closest('.modalGrp').style.display = 'none'; // 수정 시 검색 숨김
-            
+
             document.getElementById("md_PSNL_CD").value = d.EMP_NO;
             document.getElementById("md_ORG_NM").value = d.ORG_NM;
             document.getElementById("md_POSITION").value = d.POSITION;
@@ -123,7 +123,7 @@ function openEditModal(issueNo) {
             document.getElementById("md_ORIGIN_ADDR").value = d.ORIGIN_ADDR;
             document.getElementById("md_CURR_ADDR").value = d.CURR_ADDR;
             document.getElementById("md_ORG_ADDR").value = d.ORG_ADDR;
-            
+
             document.getElementById("certInputModal").style.visibility = "visible";
             document.getElementById("certInputModal").style.opacity = "1";
         });
@@ -135,14 +135,14 @@ function openPrintModal(issueNo) {
         .then(res => res.json())
         .then(json => {
             const d = json.data;
-            if(!d) return;
+            if (!d) return;
 
             // 1. 레이아웃 분기 및 초기화
             const paper = document.getElementById("certPaper");
             const layoutStandard = document.getElementById("layout_standard");
             const layoutCareer = document.getElementById("layout_career");
             const logoCross = document.getElementById("certLogoCross");
-            
+
             // 클래스 초기화 및 부여
             paper.className = "cert-paper";
             if (d.CERT_TYPE === '퇴직') paper.classList.add("type-retire");
@@ -159,28 +159,28 @@ function openPrintModal(issueNo) {
 
             // 2. 날짜 포맷팅 함수들
             const formatKrDate = (dateStr) => {
-                if(!dateStr) return "";
+                if (!dateStr) return "";
                 const bits = dateStr.split("-");
                 return bits[0] + "년 " + parseInt(bits[1]) + "월 " + parseInt(bits[2]) + "일";
             };
             const formatDotDate = (dateStr) => {
-                if(!dateStr) return "";
+                if (!dateStr) return "";
                 return dateStr.replace(/-/g, '.');
             };
 
             const birthStr = (() => {
-                if(d.PSNL_NUM && d.PSNL_NUM.length >= 6) {
-                    let yy = d.PSNL_NUM.substring(0,2);
-                    let mm = d.PSNL_NUM.substring(2,4);
-                    let dd = d.PSNL_NUM.substring(4,6);
-                    let yearPrefix = (parseInt(yy) > 50) ? "19" : "20"; 
+                if (d.PSNL_NUM && d.PSNL_NUM.length >= 6) {
+                    let yy = d.PSNL_NUM.substring(0, 2);
+                    let mm = d.PSNL_NUM.substring(2, 4);
+                    let dd = d.PSNL_NUM.substring(4, 6);
+                    let yearPrefix = (parseInt(yy) > 50) ? "19" : "20";
                     return yearPrefix + yy + "." + mm + "." + dd + ".";
                 }
                 return "";
             })();
 
             // 3. 레이아웃별 데이터 주입
-            if(d.CERT_TYPE === '경력') {
+            if (d.CERT_TYPE === '경력') {
                 layoutStandard.style.display = "none";
                 layoutCareer.style.display = "block";
 
@@ -189,17 +189,17 @@ function openPrintModal(issueNo) {
                 const nmC = d.PSNL_NM || "";
                 const nmCLen = nmC.length;
                 let nmCSpacing = "0";
-                if(nmCLen === 2) nmCSpacing = "32pt";
-                else if(nmCLen === 3) nmCSpacing = "13pt";
-                else if(nmCLen === 4) nmCSpacing = "6pt";
+                if (nmCLen === 2) nmCSpacing = "32pt";
+                else if (nmCLen === 3) nmCSpacing = "13pt";
+                else if (nmCLen === 4) nmCSpacing = "6pt";
                 document.getElementById("p_PSNL_NM_C").innerHTML = `<span style="letter-spacing:${nmCSpacing}; margin-right:-${nmCSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${nmC}</span>`;
                 document.getElementById("p_BIRTH_DT_C").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
                 document.getElementById("p_ADDR_C").innerText = d.CURR_ADDR || "";
                 document.getElementById("p_ORIGIN_C").innerText = d.ORIGIN_ADDR || "미 기 재";
-                
+
                 // 경력 히스토리 동적 생성
                 let hHtml = "";
-                if(d.history && d.history.length > 0) {
+                if (d.history && d.history.length > 0) {
                     d.history.forEach(h => {
                         hHtml += `
                             <tr style="height:15mm;">
@@ -212,12 +212,12 @@ function openPrintModal(issueNo) {
                     });
                 }
                 // 빈 행 추가 (최소 3행 보장)
-                for(let i=(d.history ? d.history.length : 0); i<4; i++){
+                for (let i = (d.history ? d.history.length : 0); i < 4; i++) {
                     hHtml += `<tr style="height:15mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>`;
                 }
                 document.getElementById("p_CAREER_LIST").innerHTML = hHtml;
 
-                if(d.ISSUE_DT) {
+                if (d.ISSUE_DT) {
                     const b = d.ISSUE_DT.split("-");
                     document.getElementById("p_ISSUE_DT_C").innerText = b[0] + "년 " + parseInt(b[1]) + "월 " + parseInt(b[2]) + "일";
                 }
@@ -231,19 +231,19 @@ function openPrintModal(issueNo) {
                 const p_PSNL_NM = d.PSNL_NM || "";
                 const nameLen = p_PSNL_NM.length;
                 let nameSpacing = "0";
-                if(nameLen === 2) nameSpacing = "32pt";
-                else if(nameLen === 3) nameSpacing = "13pt";
-                else if(nameLen === 4) nameSpacing = "6pt";
-                
+                if (nameLen === 2) nameSpacing = "32pt";
+                else if (nameLen === 3) nameSpacing = "13pt";
+                else if (nameLen === 4) nameSpacing = "6pt";
+
                 document.getElementById("p_PSNL_NM").innerHTML = `<span style="letter-spacing:${nameSpacing}; margin-right:-${nameSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${p_PSNL_NM}</span>`;
                 document.getElementById("p_BIRTH_DT").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
                 document.getElementById("p_ORIGIN_ADDR").innerText = d.ORIGIN_ADDR || "미 기 재";
                 document.getElementById("p_TITLE").innerText = d.CERT_TYPE;
-                
+
 
                 // 주소 분리
                 const fullAddr = d.CURR_ADDR || "";
-                if(fullAddr.length > 22) {
+                if (fullAddr.length > 22) {
                     const idx = fullAddr.indexOf(' ', 15);
                     document.getElementById("p_CURR_ADDR_1").innerText = (idx > 0) ? fullAddr.substring(0, idx) : fullAddr;
                     document.getElementById("p_CURR_ADDR_2").innerText = (idx > 0) ? fullAddr.substring(idx).trim() : "";
@@ -257,14 +257,14 @@ function openPrintModal(issueNo) {
                 const joinDtKr = formatKrDate(d.JOIN_DT);
                 const retireDtKr = formatKrDate(d.RETIRE_DT);
 
-                if(d.CERT_TYPE === '재직') {
-                    bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주<br>교 수원교구 ${d.ORG_NM} 성당 ${d.POSITION}으로 재직 중임을 증명함.`;
+                if (d.CERT_TYPE === '재직') {
+                    bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주교 수원교구 ${d.ORG_NM} 성당 ${d.POSITION}으로 재직 중임을 증명함.`;
                 } else {
                     bodyHtml = `위 사람은 ${joinDtKr} 입사하여 <br>${retireDtKr} 퇴직하였음을 증명함.`;
                 }
                 document.getElementById("p_BODY_CONTENT").innerHTML = bodyHtml;
 
-                if(d.ISSUE_DT) {
+                if (d.ISSUE_DT) {
                     document.getElementById("p_ISSUE_DT").innerText = d.ISSUE_DT.replace(/-/g, '.') + ".";
                 }
             }
