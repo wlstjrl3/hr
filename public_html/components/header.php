@@ -11,40 +11,47 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset='utf-8' />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <link href="<?php echo DIR_ROOT; ?>/assets/css/common.css?ver=1775259319" rel="stylesheet" />
     <link href="<?php echo DIR_ROOT; ?>/assets/css/header.css?ver=1775259319" rel="stylesheet" />
-    <script defer src="https://sinseiki.github.io/noIE.js/noIE.js" ></script><!--익스플로러 사용제한-->    
+    <script defer src="https://sinseiki.github.io/noIE.js/noIE.js"></script><!--익스플로러 사용제한-->
     <script type='text/javascript'>
         const DIR_ROOT = '<?php echo DIR_ROOT; ?>';
         const API_TOKEN = '<?php echo $_SESSION['API_TOKEN'] ?? ''; ?>';
     </script>
     <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/header.js?ver=1775259319'></script>
 
-    <title>제1대리구 본당직원 인적 관리시스템</title>
+    <title>제1대리구 소속직원 인적 관리시스템</title>
 </head>
+
 <body>
     <!-- psnlKey hidden input removed for security -->
-    <div id="closeNav" style="width:0%;height:0%;background:rgba(100,100,100,0.5);position:absolute;z-index:2;" onclick="toggleNav()"></div>
+    <div id="closeNav" style="width:0%;height:0%;background:rgba(100,100,100,0.5);position:absolute;z-index:2;"
+        onclick="toggleNav()"></div>
     <header id="header">
-        <!-- Sidebar navigation {{{ --> 
-        <div class="hd-nav-margin" style="width:0%;height:100%;float:left;background-color:white;position:fixed;z-index:3;top:54px;"></div>
+        <!-- Sidebar navigation {{{ -->
+        <div class="hd-nav-margin"
+            style="width:0%;height:100%;float:left;background-color:white;position:fixed;z-index:3;top:54px;"></div>
         <div class="side-nav" id="sideNav">
             <ul class="sideNavBlock">
                 <li>
                     <a class="fs5" href="<?php echo DIR_ROOT; ?>/">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="18" height="18" viewBox="0 0 50 50">
-                            <path fill="white" d="M 25 1.0507812 C 24.7825 1.0507812 24.565859 1.1197656 24.380859 1.2597656 L 1.3808594 19.210938 C 0.95085938 19.550938 0.8709375 20.179141 1.2109375 20.619141 C 1.5509375 21.049141 2.1791406 21.129062 2.6191406 20.789062 L 4 19.710938 L 4 46 C 4 46.55 4.45 47 5 47 L 19 47 L 19 29 L 31 29 L 31 47 L 45 47 C 45.55 47 46 46.55 46 46 L 46 19.710938 L 47.380859 20.789062 C 47.570859 20.929063 47.78 21 48 21 C 48.3 21 48.589063 20.869141 48.789062 20.619141 C 49.129063 20.179141 49.049141 19.550938 48.619141 19.210938 L 25.619141 1.2597656 C 25.434141 1.1197656 25.2175 1.0507812 25 1.0507812 z M 35 5 L 35 6.0507812 L 41 10.730469 L 41 5 L 35 5 z"></path>
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="18" height="18"
+                            viewBox="0 0 50 50">
+                            <path fill="white"
+                                d="M 25 1.0507812 C 24.7825 1.0507812 24.565859 1.1197656 24.380859 1.2597656 L 1.3808594 19.210938 C 0.95085938 19.550938 0.8709375 20.179141 1.2109375 20.619141 C 1.5509375 21.049141 2.1791406 21.129062 2.6191406 20.789062 L 4 19.710938 L 4 46 C 4 46.55 4.45 47 5 47 L 19 47 L 19 29 L 31 29 L 31 47 L 45 47 C 45.55 47 46 46.55 46 46 L 46 19.710938 L 47.380859 20.789062 C 47.570859 20.929063 47.78 21 48 21 C 48.3 21 48.589063 20.869141 48.789062 20.619141 C 49.129063 20.179141 49.049141 19.550938 48.619141 19.210938 L 25.619141 1.2597656 C 25.434141 1.1197656 25.2175 1.0507812 25 1.0507812 z M 35 5 L 35 6.0507812 L 41 10.730469 L 41 5 L 35 5 z">
+                            </path>
                         </svg>
                     </a>
                     <hr>
                 </li>
                 <li>
                     <a class="fs5" href="#">인사정보
-                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기" />
                     </a>
                     <ul>
                         <li>
@@ -77,7 +84,7 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                 </li>
                 <li>
                     <a class="fs5" href="#">개발예정
-                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기" />
                     </a>
                     <ul>
                         <li>
@@ -95,7 +102,7 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                 </li>
                 <li>
                     <a class="fs5" href="#">승급
-                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기" />
                     </a>
                     <ul>
                         <li>
@@ -118,7 +125,7 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                 </li>
                 <li>
                     <a class="fs5" href="#">급여
-                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기" />
                     </a>
                     <ul>
                         <li>
@@ -148,10 +155,10 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                         </li>
                     </ul>
                     <hr>
-                </li>    
+                </li>
                 <li>
                     <a class="fs5" href="#">기초정보
-                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기" />
                     </a>
                     <ul>
                         <li>
@@ -174,7 +181,7 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                 </li>
                 <li>
                     <a class="fs5" href="#">통계/자료
-                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기"/>
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/direction.svg" alt="더보기" />
                     </a>
                     <ul>
                         <li>
@@ -208,16 +215,16 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                 </li>
             </ul>
         </div>
-        <!-- Sidebar navigation }}}-->  
+        <!-- Sidebar navigation }}}-->
         <div class="nav" style="box-shadow: inset 0px -1px 0px rgba(186, 186, 186, 0.25);">
             <div style="height:54px;max-width:1280px;margin:0 auto;width:100%;white-space:nowrap;">
                 <div id="navToggle">
                     <a data-activates="slide-out" onclick="toggleNav()">
-                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/menu.svg" alt="메뉴"/>
+                        <img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/menu.svg" alt="메뉴" />
                     </a>
                 </div>
-            </div>   
-        </div>        
+            </div>
+        </div>
     </header>
     <div style="height:55px;">네비게이션 높이 여백</div>
     <a id="MOVE_TOP_BTN" href="#"><img src="<?php echo DIR_ROOT; ?>/assets/img/svgs/topBtn.svg" alt="스크롤 상단으로 올리기"></a>
