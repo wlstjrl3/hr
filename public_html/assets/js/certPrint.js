@@ -6,7 +6,7 @@ var mytbl = new hr_tbl({
         where: {
             EMP_NM: document.getElementById("PSNL_NM").value,
         },
-        order: { column: 4, direction: 'desc' },
+        order: { column: 0, direction: 'desc' },
         page: 0,
         limit: 10,
     },
