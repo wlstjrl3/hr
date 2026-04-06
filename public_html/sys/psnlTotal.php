@@ -2,17 +2,26 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn, @$_REQUEST['key']);
 
-$baseDate = safeDateParam(@$_REQUEST['BASE_DATE'] ?? '');
+$baseDateRequested = @$_REQUEST['BASE_DATE'] ?? @$_REQUEST['STAT_BASE_DATE'] ?? '';
+$baseDate = safeDateParam($baseDateRequested);
 $baseDateStr = str_replace('-', '', $baseDate);
+$targetYear = substr($baseDate, 0, 4);
+
+// 기준일 파라미터가 명시적으로 없는 경우 '당해년도'로 처리 (safeDateParam이 오늘날짜를 반환하므로 동일하지만 의미 명확화)
+if (empty($baseDateRequested)) {
+    $targetYear = date('Y');
+}
+
 $trsCond = "";
 $pttCond = "";
 $grdCond = "";
+
 if ($baseDate) {
     if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $baseDate)) {
-        // Condition strings for subqueries - these are safer as they are validated by regex
-        $trsCond = " AND REPLACE(TRS_DT, '-', '') <= '" . str_replace('-', '', $baseDate) . "' ";
-        $pttCond = " WHERE PTT_YEAR <= '" . substr($baseDate, 0, 4) . "' ";
-        $grdCond = " WHERE REPLACE(ADVANCE_DT, '-', '') <= '" . str_replace('-', '', $baseDate) . "' ";
+        // Condition strings for subqueries
+        $trsCond = " AND REPLACE(TRS_DT, '-', '') <= '" . $baseDateStr . "' ";
+        $pttCond = " WHERE PTT_YEAR <= '" . $targetYear . "' ";
+        $grdCond = " WHERE REPLACE(ADVANCE_DT, '-', '') <= '" . $baseDateStr . "' ";
     }
 }
 
@@ -85,7 +94,7 @@ $sql = "SELECT
         ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM
         ,{$ageSql} AS AGE
         ,A.PHONE_NUM,LEFT(A.PSNL_NUM,14) AS PSNL_NUM
-        ,TRUNCATE(DATEDIFF(CURDATE(), C.TRS_DT)/365,1) AS TRS_ELAPSE 
+        ,TRUNCATE(DATEDIFF('{$baseDate}', IF(C2.TRS_TYPE = 3, CM.HIRE_DT, C.TRS_DT))/365,1) AS TRS_ELAPSE 
         ,CASE 
             WHEN D.ADVANCE_DT IS NOT NULL AND PTT.PTT_YEAR IS NOT NULL THEN 
                 IF(LEFT(D.ADVANCE_DT, 4) >= PTT.PTT_YEAR, D.ADVANCE_DT, CONCAT(PTT.PTT_YEAR, '(최저)'))
@@ -128,6 +137,13 @@ $sql = "SELECT
 
         LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD            
         
+        /* [추가] 입사(최초 발령)일 조회를 위한 집계 */
+        LEFT OUTER JOIN (
+            SELECT PSNL_CD, MIN(TRS_DT) AS HIRE_DT
+            FROM PSNL_TRANSFER
+            GROUP BY PSNL_CD
+        ) CM ON CM.PSNL_CD = A.PSNL_CD
+        
         LEFT OUTER JOIN (
             SELECT PSNL_CD, GRD_CD AS MAX_GRD_CD
             FROM (
@@ -159,54 +175,38 @@ $sql = "SELECT
 
         /* C2의 최근고용형태 참조 & 계약직+무기 계약직 동시 조건에 들어가도록 join 조건에 concat을 이용한 like 조건을 적용함.*/
         LEFT OUTER JOIN SALARY_TB E 
-            ON E.SLR_YEAR = NULLIF(GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000')), '0000')
+            ON E.SLR_YEAR = '{$targetYear}'
             AND D.GRD_GRADE = E.SLR_GRADE 
             AND D.GRD_PAY = E.SLR_PAY 
             AND C2.WORK_TYPE LIKE CONCAT('%', E.SLR_TYPE)
 
         LEFT OUTER JOIN SALARY_TB E_MIN 
-            ON E_MIN.SLR_YEAR = PTT.PTT_YEAR 
+            ON E_MIN.SLR_YEAR = '{$targetYear}'
             AND E_MIN.SLR_TYPE = '최저시급'
 
-        /* [N+1 최적화 - 카테시안 곱 방지 완벽 해결] 연도별 기준 사전 집계 뷰 */
+        /* [N+1 최적화 - 카테시안 곱 방지 완벽 해결] 당해년도(targetYear) 기준 집계 뷰 */
         LEFT OUTER JOIN (
-            SELECT ADJ.PSNL_CD, YEARS.T_YEAR,
+            SELECT ADJ.PSNL_CD,
                    SUM(CASE WHEN ADJ.ADJ_TYPE='직책' THEN ADJ.ADJ_PAY ELSE 0 END) AS SUM_ADJ1,
                    SUM(CASE WHEN ADJ.ADJ_TYPE='자격' THEN ADJ.ADJ_PAY ELSE 0 END) AS SUM_ADJ2,
                    SUM(CASE WHEN ADJ.ADJ_TYPE='장애' THEN ADJ.ADJ_PAY ELSE 0 END) AS SUM_ADJ3,
                    SUM(CASE WHEN ADJ.ADJ_TYPE='조정' THEN ADJ.ADJ_PAY ELSE 0 END) AS SUM_ADJ4,
                    SUM(ADJ.ADJ_PAY) AS SUM_ADJ_ALL
             FROM PSNL_ADJUST ADJ
-            JOIN (
-                SELECT PSNL_CD, LEFT(ADVANCE_DT, 4) AS T_YEAR FROM GRADE_HISTORY WHERE ADVANCE_DT IS NOT NULL
-                UNION
-                SELECT PSNL_CD, CAST(PTT_YEAR AS CHAR) AS T_YEAR FROM PSNL_PARTTIME WHERE PTT_YEAR IS NOT NULL
-                UNION
-                SELECT PSNL_CD, '0000' AS T_YEAR FROM PSNL_INFO
-            ) YEARS ON YEARS.PSNL_CD = ADJ.PSNL_CD
-            WHERE ADJ.ADJ_STT_DT <= CONCAT(YEARS.T_YEAR, '-12-31')
-              AND (ADJ.ADJ_END_DT >= CONCAT(YEARS.T_YEAR, '-01-01') OR ADJ.ADJ_END_DT IS NULL)
-            GROUP BY ADJ.PSNL_CD, YEARS.T_YEAR
+            WHERE ADJ.ADJ_STT_DT <= '{$targetYear}-12-31'
+              AND (ADJ.ADJ_END_DT >= '{$targetYear}-01-01' OR ADJ.ADJ_END_DT IS NULL)
+            GROUP BY ADJ.PSNL_CD
         ) ADJ_V ON ADJ_V.PSNL_CD = A.PSNL_CD
-               AND ADJ_V.T_YEAR = GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000'))
 
-        /* [N+1 최적화 - 가족수당 집계 인라인 뷰] */
+        /* [N+1 최적화 - 가족수당 집계 인라 인 뷰] */
         LEFT OUTER JOIN (
-            SELECT FML.PSNL_CD, YEARS.T_YEAR,
+            SELECT FML.PSNL_CD,
                    SUM(FML.FML_PAY) AS SUM_FML
             FROM PSNL_FAMILY FML
-            JOIN (
-                SELECT PSNL_CD, LEFT(ADVANCE_DT, 4) AS T_YEAR FROM GRADE_HISTORY WHERE ADVANCE_DT IS NOT NULL
-                UNION
-                SELECT PSNL_CD, CAST(PTT_YEAR AS CHAR) AS T_YEAR FROM PSNL_PARTTIME WHERE PTT_YEAR IS NOT NULL
-                UNION
-                SELECT PSNL_CD, '0000' AS T_YEAR FROM PSNL_INFO
-            ) YEARS ON YEARS.PSNL_CD = FML.PSNL_CD
-            WHERE FML.FML_STT_DT <= CONCAT(YEARS.T_YEAR, '-12-31')
-              AND (FML.FML_END_DT >= CONCAT(YEARS.T_YEAR, '-01-01') OR FML.FML_END_DT IS NULL)
-            GROUP BY FML.PSNL_CD, YEARS.T_YEAR
+            WHERE FML.FML_STT_DT <= '{$targetYear}-12-31'
+              AND (FML.FML_END_DT >= '{$targetYear}-01-01' OR FML.FML_END_DT IS NULL)
+            GROUP BY FML.PSNL_CD
         ) FML_V ON FML_V.PSNL_CD = A.PSNL_CD
-               AND FML_V.T_YEAR = GREATEST(IFNULL(LEFT(D.ADVANCE_DT, 4), '0000'), IFNULL(PTT.PTT_YEAR, '0000'))
         ";
 //조건문 지정
 $whereSql = " WHERE 1=1 ";

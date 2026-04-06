@@ -191,6 +191,18 @@ async function deleteBatch() {
 
 // 이벤트 리스너 바인딩
 document.addEventListener("DOMContentLoaded", function() {
+    // [수정] URL 파라미터 확인 및 필터 적용
+    const urlParams = new URLSearchParams(window.location.search);
+    const psnlNmParam = urlParams.get('PSNL_NM');
+    if (psnlNmParam) {
+        const psnlNmInput = document.getElementById("PSNL_NM");
+        if (psnlNmInput) {
+            psnlNmInput.value = psnlNmParam;
+            mytbl.hrDt.xhr.where["PSNL_NM"] = psnlNmParam;
+            mytbl.show("myTbl");
+        }
+    }
+
     // 하단 버튼 바인딩
     document.getElementById('modalEdtBtn').addEventListener('click', saveIssue);
     document.getElementById('modalDelBtn').addEventListener('click', deleteBatch);

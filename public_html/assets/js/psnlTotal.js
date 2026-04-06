@@ -76,7 +76,7 @@ var mytbl = new hr_tbl({
 //행을 클릭했을때 fetch로 다시 끌어올 데이터
 async function trDataXHR(idx) {
     //이전 정보 초기화 INIT
-    const ids = ["mdBdOrgNm", "mdBdPsnlNm", "mdBdBaptNm", "mdBdPsnlNum", "mdBdPhoneNum", "mdBdPosition", "mdBdTrsType", "mdBdTrsDt", "mdBdWorkType", "mdBdGrdPay", "mdBdAdvDt", "mdBdAdvRng", "fmlTbl", "adjTbl", "opiTbl"];
+    const ids = ["mdBdOrgNm", "mdBdPsnlNm", "mdBdBaptNm", "mdBdPsnlNum", "mdBdPhoneNum", "mdBdPosition", "mdBdTrsType", "mdBdTrsDt", "mdBdWorkType", "mdBdGrdPay", "mdBdAdvDt", "mdBdAdvRng", "fmlTbl", "adjTbl", "opiTbl", "tuitionTbl"];
     ids.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = "";
@@ -113,6 +113,8 @@ async function trDataXHR(idx) {
         document.getElementById("mdBdAdvDt").innerHTML = row.ADVANCE_DT;
         document.getElementById("mdBdAdvRng").innerHTML = row.ADVANCE_RNG;
         document.getElementById("mdBdOrgInTel").innerHTML = "본당 내선번호 : " + row.ORG_IN_TEL + " / 전화번호 : " + row.ORG_OUT_TEL;
+
+        document.getElementById("goTuitionListBtn").onclick = () => { location.href = DIR_ROOT + "/tuition?PSNL_NM=" + row.PSNL_NM };
 
         // 버튼 이벤트 바인딩
         document.getElementById("goPsnlListBtn").onclick = () => { location.href = DIR_ROOT + "/psnlList?PSNL_NM=" + row.PSNL_NM + "&BAPT_NM=" + row.BAPT_NM + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
@@ -154,6 +156,16 @@ async function trDataXHR(idx) {
                 tmpStr += `<ul class="clBgW"><li class="td"><span>${opiTypes[o.OPI_TYPE] || ""}</span></li><li class="td"><span>${o.OPI_DT}</span></li><li class="td"><span>${o.OPI_PERSON}</span></li><li class="td"><span>${o.OPI_DTL}</span></li><li class="clearB"></li></ul>`;
             });
             document.getElementById("opiTbl").innerHTML = tmpStr;
+        }
+
+        // 5. 자녀 학비 보조 정보 조회
+        const res7 = await fetch(`${DIR_ROOT}/sys/tuitionList.php?key=${API_TOKEN}&PSNL_CD=${idx}`).then(r => r.json());
+        if (res7.data && res7.data.length > 0) {
+            let tmpStr = `<ul class="clBg5 mt15"><li class="th"><span>자녀명</span></li><li class="th"><span>생일</span></li><li class="th"><span>지급시작</span></li><li class="th"><span>지급</span></li><li class="th"><span>잔여</span></li><li class="th"><span>누계</span></li><li class="clearB"></li></ul>`;
+            res7.data.forEach(t => {
+                tmpStr += `<ul class="clBgW"><li class="td"><span>${t.FML_NM}</span></li><li class="td"><span>${t.FML_BIRTH}</span></li><li class="td"><span>${t.START_GRADE || '-'}</span></li><li class="td"><span>${t.SUPPORT_CNT}회</span></li><li class="td clRed"><span>${t.REMAIN_CNT}회</span></li><li class="td tar" style="padding-right:5px;"><span>${Number(t.TOTAL_AMT).toLocaleString()}원</span></li><li class="clearB"></li></ul>`;
+            });
+            document.getElementById("tuitionTbl").innerHTML = tmpStr;
         }
     } catch (e) {
         console.error("Data load failed:", e);

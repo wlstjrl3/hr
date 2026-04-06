@@ -62,19 +62,19 @@
 #adjTbl li{
     width:25%;
 }
-#opiTbl li:nth-child(1){
-    width:15%;height:100%;
-}
-#opiTbl li:nth-child(2){
-    width:15%;height:100%;
-}
-#opiTbl li:nth-child(3){
-    width:15%;height:100%;
+#opiTbl li:nth-child(1), #opiTbl li:nth-child(2), #opiTbl li:nth-child(3){
+    width:15%;
 }
 #opiTbl li:nth-child(4){
     width:55%;
 }
-#opiTbl ul, #fmlTbl ul, #adjTbl ul{
+#tuitionTbl li:nth-child(1), #tuitionTbl li:nth-child(2), #tuitionTbl li:nth-child(4), #tuitionTbl li:nth-child(5){
+    width:15%;
+}
+#tuitionTbl li:nth-child(3), #tuitionTbl li:nth-child(6){
+    width:20%;
+}
+#opiTbl ul, #fmlTbl ul, #adjTbl ul, #tuitionTbl ul{
     border-bottom: 1px solid #999;
 }
 @media(min-width:480px){

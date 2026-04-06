@@ -24,8 +24,10 @@
             <div id="fmlTbl"></div>
             <div id="adjTbl"></div>
             <div id="opiTbl"></div>
+            <div id="tuitionTbl"></div>
         </div>
         <div class="modalFooter">
+            <button id="goTuitionListBtn" style="margin:0 0 5px 0;padding:5px 9px;">자녀학비보조</button>
             <button id="goPsnlListBtn" style="margin:0 0 5px 0;padding:5px 9px;">기초정보</button>
             <button id="goTrsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">발령정보</button>
             <button id="goGrdListBtn" style="margin:0 0 5px 0;padding:5px 9px;">급호봉관리</button>
