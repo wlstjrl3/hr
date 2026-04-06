@@ -15,7 +15,20 @@ var mytbl = new hr_tbl({
         , { title: "종류", data: "CERT_TYPE", className: "" }
         , { title: "대상자", data: "PSNL_NM", className: "" }
         , { title: "소속", data: "ORG_NM", className: "" }
+        , { title: "직책", data: "POSITION", className: "hidden" }
+        , { title: "입사일", data: "JOIN_DT", className: "hidden" }
         , { title: "발급일자", data: "ISSUE_DT", className: "" }
+        , { 
+            title: "현재주소", 
+            data: "CURR_ADDR", 
+            className: "",
+            render: function(data) {
+                if(!data) return "";
+                if(data.length > 15) return data.substring(0, 15) + "...";
+                return data;
+            }
+        }
+        , { title: "비고", data: "MEMO", className: "" }
         , {
             title: "관리",
             data: "ISSUE_NO",
@@ -59,6 +72,7 @@ document.getElementById("newBtn").addEventListener("click", () => {
     document.getElementById("md_ORG_NM").value = "";
     document.getElementById("md_POSITION").value = "";
     document.getElementById("md_PSNL_NM").value = "";
+    document.getElementById("md_MEMO").value = "";
 
     document.getElementById("md_PSNL_NM_SEARCH").closest('.modalGrp').style.display = 'block';
     document.getElementById("md_CERT_TYPE").value = "재직";
@@ -79,6 +93,7 @@ document.getElementById("modalSaveBtn").addEventListener("click", () => {
     let originAddr = document.getElementById("md_ORIGIN_ADDR").value;
     let currAddr = document.getElementById("md_CURR_ADDR").value;
     let orgAddr = document.getElementById("md_ORG_ADDR").value;
+    let memo = document.getElementById("md_MEMO").value;
 
     if (!empNo) {
         alert("먼저 사원 검색을 통해 대상 직원을 선택해주세요.");
@@ -89,7 +104,7 @@ document.getElementById("modalSaveBtn").addEventListener("click", () => {
         return;
     }
 
-    let params = `key=${API_TOKEN}&CRUD=C&ISSUE_NO=${issueNo}&EMP_NO=${empNo}&CERT_TYPE=${certType}&ORIGIN_ADDR=${encodeURIComponent(originAddr)}&CURR_ADDR=${encodeURIComponent(currAddr)}&ORG_ADDR=${encodeURIComponent(orgAddr)}`;
+    let params = `key=${API_TOKEN}&CRUD=C&ISSUE_NO=${issueNo}&EMP_NO=${empNo}&CERT_TYPE=${certType}&ORIGIN_ADDR=${encodeURIComponent(originAddr)}&CURR_ADDR=${encodeURIComponent(currAddr)}&ORG_ADDR=${encodeURIComponent(orgAddr)}&MEMO=${encodeURIComponent(memo)}`;
 
     fetch(DIR_ROOT + "/sys/certConfig.php?" + params)
         .then(res => res.json())
@@ -123,6 +138,7 @@ function openEditModal(issueNo) {
             document.getElementById("md_ORIGIN_ADDR").value = d.ORIGIN_ADDR;
             document.getElementById("md_CURR_ADDR").value = d.CURR_ADDR;
             document.getElementById("md_ORG_ADDR").value = d.ORG_ADDR;
+            document.getElementById("md_MEMO").value = d.MEMO || "";
 
             document.getElementById("certInputModal").style.visibility = "visible";
             document.getElementById("certInputModal").style.opacity = "1";

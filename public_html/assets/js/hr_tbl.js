@@ -279,18 +279,21 @@ class hr_tbl {
                     return response.json();
                 })
                 .then(json => {
-                    var rows = json['data'];
+                    var rows = json['data'].map(row => {
+                        let newRow = {};
+                        this.hrDt.columns.forEach(cl => {
+                            // 제목이 없거나 관리열인 경우에는 내보내지 않음
+                            if (cl.title && cl.title !== "idx" && cl.title !== "관리") {
+                                newRow[cl.title] = row[cl.data];
+                            }
+                        });
+                        return newRow;
+                    });
                     const worksheet = XLSX.utils.json_to_sheet(rows);
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
-                    /* fix headers */
 
-                    let clTitle = [];
-                    this.hrDt.columns.forEach((cl) => {
-                        //    clTitle.push(cl.title); //페이지의 제목열을 엑셀파일 제목열로 푸시
-                    });
-                    XLSX.utils.sheet_add_aoa(worksheet, [clTitle], { origin: "A1" });
-                    /* create an XLSX file and try to save to Presidents.xlsx */
+                    /* create an XLSX file */
 
                     // 오늘 날짜
                     const today = new Date(); const year = today.getFullYear(); const month = (today.getMonth() + 1).toString().padStart(2, '0'); const day = today.getDate().toString().padStart(2, '0');

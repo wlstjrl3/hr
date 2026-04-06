@@ -61,6 +61,11 @@
                 <div class="modalBd"><input id="md_ORG_ADDR" placeholder="소속기관 주소 입력" autocomplete='off'
                         style="width:calc(100% - 14px);"></div>
             </div>
+            <div class="modalGrp" style="width:100% !important; margin-bottom:12px;">
+                <div class="modalHd">비고 (메모)</div>
+                <div class="modalBd"><input id="md_MEMO" placeholder="이메일 발급 일자 등 기타 정보 입력" autocomplete='off'
+                        style="width:calc(100% - 14px);"></div>
+            </div>
 
             <input type="hidden" id="md_EMP_NO">
             <input type="hidden" id="md_ISSUE_NO">

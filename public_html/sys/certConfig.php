@@ -31,10 +31,10 @@ if ($_REQUEST['CRUD'] == 'C') { // Create or Update
             $newIssueNo = sprintf("%s-%d-%03d", $certType, $year, $nextSeq);
             
             executeUpdate($conn,
-                "INSERT INTO TB_CERT_PRINT (ISSUE_NO, EMP_NO, CERT_TYPE, ORIGIN_ADDR, CURR_ADDR, ORG_ADDR, ISSUE_DT, REG_EMP_NO) 
-                 VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)",
-                "sssssss",
-                [$newIssueNo, $_REQUEST['EMP_NO'], $_REQUEST['CERT_TYPE'], $_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $userName]
+                "INSERT INTO TB_CERT_PRINT (ISSUE_NO, EMP_NO, CERT_TYPE, ORIGIN_ADDR, CURR_ADDR, ORG_ADDR, ISSUE_DT, REG_EMP_NO, MEMO) 
+                 VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE, ?, ?)",
+                "ssssssss",
+                [$newIssueNo, $_REQUEST['EMP_NO'], $_REQUEST['CERT_TYPE'], $_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $userName, $_REQUEST['MEMO']]
             );
             
             mysqli_commit($conn);
@@ -62,17 +62,17 @@ if ($_REQUEST['CRUD'] == 'C') { // Create or Update
                 $finalIssueNo = sprintf("%s-%d-%03d", $newCertType, $year, $nextSeq);
                 
                 executeUpdate($conn,
-                    "INSERT INTO TB_CERT_PRINT (ISSUE_NO, EMP_NO, CERT_TYPE, ORIGIN_ADDR, CURR_ADDR, ORG_ADDR, ISSUE_DT, REG_EMP_NO) 
-                     VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)",
-                    "sssssss",
-                    [$finalIssueNo, $_REQUEST['EMP_NO'], $newCertType, $_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $userName]
+                    "INSERT INTO TB_CERT_PRINT (ISSUE_NO, EMP_NO, CERT_TYPE, ORIGIN_ADDR, CURR_ADDR, ORG_ADDR, ISSUE_DT, REG_EMP_NO, MEMO) 
+                     VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE, ?, ?)",
+                    "ssssssss",
+                    [$finalIssueNo, $_REQUEST['EMP_NO'], $newCertType, $_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $userName, $_REQUEST['MEMO']]
                 );
             } else {
                 $finalIssueNo = $oldIssueNo;
                 executeUpdate($conn,
-                    "UPDATE TB_CERT_PRINT SET ORIGIN_ADDR=?, CURR_ADDR=?, ORG_ADDR=? WHERE ISSUE_NO=?",
-                    "ssss",
-                    [$_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $oldIssueNo]
+                    "UPDATE TB_CERT_PRINT SET ORIGIN_ADDR=?, CURR_ADDR=?, ORG_ADDR=?, MEMO=? WHERE ISSUE_NO=?",
+                    "sssss",
+                    [$_REQUEST['ORIGIN_ADDR'], $_REQUEST['CURR_ADDR'], $_REQUEST['ORG_ADDR'], $_REQUEST['MEMO'], $oldIssueNo]
                 );
             }
             mysqli_commit($conn);
@@ -122,7 +122,7 @@ else if ($_REQUEST['CRUD'] == 'R') { // 단건 조회 (인쇄용 등)
                                 T.POSITION
                            FROM PSNL_TRANSFER T
                            LEFT JOIN ORG_INFO O ON T.ORG_CD = O.ORG_CD
-                           WHERE T.PSNL_CD = ?
+                           WHERE T.PSNL_CD = ? AND T.TRS_TYPE IN ('1', '3')
                            ORDER BY T.TRS_DT ASC";
             $res['history'] = executeQuery($conn, $historySql, "s", [$res['EMP_NO']]);
         }
