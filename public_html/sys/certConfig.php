@@ -91,8 +91,9 @@ else if ($_REQUEST['CRUD'] == 'R') { // 단건 조회 (인쇄용 등)
                 A.*, 
                 B.PSNL_NM,
                 B.PSNL_NUM,
-                (SELECT ORG_NM FROM ORG_INFO WHERE ORG_CD = (SELECT ORG_CD FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1)) AS ORG_NM,
-                (SELECT POSITION FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1) AS POSITION,
+                (SELECT ORG_NM FROM ORG_INFO WHERE ORG_CD = (SELECT ORG_CD FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_DT <= A.ISSUE_DT ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1)) AS ORG_NM,
+                (SELECT ORG_TYPE FROM ORG_INFO WHERE ORG_CD = (SELECT ORG_CD FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_DT <= A.ISSUE_DT ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1)) AS ORG_TYPE,
+                (SELECT POSITION FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_DT <= A.ISSUE_DT ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1) AS POSITION,
                 
                 /* [JOIN_DT 로직]: 퇴직증명서일 경우 마지막 퇴직 직전의 입사일을 가져옴 */
                 CASE 
@@ -117,14 +118,15 @@ else if ($_REQUEST['CRUD'] == 'R') { // 단건 조회 (인쇄용 등)
         if ($res['CERT_TYPE'] == '경력') {
             $historySql = "SELECT 
                                 T.TRS_DT AS STT_DT,
-                                (SELECT MIN(T2.TRS_DT) FROM PSNL_TRANSFER T2 WHERE T2.PSNL_CD = T.PSNL_CD AND T2.TRS_DT > T.TRS_DT) AS END_DT,
+                                (SELECT MIN(T2.TRS_DT) FROM PSNL_TRANSFER T2 WHERE T2.PSNL_CD = T.PSNL_CD AND T2.TRS_DT > T.TRS_DT AND T2.TRS_DT <= ?) AS END_DT,
                                 O.ORG_NM,
+                                O.ORG_TYPE,
                                 T.POSITION
                            FROM PSNL_TRANSFER T
                            LEFT JOIN ORG_INFO O ON T.ORG_CD = O.ORG_CD
-                           WHERE T.PSNL_CD = ? AND T.TRS_TYPE IN ('1', '3')
+                           WHERE T.PSNL_CD = ? AND T.TRS_TYPE IN ('1', '3') AND T.TRS_DT <= ?
                            ORDER BY T.TRS_DT ASC";
-            $res['history'] = executeQuery($conn, $historySql, "s", [$res['EMP_NO']]);
+            $res['history'] = executeQuery($conn, $historySql, "sss", [$res['ISSUE_DT'], $res['EMP_NO'], $res['ISSUE_DT']]);
         }
     }
 

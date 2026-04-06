@@ -18,13 +18,13 @@ var mytbl = new hr_tbl({
         , { title: "직책", data: "POSITION", className: "hidden" }
         , { title: "입사일", data: "JOIN_DT", className: "hidden" }
         , { title: "발급일자", data: "ISSUE_DT", className: "" }
-        , { 
-            title: "현재주소", 
-            data: "CURR_ADDR", 
+        , {
+            title: "현재주소",
+            data: "CURR_ADDR",
             className: "",
-            render: function(data) {
-                if(!data) return "";
-                if(data.length > 15) return data.substring(0, 15) + "...";
+            render: function (data) {
+                if (!data) return "";
+                if (data.length > 15) return data.substring(0, 15) + "...";
                 return data;
             }
         }
@@ -221,7 +221,7 @@ function openPrintModal(issueNo) {
                             <tr style="height:15mm;">
                                 <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.STT_DT)}</td>
                                 <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.END_DT || "")}</td>
-                                <td style="border:1px solid #777;">천주교 수원교구<br>${h.ORG_NM} 성당</td>
+                                <td style="border:1px solid #777;">천주교 수원교구<br>${h.ORG_NM} ${h.ORG_TYPE == '1' ? '성지' : '성당'}</td>
                                 <td style="border:1px solid #777;">${h.POSITION}</td>
                             </tr>
                         `;
@@ -274,7 +274,7 @@ function openPrintModal(issueNo) {
                 const retireDtKr = formatKrDate(d.RETIRE_DT);
 
                 if (d.CERT_TYPE === '재직') {
-                    bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주교 수원교구 ${d.ORG_NM} 성당 ${d.POSITION}으로 재직 중임을 증명함.`;
+                    bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주교 수원교구 ${d.ORG_NM} ${d.ORG_TYPE == '1' ? '' : '성당'} ${d.POSITION}으로 재직 중임을 증명함.`;
                 } else {
                     bodyHtml = `위 사람은 ${joinDtKr} 입사하여 <br>${retireDtKr} 퇴직하였음을 증명함.`;
                 }
