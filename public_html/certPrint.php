@@ -67,8 +67,8 @@
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
-            <button id="modalSaveBtn" style="padding:5px 15px;" class="clBg2 clW rndCorner">저장</button>
-            <button id="modalDelBtn" style="padding:5px 15px;" class="clBg3 clW rndCorner">삭제</button>
+            <button id="modalSaveBtn" style="padding:5px 9px;">저장</button>
+            <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
         </div>
     </div>
 </div>
@@ -211,10 +211,10 @@
             </div>
         </div>
         <div class="modalFooter no-print">
-            <button onclick="window.print()" style="padding:8px 20px;" class="clBg2 clW rndCorner">인쇄하기</button>
+            <button onclick="window.print()" style="padding:5px 9px;">인쇄하기</button>
             <button
                 onclick="document.getElementById('certPrintModal').style.visibility='hidden'; document.getElementById('certPrintModal').style.opacity='0';"
-                style="padding:8px 20px;" class="clBg3 clW rndCorner">닫기</button>
+                style="padding:5px 9px;">닫기</button>
         </div>
     </div>
 </div>

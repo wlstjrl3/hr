@@ -20,9 +20,8 @@ var mytbl = new hr_tbl({
             title: "관리", 
             data: "ISSUE_NO", 
             render: function(data, type, row) {
-                return `<button onclick="openPrintModal('${data}')" class="pddSS clBg2 clW rndCorner pointer">인쇄</button>
-                        <button onclick="openEditModal('${data}')" class="pddSS clBg5 cl2 rndCorner pointer">수정</button>
-                        <button onclick="deleteCert('${data}')" class="pddSS clBg1 clW rndCorner pointer">삭제</button>`;
+                return `<button onclick="openPrintModal('${data}')" style="padding:5px 9px;">인쇄</button>
+                        <button onclick="deleteCert('${data}')" style="padding:5px 9px;">삭제</button>`;
             }
         }
     ],
@@ -31,7 +30,7 @@ var mytbl = new hr_tbl({
 // 삭제 처리 함수
 function deleteCert(issueNo) {
     if(!issueNo) return;
-    if(!confirm("해당 발급 내역을 삭제하시겠습니까? (출력된 원본과 번호 불일치 주의)")) return;
+    if(prompt("해당 발급 내역을 삭제하시려면 '삭제'라고 입력해주세요. \n(출력된 원본과 번호 불일치 주의)") !== "삭제") return;
 
     fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=D&ISSUE_NO=${issueNo}`)
         .then(res => res.json())
@@ -45,6 +44,11 @@ function deleteCert(issueNo) {
 }
 mytbl.show('myTbl');
 mytbl.xportBind();
+
+// 행 클릭 시 수정 모달 오픈
+function trDataXHR(idx) {
+    openEditModal(idx);
+}
 
 // 2. 신규 발급 업무 처리
 document.getElementById("newBtn").addEventListener("click", () => {
