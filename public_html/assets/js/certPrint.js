@@ -322,20 +322,18 @@ async function sendEmail() {
         const json = await resp.json();
         const d = json.data;
 
-        let targetEmail = d.CURR_ORG_EMAIL;
+        // [수정]: 조직 이메일을 기본값으로 보여주되, 수동 입력이나 수정이 가능하도록 함
+        let defaultEmail = d.CURR_ORG_EMAIL || "";
+        let targetEmail = prompt("발송할 이메일 주소를 확인하거나 수동으로 입력해주세요.", defaultEmail);
 
-        // 조직 이메일 정보가 없는 경우 수동 입력 받기
-        if (!targetEmail) {
-            targetEmail = prompt("소속된 조직의 이메일 정보가 없습니다.\n발송할 이메일 주소를 직접 입력해주세요.");
-            if (!targetEmail) return; // 입력을 취소하거나 빈값인 경우 중단
+        if (!targetEmail) return; // 입력을 취소하거나 빈값인 경우 중단
 
-            if (!targetEmail.includes("@")) {
-                alert("올바른 이메일 형식이 아닙니다.");
-                return;
-            }
+        if (!targetEmail.includes("@")) {
+            alert("올바른 이메일 형식이 아닙니다.");
+            return;
         }
 
-        if (!confirm(`${d.CURR_ORG_NM || '선택된 대상'} (${targetEmail})로 증명서 파일을 발송하시겠습니까?`)) return;
+        if (!confirm(`${targetEmail} 로 증명서 파일을 발송하시겠습니까?`)) return;
 
         // [캡처용 모달 활성화]
         const printModal = document.getElementById("certPrintModal");
