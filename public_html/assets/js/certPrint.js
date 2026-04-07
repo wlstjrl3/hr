@@ -381,6 +381,8 @@ async function sendEmail() {
 
         if (emailResult.result === "success") {
             alert("이메일 발송이 성공적으로 완료되었습니다.");
+            mytbl.show('myTbl'); // 목록 즉시 새로고침
+            modalClose();       // 입력 모달 닫기
         } else {
             alert("이메일 발송 실패: " + emailResult.message);
         }
