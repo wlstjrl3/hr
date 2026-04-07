@@ -149,11 +149,8 @@
                     if (isFirstRowOfParish) {
                         html += `<td rowspan="${parishRowCount}" class="txtCenter" style="border: 1px solid #ddd; vertical-align: middle;">${parishName}</td>`;
 
-                        let extension = '';
-                        if (row.ORG_IN_TEL) {
-                            const match = row.ORG_IN_TEL.match(/\d{4}/);
-                            if (match) extension = match[0];
-                        }
+                        let extension = row.ORG_IN_TEL || '';
+
                         const outTel = row.ORG_OUT_TEL || '';
 
                         if (showExt) {
@@ -243,18 +240,15 @@
                 districtIdx++;
                 lastDistrictName = currentDistrictName;
             }
-            
+
             parishCounter++;
             let posCounter = {};
 
             group.forEach(row => {
                 // 내선 추출
-                let extension = '';
-                if (row.ORG_IN_TEL) {
-                    const match = row.ORG_IN_TEL.match(/\d{4}/);
-                    if (match) extension = match[0];
-                }
-                
+                let extension = row.ORG_IN_TEL || '';
+
+
                 // 내선이 없는 경우 국번(OUT_TEL)에서 앞자리 제거 후 표시
                 if (!extension && row.ORG_OUT_TEL) {
                     extension = row.ORG_OUT_TEL.replace(/^031-/, '');

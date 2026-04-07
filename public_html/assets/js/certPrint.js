@@ -15,6 +15,7 @@ var mytbl = new hr_tbl({
         , { title: "종류", data: "CERT_TYPE", className: "" }
         , { title: "대상자", data: "PSNL_NM", className: "" }
         , { title: "소속", data: "ORG_NM", className: "" }
+        , { title: "이메일", data: "ORG_EMAIL", className: "" }
         , { title: "직책", data: "POSITION", className: "hidden" }
         , { title: "입사일", data: "JOIN_DT", className: "hidden" }
         , { title: "발급일자", data: "ISSUE_DT", className: "" }
@@ -146,6 +147,144 @@ function openEditModal(issueNo) {
 }
 
 // 5. 인쇄 모달 열기 및 데이터 매핑
+// 5. 증명서 템플릿에 데이터 매핑 (인쇄/메일 공통)
+function renderCertificate(d) {
+    if (!d) return;
+
+    // 1. 레이아웃 분기 및 초기화
+    const paper = document.getElementById("certPaper");
+    const layoutStandard = document.getElementById("layout_standard");
+    const layoutCareer = document.getElementById("layout_career");
+    const logoCross = document.getElementById("certLogoCross");
+
+    // 클래스 초기화 및 부여
+    paper.className = "cert-paper";
+    if (d.CERT_TYPE === '퇴직') paper.classList.add("type-retire");
+    else if (d.CERT_TYPE === '경력') paper.classList.add("type-career");
+
+    // 로고 농도 및 가시성
+    logoCross.style.display = "block";
+    if (d.CERT_TYPE === '퇴직') logoCross.style.opacity = "0.9";
+    else if (d.CERT_TYPE === '경력') logoCross.style.opacity = "0.05";
+    else logoCross.style.opacity = "0.12";
+
+    logoCross.src = DIR_ROOT + "/assets/img/certs/cert_bg_cross.png";
+    document.querySelectorAll(".official-seal").forEach(s => s.src = DIR_ROOT + "/assets/img/certs/official_seal.png");
+
+    // 2. 날짜 포맷팅 함수들
+    const formatKrDate = (dateStr) => {
+        if (!dateStr) return "";
+        const bits = dateStr.split("-");
+        return bits[0] + "년 " + parseInt(bits[1]) + "월 " + parseInt(bits[2]) + "일";
+    };
+    const formatDotDate = (dateStr) => {
+        if (!dateStr) return "";
+        return dateStr.replace(/-/g, '.');
+    };
+
+    const birthStr = (() => {
+        if (d.PSNL_NUM && d.PSNL_NUM.length >= 6) {
+            let yy = d.PSNL_NUM.substring(0, 2);
+            let mm = d.PSNL_NUM.substring(2, 4);
+            let dd = d.PSNL_NUM.substring(4, 6);
+            let yearPrefix = (parseInt(yy) > 50) ? "19" : "20";
+            return yearPrefix + yy + "." + mm + "." + dd + ".";
+        }
+        return "";
+    })();
+
+    // 3. 레이아웃별 데이터 주입
+    if (d.CERT_TYPE === '경력') {
+        layoutStandard.style.display = "none";
+        layoutCareer.style.display = "block";
+
+        document.getElementById("p_ISSUE_NO_C").innerText = d.ISSUE_NO.split('-').pop(); // 순번만
+        // 성명 자간 처리 (경력)
+        const nmC = d.PSNL_NM || "";
+        const nmCLen = nmC.length;
+        let nmCSpacing = "0";
+        if (nmCLen === 2) nmCSpacing = "32pt";
+        else if (nmCLen === 3) nmCSpacing = "13pt";
+        else if (nmCLen === 4) nmCSpacing = "6pt";
+        document.getElementById("p_PSNL_NM_C").innerHTML = `<span style="letter-spacing:${nmCSpacing}; margin-right:-${nmCSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${nmC}</span>`;
+        document.getElementById("p_BIRTH_DT_C").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
+        document.getElementById("p_ADDR_C").innerText = d.CURR_ADDR || "";
+        document.getElementById("p_ORIGIN_C").innerText = d.ORIGIN_ADDR || "미 기 재";
+
+        // 경력 히스토리 동적 생성
+        let hHtml = "";
+        if (d.history && d.history.length > 0) {
+            d.history.forEach(h => {
+                hHtml += `
+                    <tr style="height:15mm;">
+                        <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.STT_DT)}</td>
+                        <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.END_DT || "")}</td>
+                        <td style="border:1px solid #777;">천주교 수원교구<br>${h.ORG_NM} ${h.ORG_TYPE == '1' ? '성지' : '성당'}</td>
+                        <td style="border:1px solid #777;">${h.POSITION}</td>
+                    </tr>
+                `;
+            });
+        }
+        // 빈 행 추가 (최소 3행 보장)
+        for (let i = (d.history ? d.history.length : 0); i < 4; i++) {
+            hHtml += `<tr style="height:15mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>`;
+        }
+        document.getElementById("p_CAREER_LIST").innerHTML = hHtml;
+
+        if (d.ISSUE_DT) {
+            const b = d.ISSUE_DT.split("-");
+            document.getElementById("p_ISSUE_DT_C").innerText = b[0] + "년 " + parseInt(b[1]) + "월 " + parseInt(b[2]) + "일";
+        }
+    } else {
+        layoutStandard.style.display = "block";
+        layoutCareer.style.display = "none";
+
+        // 표준 레이아웃 (재직/퇴직)
+        document.getElementById("p_ISSUE_NO").innerText = d.ISSUE_NO.split('-').pop();
+        // 성명 자간 처리
+        const p_PSNL_NM = d.PSNL_NM || "";
+        const nameLen = p_PSNL_NM.length;
+        let nameSpacing = "0";
+        if (nameLen === 2) nameSpacing = "32pt";
+        else if (nameLen === 3) nameSpacing = "13pt";
+        else if (nameLen === 4) nameSpacing = "6pt";
+
+        document.getElementById("p_PSNL_NM").innerHTML = `<span style="letter-spacing:${nameSpacing}; margin-right:-${nameSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${p_PSNL_NM}</span>`;
+        document.getElementById("p_BIRTH_DT").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
+        document.getElementById("p_ORIGIN_ADDR").innerText = d.ORIGIN_ADDR || "미 기 재";
+        document.getElementById("p_TITLE").innerText = d.CERT_TYPE;
+
+
+        // 주소 분리
+        const fullAddr = d.CURR_ADDR || "";
+        if (fullAddr.length > 22) {
+            const idx = fullAddr.indexOf(' ', 15);
+            document.getElementById("p_CURR_ADDR_1").innerText = (idx > 0) ? fullAddr.substring(0, idx) : fullAddr;
+            document.getElementById("p_CURR_ADDR_2").innerText = (idx > 0) ? fullAddr.substring(idx).trim() : "";
+        } else {
+            document.getElementById("p_CURR_ADDR_1").innerText = fullAddr;
+            document.getElementById("p_CURR_ADDR_2").innerText = "";
+        }
+
+        // 본문 문구
+        let bodyHtml = "";
+        const joinDtKr = formatKrDate(d.JOIN_DT);
+        const retireDtKr = formatKrDate(d.RETIRE_DT);
+
+        if (d.CERT_TYPE === '재직') {
+            bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주교 수원교구 ${d.ORG_NM} ${d.ORG_TYPE == '1' ? '' : '성당'} ${d.POSITION}으로 재직 중임을 증명함.`;
+        } else {
+            bodyHtml = `위 사람은 ${joinDtKr} 입사하여 <br>${retireDtKr} 퇴직하였음을 증명함.`;
+        }
+        document.getElementById("p_BODY_CONTENT").innerHTML = bodyHtml;
+
+        if (d.ISSUE_DT) {
+            document.getElementById("p_ISSUE_DT").innerText = d.ISSUE_DT.replace(/-/g, '.') + ".";
+        }
+    }
+}
+
+// 6. 인쇄 모달 열기
 function openPrintModal(issueNo) {
     fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=R&ISSUE_NO=${issueNo}`)
         .then(res => res.json())
@@ -153,149 +292,105 @@ function openPrintModal(issueNo) {
             const d = json.data;
             if (!d) return;
 
-            // 1. 레이아웃 분기 및 초기화
-            const paper = document.getElementById("certPaper");
-            const layoutStandard = document.getElementById("layout_standard");
-            const layoutCareer = document.getElementById("layout_career");
-            const logoCross = document.getElementById("certLogoCross");
+            renderCertificate(d);
 
-            // 클래스 초기화 및 부여
-            paper.className = "cert-paper";
-            if (d.CERT_TYPE === '퇴직') paper.classList.add("type-retire");
-            else if (d.CERT_TYPE === '경력') paper.classList.add("type-career");
-
-            // 로고 농도 및 가시성
-            logoCross.style.display = "block";
-            if (d.CERT_TYPE === '퇴직') logoCross.style.opacity = "0.9";
-            else if (d.CERT_TYPE === '경력') logoCross.style.opacity = "0.05";
-            else logoCross.style.opacity = "0.12";
-
-            logoCross.src = DIR_ROOT + "/assets/img/certs/cert_bg_cross.png";
-            document.querySelectorAll(".official-seal").forEach(s => s.src = DIR_ROOT + "/assets/img/certs/official_seal.png");
-
-            // 2. 날짜 포맷팅 함수들
-            const formatKrDate = (dateStr) => {
-                if (!dateStr) return "";
-                const bits = dateStr.split("-");
-                return bits[0] + "년 " + parseInt(bits[1]) + "월 " + parseInt(bits[2]) + "일";
-            };
-            const formatDotDate = (dateStr) => {
-                if (!dateStr) return "";
-                return dateStr.replace(/-/g, '.');
-            };
-
-            const birthStr = (() => {
-                if (d.PSNL_NUM && d.PSNL_NUM.length >= 6) {
-                    let yy = d.PSNL_NUM.substring(0, 2);
-                    let mm = d.PSNL_NUM.substring(2, 4);
-                    let dd = d.PSNL_NUM.substring(4, 6);
-                    let yearPrefix = (parseInt(yy) > 50) ? "19" : "20";
-                    return yearPrefix + yy + "." + mm + "." + dd + ".";
-                }
-                return "";
-            })();
-
-            // 3. 레이아웃별 데이터 주입
-            if (d.CERT_TYPE === '경력') {
-                layoutStandard.style.display = "none";
-                layoutCareer.style.display = "block";
-
-                document.getElementById("p_ISSUE_NO_C").innerText = d.ISSUE_NO.split('-').pop(); // 순번만
-                // 성명 자간 처리 (경력)
-                const nmC = d.PSNL_NM || "";
-                const nmCLen = nmC.length;
-                let nmCSpacing = "0";
-                if (nmCLen === 2) nmCSpacing = "32pt";
-                else if (nmCLen === 3) nmCSpacing = "13pt";
-                else if (nmCLen === 4) nmCSpacing = "6pt";
-                document.getElementById("p_PSNL_NM_C").innerHTML = `<span style="letter-spacing:${nmCSpacing}; margin-right:-${nmCSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${nmC}</span>`;
-                document.getElementById("p_BIRTH_DT_C").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
-                document.getElementById("p_ADDR_C").innerText = d.CURR_ADDR || "";
-                document.getElementById("p_ORIGIN_C").innerText = d.ORIGIN_ADDR || "미 기 재";
-
-                // 경력 히스토리 동적 생성
-                let hHtml = "";
-                if (d.history && d.history.length > 0) {
-                    d.history.forEach(h => {
-                        hHtml += `
-                            <tr style="height:15mm;">
-                                <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.STT_DT)}</td>
-                                <td style="border:1px solid #777; font-family:sans-serif;">${formatDotDate(h.END_DT || "")}</td>
-                                <td style="border:1px solid #777;">천주교 수원교구<br>${h.ORG_NM} ${h.ORG_TYPE == '1' ? '성지' : '성당'}</td>
-                                <td style="border:1px solid #777;">${h.POSITION}</td>
-                            </tr>
-                        `;
-                    });
-                }
-                // 빈 행 추가 (최소 3행 보장)
-                for (let i = (d.history ? d.history.length : 0); i < 4; i++) {
-                    hHtml += `<tr style="height:15mm;"><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td><td style="border:1px solid #777;"></td></tr>`;
-                }
-                document.getElementById("p_CAREER_LIST").innerHTML = hHtml;
-
-                if (d.ISSUE_DT) {
-                    const b = d.ISSUE_DT.split("-");
-                    document.getElementById("p_ISSUE_DT_C").innerText = b[0] + "년 " + parseInt(b[1]) + "월 " + parseInt(b[2]) + "일";
-                }
-            } else {
-                layoutStandard.style.display = "block";
-                layoutCareer.style.display = "none";
-
-                // 표준 레이아웃 (재직/퇴직)
-                document.getElementById("p_ISSUE_NO").innerText = d.ISSUE_NO.split('-').pop();
-                // 성명 자간 처리
-                const p_PSNL_NM = d.PSNL_NM || "";
-                const nameLen = p_PSNL_NM.length;
-                let nameSpacing = "0";
-                if (nameLen === 2) nameSpacing = "32pt";
-                else if (nameLen === 3) nameSpacing = "13pt";
-                else if (nameLen === 4) nameSpacing = "6pt";
-
-                document.getElementById("p_PSNL_NM").innerHTML = `<span style="letter-spacing:${nameSpacing}; margin-right:-${nameSpacing}; font-family:'NanumMyeongjo', serif; font-size:17pt;">${p_PSNL_NM}</span>`;
-                document.getElementById("p_BIRTH_DT").innerHTML = `<span style="font-family:'NanumMyeongjo', serif; font-size:17pt;">${birthStr}</span>`;
-                document.getElementById("p_ORIGIN_ADDR").innerText = d.ORIGIN_ADDR || "미 기 재";
-                document.getElementById("p_TITLE").innerText = d.CERT_TYPE;
-
-
-                // 주소 분리
-                const fullAddr = d.CURR_ADDR || "";
-                if (fullAddr.length > 22) {
-                    const idx = fullAddr.indexOf(' ', 15);
-                    document.getElementById("p_CURR_ADDR_1").innerText = (idx > 0) ? fullAddr.substring(0, idx) : fullAddr;
-                    document.getElementById("p_CURR_ADDR_2").innerText = (idx > 0) ? fullAddr.substring(idx).trim() : "";
-                } else {
-                    document.getElementById("p_CURR_ADDR_1").innerText = fullAddr;
-                    document.getElementById("p_CURR_ADDR_2").innerText = "";
-                }
-
-                // 본문 문구
-                let bodyHtml = "";
-                const joinDtKr = formatKrDate(d.JOIN_DT);
-                const retireDtKr = formatKrDate(d.RETIRE_DT);
-
-                if (d.CERT_TYPE === '재직') {
-                    bodyHtml = `이 사람은 ${joinDtKr} 부터 현재 까지 본 천주교 수원교구 ${d.ORG_NM} ${d.ORG_TYPE == '1' ? '' : '성당'} ${d.POSITION}으로 재직 중임을 증명함.`;
-                } else {
-                    bodyHtml = `위 사람은 ${joinDtKr} 입사하여 <br>${retireDtKr} 퇴직하였음을 증명함.`;
-                }
-                document.getElementById("p_BODY_CONTENT").innerHTML = bodyHtml;
-
-                if (d.ISSUE_DT) {
-                    document.getElementById("p_ISSUE_DT").innerText = d.ISSUE_DT.replace(/-/g, '.') + ".";
-                }
-            }
-
-            // 모달 표시
             document.getElementById("certPrintModal").style.visibility = "visible";
             document.getElementById("certPrintModal").style.opacity = "1";
         });
 }
 
-// 6. 모달 내부 삭제 버튼 연결
+// 7. 모달 내부 삭제 버튼 연결
 document.getElementById("modalDelBtn").addEventListener("click", () => {
     let issueNo = document.getElementById("md_ISSUE_NO").value;
     deleteCert(issueNo);
 });
+
+// 8. 모달 내부 이메일 발송 버튼 연결
+document.getElementById("modalEmailBtn").addEventListener("click", sendEmail);
+
+// 9. 이메일 발송 처리
+async function sendEmail() {
+    const issueNo = document.getElementById("md_ISSUE_NO").value;
+    if (!issueNo) {
+        alert("먼저 증명서를 저장 또는 선택해주세요.");
+        return;
+    }
+
+    try {
+        // 1. 데이터 조회 (메일 주소 포함)
+        const resp = await fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=R&ISSUE_NO=${issueNo}`);
+        const json = await resp.json();
+        const d = json.data;
+
+        let targetEmail = d.CURR_ORG_EMAIL;
+
+        // 조직 이메일 정보가 없는 경우 수동 입력 받기
+        if (!targetEmail) {
+            targetEmail = prompt("소속된 조직의 이메일 정보가 없습니다.\n발송할 이메일 주소를 직접 입력해주세요.");
+            if (!targetEmail) return; // 입력을 취소하거나 빈값인 경우 중단
+
+            if (!targetEmail.includes("@")) {
+                alert("올바른 이메일 형식이 아닙니다.");
+                return;
+            }
+        }
+
+        if (!confirm(`${d.CURR_ORG_NM || '선택된 대상'} (${targetEmail})로 증명서 파일을 발송하시겠습니까?`)) return;
+
+        // [캡처용 모달 활성화]
+        const printModal = document.getElementById("certPrintModal");
+        printModal.style.visibility = "visible";
+        printModal.style.opacity = "1";
+        printModal.style.zIndex = "10000";
+
+        // 2. 증명서 렌더링 (캡처용)
+        renderCertificate(d);
+        
+        // 브라우저 렌더링 대기 (이미지 로드 등 충분한 시간 부여)
+        await new Promise(r => setTimeout(r, 800));
+
+        // 3. html2canvas로 캡처
+        const canvas = await html2canvas(document.getElementById("certPaper"), {
+            scale: 2,           // 고해상도
+            useCORS: true,      // 외부 이미지 로드 허용
+            backgroundColor: "#ffffff",
+            scrollY: -window.scrollY // 스크롤 위치 보정
+        });
+        const imageData = canvas.toDataURL("image/png");
+
+        // 캡처 완료 후 모달 숨기기
+        printModal.style.visibility = "hidden";
+        printModal.style.opacity = "0";
+        printModal.style.zIndex = "100";
+
+        // 4. 백엔드로 전송
+        const formData = new FormData();
+        formData.append("key", API_TOKEN);
+        formData.append("ISSUE_NO", issueNo);
+        formData.append("EMAIL", targetEmail);
+        formData.append("ORG_NM", d.CURR_ORG_NM);
+        formData.append("PSNL_NM", d.PSNL_NM);
+        formData.append("CERT_TYPE", d.CERT_TYPE);
+        formData.append("IMAGE_DATA", imageData);
+
+        const emailResp = await fetch(DIR_ROOT + "/sys/sendCertEmail.php", {
+            method: "POST",
+            body: formData
+        });
+        const emailResult = await emailResp.json();
+
+        if (emailResult.result === "success") {
+            alert("이메일 발송이 성공적으로 완료되었습니다.");
+        } else {
+            alert("이메일 발송 실패: " + emailResult.message);
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("이메일 발송 중 오류가 발생했습니다: " + e.message);
+        document.getElementById("certPrintModal").style.visibility = "hidden";
+    }
+}
 
 // 7. 검색 필터링 이벤트 (hr_tbl.js 의존)
 document.querySelectorAll(".filter").forEach(f => {

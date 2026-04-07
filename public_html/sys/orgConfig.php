@@ -4,15 +4,15 @@ verifyApiKey($conn, @$_REQUEST['key']);
 
 if ($_REQUEST['CRUD'] == 'C') {
     $now = date("Y-m-d h:m:s");
-    $sql = "INSERT INTO BONDANG_HR.ORG_INFO(ORG_CD, ORG_NM, UPPR_ORG_CD, ORG_TYPE, ORG_IN_TEL, ORG_OUT_TEL, REFRESH_DT, REG_DT) 
-            VALUES (?,?,?,?,?,?,?,?) 
+    $sql = "INSERT INTO BONDANG_HR.ORG_INFO(ORG_CD, ORG_NM, UPPR_ORG_CD, ORG_TYPE, ORG_IN_TEL, ORG_OUT_TEL, EMAIL, REFRESH_DT, REG_DT) 
+            VALUES (?,?,?,?,?,?,?,?,?) 
             ON DUPLICATE KEY UPDATE 
-            ORG_NM=?, UPPR_ORG_CD=?, ORG_TYPE=?, ORG_IN_TEL=?, ORG_OUT_TEL=?, REFRESH_DT=?";
+            ORG_NM=?, UPPR_ORG_CD=?, ORG_TYPE=?, ORG_IN_TEL=?, ORG_OUT_TEL=?, EMAIL=?, REFRESH_DT=?";
 
-    $types = "ssssssssssssss";
+    $types = "ssssssssssssssss";
     $params = [
-        $_REQUEST['ORG_CD'], $_REQUEST['ORG_NM'], $_REQUEST['UPPR_ORG_CD'], $_REQUEST['ORG_TYPE'], $_REQUEST['ORG_IN_TEL'], $_REQUEST['ORG_OUT_TEL'], $now, $now,
-        $_REQUEST['ORG_NM'], $_REQUEST['UPPR_ORG_CD'], $_REQUEST['ORG_TYPE'], $_REQUEST['ORG_IN_TEL'], $_REQUEST['ORG_OUT_TEL'], $now
+        $_REQUEST['ORG_CD'], $_REQUEST['ORG_NM'], $_REQUEST['UPPR_ORG_CD'], $_REQUEST['ORG_TYPE'], $_REQUEST['ORG_IN_TEL'], $_REQUEST['ORG_OUT_TEL'], $_REQUEST['EMAIL'], $now, $now,
+        $_REQUEST['ORG_NM'], $_REQUEST['UPPR_ORG_CD'], $_REQUEST['ORG_TYPE'], $_REQUEST['ORG_IN_TEL'], $_REQUEST['ORG_OUT_TEL'], $_REQUEST['EMAIL'], $now
     ];
 
     executeUpdate($conn, $sql, $types, $params);

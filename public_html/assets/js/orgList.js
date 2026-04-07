@@ -22,6 +22,7 @@ var mytbl = new hr_tbl({
         , { title: "조직타입", data: "ORG_TYPE", className: "" }
         , { title: "내선번호", data: "ORG_IN_TEL", className: "" }
         , { title: "전화번호", data: "ORG_OUT_TEL", className: "" }
+        , { title: "이메일", data: "EMAIL", className: "" }
         , { title: "갱신일자", data: "REFRESH_DT", className: "" }
     ],
 });
@@ -74,6 +75,9 @@ function trDataXHR(idx) {
                         case 5:
                             input.value = res[0].ORG_OUT_TEL;
                             break;
+                        case 6:
+                            input.value = res[0].EMAIL;
+                            break;
                     }
                 });
                 document.querySelector(".modalBody").querySelector("select").value = res[0].ORG_TYPE; //대면 비대면은 셀렉트박스에서 구분
@@ -99,6 +103,7 @@ modalEdtBtn.addEventListener("click", () => {
             }
             else if (key == 4) { writeUrl += "&ORG_IN_TEL=" + input.value }
             else if (key == 5) { writeUrl += "&ORG_OUT_TEL=" + input.value }
+            else if (key == 6) { writeUrl += "&EMAIL=" + input.value }
         });
     } catch (e) {
         console.log("필수값 체크"); return false;
@@ -168,7 +173,7 @@ document.getElementById("UUPR_ORG").addEventListener("change", evt => {
 });
 //조직 검색 팝업 띄우기
 document.getElementById("orgSerchPop").addEventListener('click', () => {
-    window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
+    window.open(DIR_ROOT + '/components/orgPopup.php', '조직 검색', 'width=320, height=500');
 });
 document.getElementById("orgNm").addEventListener("keyup", (evt) => {
     if (evt.keyCode == 13) {

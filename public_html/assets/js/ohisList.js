@@ -227,7 +227,7 @@ document.querySelectorAll(".dateBox").forEach(dtBox => {
 });
 //조직 검색 팝업 띄우기
 document.getElementById("orgSerchPop").addEventListener('click', () => {
-    window.open('/components/orgPopup.php', '조직 검색', 'width=320, height=500');
+    window.open(DIR_ROOT + '/components/orgPopup.php', '조직 검색', 'width=320, height=500');
 });
 document.getElementById("orgNm").addEventListener("keyup", (evt) => {
     if (evt.keyCode == 13) {

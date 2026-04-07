@@ -43,6 +43,10 @@ include('./components/header.php');
                 <div class="modalHd">전화번호</div>
                 <div class="modalBd"><input autocomplete='off'></div>
             </div>
+            <div class="modalGrp">
+                <div class="modalHd">이메일</div>
+                <div class="modalBd"><input autocomplete='off'></div>
+            </div>
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">

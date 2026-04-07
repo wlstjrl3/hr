@@ -72,8 +72,9 @@
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">
-            <button id="modalSaveBtn" style="padding:5px 15px;" class="clBg3 clW rndCorner">저장</button>
-            <button id="modalDelBtn" style="padding:5px 15px;" class="clBg5 cl2 rndCorner">삭제</button>
+            <button id="modalEmailBtn" style="padding:5px 9px;">이메일발송</button>
+            <button id="modalSaveBtn" style="padding:5px 9px;">저장</button>
+            <button id="modalDelBtn" style="padding:5px 9px;">삭제</button>
         </div>
     </div>
 </div>
@@ -222,10 +223,10 @@
             </div>
         </div>
         <div class="modalFooter no-print">
-            <button onclick="window.print()" style="padding:8px 20px;" class="clBg3 clW rndCorner">인쇄하기</button>
+            <button onclick="window.print()" style="padding:5px 9px;">인쇄하기</button>
             <button
                 onclick="document.getElementById('certPrintModal').style.visibility='hidden'; document.getElementById('certPrintModal').style.opacity='0';"
-                style="padding:8px 20px;" class="clBg5 cl2 rndCorner">닫기</button>
+                style="padding:5px 9px;">닫기</button>
         </div>
     </div>
 </div>
@@ -241,12 +242,6 @@
     <!-- 상단 필터 영역 (fmlList 참조) -->
     <div class="searchArea">
         <div class="colGrp">
-            <div class="colHd clBg5 cl2"><span><b>성명</b></span></div>
-            <div class="colBd">
-                <input id="PSNL_NM" class="filter" style="width:100%;" placeholder="">
-            </div>
-        </div>
-        <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>증명서종류</b></span></div>
             <div class="colBd">
                 <select id="CERT_TYPE_SEARCH" class="filter">
@@ -255,6 +250,12 @@
                     <option value="경력">경력증명서</option>
                     <option value="퇴직">퇴직증명서</option>
                 </select>
+            </div>
+        </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>성명</b></span></div>
+            <div class="colBd">
+                <input id="PSNL_NM" class="filter" style="width:100%;" placeholder="">
             </div>
         </div>
         <div class="colGrp">
@@ -593,6 +594,7 @@
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js?ver=1775259319'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateForm.js'></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/certPrint.js'></script>
 
 <?php include('components/footer.php'); ?>

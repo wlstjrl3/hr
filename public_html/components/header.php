@@ -79,6 +79,11 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                                 └&nbsp;상벌/직무평가
                             </a>
                         </li>
+                        <li>
+                            <a href="<?php echo DIR_ROOT; ?>/certPrint">
+                                └&nbsp;증명서 발급
+                            </a>
+                        </li>
                     </ul>
                     <hr>
                 </li>
@@ -90,11 +95,6 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/insList">
                                 └&nbsp;보증보험 정보
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?php echo DIR_ROOT; ?>/certPrint">
-                                └&nbsp;증명서 발급
                             </a>
                         </li>
                     </ul>
