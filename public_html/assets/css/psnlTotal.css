@@ -24,6 +24,10 @@
     border-collapse: collapse;
     width:100%;
 }
+#myTbl tbody td:nth-child(5) {
+    text-align: left;
+    padding-left: 15px;
+}
 .modalBody td,.modalBody th{
     border:1px solid #999;
     background-color: white;
