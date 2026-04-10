@@ -4,12 +4,12 @@ verifyApiKey($conn, @$_REQUEST['key']);
 
 if ($_REQUEST['CRUD'] == 'C') {
     if ($_REQUEST['TRS_CD'] == "") {
-        $cols = "PSNL_CD,ORG_CD,WORK_TYPE,POSITION,TRS_TYPE,TRS_DTL,TRS_DT,REG_DT";
-        $placeholders = "?,?,?,?,?,?,?,?";
-        $types = "ssssssss";
+        $cols = "PSNL_CD,ORG_CD,WORK_TYPE,POSITION,TRS_TYPE,TRS_DTL,TRS_DT,BNF_DT,REG_DT";
+        $placeholders = "?,?,?,?,?,?,?,?,?";
+        $types = "sssssssss";
         $regDt = date("Y-m-d h:m:s");
         $params = [$_REQUEST['PSNL_CD'], $_REQUEST['ORG_CD'], $_REQUEST['WORK_TYPE'], $_REQUEST['POSITION'],
-            $_REQUEST['TRS_TYPE'], $_REQUEST['TRS_DTL'], $_REQUEST['TRS_DT'], $regDt];
+            $_REQUEST['TRS_TYPE'], $_REQUEST['TRS_DTL'], $_REQUEST['TRS_DT'], $_REQUEST['BNF_DT'], $regDt];
 
         if (@$_REQUEST['APP_DT']) {
             $cols .= ",APP_DT";
@@ -20,10 +20,10 @@ if ($_REQUEST['CRUD'] == 'C') {
         executeUpdate($conn, "INSERT INTO BONDANG_HR.PSNL_TRANSFER($cols) VALUES ($placeholders)", $types, $params);
     }
     else {
-        $setSql = "PSNL_CD=?, ORG_CD=?, WORK_TYPE=?, POSITION=?, TRS_TYPE=?, TRS_DTL=?, TRS_DT=?";
-        $types = "sssssss";
+        $setSql = "PSNL_CD=?, ORG_CD=?, WORK_TYPE=?, POSITION=?, TRS_TYPE=?, TRS_DTL=?, TRS_DT=?, BNF_DT=?";
+        $types = "ssssssss";
         $params = [$_REQUEST['PSNL_CD'], @$_REQUEST['ORG_CD'], @$_REQUEST['WORK_TYPE'], @$_REQUEST['POSITION'],
-            @$_REQUEST['TRS_TYPE'], @$_REQUEST['TRS_DTL'], @$_REQUEST['TRS_DT']];
+            @$_REQUEST['TRS_TYPE'], @$_REQUEST['TRS_DTL'], @$_REQUEST['TRS_DT'], @$_REQUEST['BNF_DT']];
 
         if (@$_REQUEST['APP_DT']) {
             $setSql .= ", APP_DT=?";

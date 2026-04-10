@@ -60,6 +60,10 @@
                 <div class="modalHd">임용일</div>
                 <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
             </div>
+            <div class="modalGrp">
+                <div class="modalHd">복리후생기준일</div>
+                <div class="modalBd"><input autocomplete='off' class="dateBox"></div>
+            </div>
             <div style="clear:both;"></div>
         </div>
         <div class="modalFooter">

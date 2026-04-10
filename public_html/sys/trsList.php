@@ -47,7 +47,7 @@ if (@$_REQUEST['TRS_DT_To']) {
     $types .= "s";
 }
 
-$allowedColumns = ['PSNL_CD', 'ORG_NM', 'TRS_TYPE', 'TRS_DTL', 'TRS_DT', 'REG_DT', 'PSNL_NM', 'TRS_CD', 'POSITION', 'WORK_TYPE', 'APP_DT'];
+$allowedColumns = ['PSNL_CD', 'ORG_NM', 'TRS_TYPE', 'TRS_DTL', 'TRS_DT', 'BNF_DT', 'REG_DT', 'PSNL_NM', 'TRS_CD', 'POSITION', 'WORK_TYPE', 'APP_DT'];
 $orderSql = safeOrderBy(@$_REQUEST['ORDER'], $allowedColumns);
 $limitSql = safeLimit(@$_REQUEST['LIMIT']);
 

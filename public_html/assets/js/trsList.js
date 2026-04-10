@@ -28,6 +28,7 @@ var mytbl = new hr_tbl({
         , { title: "상세정보", data: "TRS_DTL", className: "" }
         , { title: "발령일", data: "TRS_DT", className: "" }
         , { title: "임용일", data: "APP_DT", className: "" }
+        , { title: "복리후생", data: "BNF_DT", className: "" }
     ],
 });
 mytbl.show('myTbl'); //테이블의 아이디에 렌더링 한다(갱신도 가능)
@@ -83,6 +84,7 @@ function trDataXHR(idx) {
                         case 3: input.value = res[0].TRS_DTL; break;
                         case 4: input.value = res[0].TRS_DT; break;
                         case 5: input.value = res[0].APP_DT; break;
+                        case 6: input.value = res[0].BNF_DT; break;
                     }
                 });
                 document.querySelector(".modalBody").querySelectorAll("select").forEach((sel, key) => {
@@ -117,6 +119,7 @@ modalEdtBtn.addEventListener("click", () => {
                 writeUrl += "&TRS_DT=" + input.value;
             }
             else if (key == 5) { writeUrl += "&APP_DT=" + input.value; }
+            else if (key == 6) { writeUrl += "&BNF_DT=" + input.value; }
         });
     } catch (e) {
         console.log("필수값 체크"); return false;
