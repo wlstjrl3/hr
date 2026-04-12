@@ -8,8 +8,10 @@ if ($_REQUEST['CRUD'] == 'C') {
         $placeholders = "?,?,?,?,?,?,?,?,?";
         $types = "sssssssss";
         $regDt = date("Y-m-d h:m:s");
+        $trsDt = $_REQUEST['TRS_DT'] ?: null;
+        $bnfDt = $_REQUEST['BNF_DT'] ?: null;
         $params = [$_REQUEST['PSNL_CD'], $_REQUEST['ORG_CD'], $_REQUEST['WORK_TYPE'], $_REQUEST['POSITION'],
-            $_REQUEST['TRS_TYPE'], $_REQUEST['TRS_DTL'], $_REQUEST['TRS_DT'], $_REQUEST['BNF_DT'], $regDt];
+            $_REQUEST['TRS_TYPE'], $_REQUEST['TRS_DTL'], $trsDt, $bnfDt, $regDt];
 
         if (@$_REQUEST['APP_DT']) {
             $cols .= ",APP_DT";
@@ -22,8 +24,10 @@ if ($_REQUEST['CRUD'] == 'C') {
     else {
         $setSql = "PSNL_CD=?, ORG_CD=?, WORK_TYPE=?, POSITION=?, TRS_TYPE=?, TRS_DTL=?, TRS_DT=?, BNF_DT=?";
         $types = "ssssssss";
+        $trsDt = @$_REQUEST['TRS_DT'] ?: null;
+        $bnfDt = @$_REQUEST['BNF_DT'] ?: null;
         $params = [$_REQUEST['PSNL_CD'], @$_REQUEST['ORG_CD'], @$_REQUEST['WORK_TYPE'], @$_REQUEST['POSITION'],
-            @$_REQUEST['TRS_TYPE'], @$_REQUEST['TRS_DTL'], @$_REQUEST['TRS_DT'], @$_REQUEST['BNF_DT']];
+            @$_REQUEST['TRS_TYPE'], @$_REQUEST['TRS_DTL'], $trsDt, $bnfDt];
 
         if (@$_REQUEST['APP_DT']) {
             $setSql .= ", APP_DT=?";
