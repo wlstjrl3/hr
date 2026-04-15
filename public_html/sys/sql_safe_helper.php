@@ -74,7 +74,15 @@ function executeQuery($conn, $sql, $types = "", $params = [])
 {
     $stmt = $conn->prepare($sql);
     if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
+        // Bind parameters by reference to satisfy mysqli_stmt::bind_param requirements.
+        // Merge the type string with the parameters and create a reference array.
+        $bind_names = array_merge([$types], $params);
+        $tmp = [];
+        foreach ($bind_names as $key => $value) {
+            $tmp[$key] = &$bind_names[$key];
+        }
+        // Use call_user_func_array to bind the parameters.
+        call_user_func_array([$stmt, 'bind_param'], $tmp);
     }
     $stmt->execute();
     $result = $stmt->get_result();
@@ -100,7 +108,13 @@ function executeUpdate($conn, $sql, $types = "", $params = [])
 {
     $stmt = $conn->prepare($sql);
     if (!empty($params)) {
-        $stmt->bind_param($types, ...$params);
+        // Bind parameters by reference similar to executeQuery.
+        $bind_names = array_merge([$types], $params);
+        $tmp = [];
+        foreach ($bind_names as $key => $value) {
+            $tmp[$key] = &$bind_names[$key];
+        }
+        call_user_func_array([$stmt, 'bind_param'], $tmp);
     }
     $stmt->execute();
     $affected = $stmt->affected_rows;

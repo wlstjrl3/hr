@@ -89,7 +89,7 @@
         <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>재직구분</b></span></div>
             <div class="colBd"><select id="TRS_TYPE" class="filter">
-                <option value="1">재직(+전보)</option><option value="2">퇴사</option><option value="">전체</option>
+                <option value="1">재직</option><option value="2">퇴사</option><option value="">전체</option>
             </select></div>
         </div>
         <div class="colGrp">

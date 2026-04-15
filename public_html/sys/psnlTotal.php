@@ -82,19 +82,28 @@ $rowCntSql = "SELECT COUNT(*) AS ROW_CNT FROM PSNL_INFO A
         LEFT OUTER JOIN PSNL_PARTTIME PTT ON PTT.PTT_CD = PTT_SUB.MAX_PTT_CD
         ";
 //기본 쿼리 (전보로 사무장 전환 등의 정보를 반영하기 위하여 기존 C.TRS_TYPE / C.POSITION등의 데이터를 모두 C2로 교체함 20251128 양진석)
-$sql = "SELECT 
+        $sql = "SELECT 
         CASE 
         WHEN C2.TRS_TYPE = 1 THEN '재직'
         WHEN C2.TRS_TYPE = 2 THEN '퇴사'
         WHEN C2.TRS_TYPE = 3 THEN '전보'
         END AS TRS_TYPE
         ,C2.POSITION,C2.WORK_TYPE
-        ,C2.TRS_DT, HIRE_TRS.BNF_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
+        ,CASE 
+            WHEN C2.TRS_TYPE = 2 THEN C2.TRS_DT
+            /* 전보( TRS_TYPE = 3 )인 경우에도 최신 입사일을 표시하도록 함 */
+            ELSE LATEST_ENTRY.LATEST_HIRE_DT
+          END AS TRS_DT, LATEST_ENTRY.LATEST_BNF_DT AS BNF_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
         ,IFNULL(OH_V.PERSON_CNT, 0) AS PERSON_CNT
         ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM
         ,{$ageSql} AS AGE
         ,A.PHONE_NUM,LEFT(A.PSNL_NUM,14) AS PSNL_NUM
-        ,TRUNCATE(DATEDIFF('{$baseDate}', IF(C2.TRS_TYPE = 3, CM.HIRE_DT, C.TRS_DT))/365,1) AS TRS_ELAPSE 
+        ,TRUNCATE(DATEDIFF('{$baseDate}', 
+            CASE 
+                WHEN C2.TRS_TYPE = 2 THEN C2.TRS_DT
+                ELSE LATEST_ENTRY.LATEST_HIRE_DT
+            END
+        )/365,1) AS TRS_ELAPSE 
         ,CASE 
             WHEN D.ADVANCE_DT IS NOT NULL AND PTT.PTT_YEAR IS NOT NULL THEN 
                 IF(LEFT(D.ADVANCE_DT, 4) >= PTT.PTT_YEAR, D.ADVANCE_DT, CONCAT(PTT.PTT_YEAR, '(최저)'))
@@ -137,23 +146,16 @@ $sql = "SELECT
 
         LEFT OUTER JOIN ORG_INFO B ON C2.ORG_CD = B.ORG_CD            
         
-        /* [추가] 입사(최초 발령)일 조회를 위한 집계 */
+        /* [추가] 최신 입사(재입사) 레코드 조회 */
         LEFT OUTER JOIN (
-            SELECT PSNL_CD, MIN(TRS_DT) AS HIRE_DT
-            FROM PSNL_TRANSFER
-            GROUP BY PSNL_CD
-        ) CM ON CM.PSNL_CD = A.PSNL_CD
-
-        /* [추가] 발령구분 '입사'(TRS_TYPE=1) 레코드의 BNF_DT 조회 (1건 보장) */
-        LEFT OUTER JOIN (
-            SELECT PSNL_CD, BNF_DT
+            SELECT PSNL_CD, TRS_DT AS LATEST_HIRE_DT, BNF_DT AS LATEST_BNF_DT
             FROM (
-                SELECT PSNL_CD, BNF_DT,
-                       ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY TRS_DT ASC, TRS_CD ASC) AS rn
+                SELECT PSNL_CD, TRS_DT, BNF_DT,
+                       ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY TRS_DT DESC, TRS_CD DESC) AS rn
                 FROM PSNL_TRANSFER
                 WHERE TRS_TYPE = '1'
             ) t WHERE rn = 1
-        ) HIRE_TRS ON HIRE_TRS.PSNL_CD = A.PSNL_CD
+        ) LATEST_ENTRY ON LATEST_ENTRY.PSNL_CD = A.PSNL_CD
         
         LEFT OUTER JOIN (
             SELECT PSNL_CD, GRD_CD AS MAX_GRD_CD
