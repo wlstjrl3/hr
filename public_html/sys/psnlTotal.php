@@ -89,7 +89,7 @@ $sql = "SELECT
         WHEN C2.TRS_TYPE = 3 THEN '전보'
         END AS TRS_TYPE
         ,C2.POSITION,C2.WORK_TYPE
-        ,C2.TRS_DT, C2.BNF_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
+        ,C2.TRS_DT, HIRE_TRS.BNF_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
         ,IFNULL(OH_V.PERSON_CNT, 0) AS PERSON_CNT
         ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM
         ,{$ageSql} AS AGE
@@ -143,6 +143,13 @@ $sql = "SELECT
             FROM PSNL_TRANSFER
             GROUP BY PSNL_CD
         ) CM ON CM.PSNL_CD = A.PSNL_CD
+
+        /* [추가] 발령구분 '입사'(TRS_TYPE=1) 레코드의 BNF_DT 조회 */
+        LEFT OUTER JOIN (
+            SELECT PSNL_CD, BNF_DT
+            FROM PSNL_TRANSFER
+            WHERE TRS_TYPE = '1'
+        ) HIRE_TRS ON HIRE_TRS.PSNL_CD = A.PSNL_CD
         
         LEFT OUTER JOIN (
             SELECT PSNL_CD, GRD_CD AS MAX_GRD_CD
