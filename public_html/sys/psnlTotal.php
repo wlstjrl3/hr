@@ -89,7 +89,7 @@ $sql = "SELECT
         WHEN C2.TRS_TYPE = 3 THEN '전보'
         END AS TRS_TYPE
         ,C2.POSITION,C2.WORK_TYPE
-        ,C2.TRS_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
+        ,C2.TRS_DT, C2.BNF_DT, C.APP_DT, B.ORG_NM, B.ORG_CD
         ,IFNULL(OH_V.PERSON_CNT, 0) AS PERSON_CNT
         ,A.PSNL_CD,A.PSNL_NM,A.BAPT_NM
         ,{$ageSql} AS AGE

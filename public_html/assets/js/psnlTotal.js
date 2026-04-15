@@ -32,6 +32,7 @@ var mytbl = new hr_tbl({
         , { title: "연락처", data: "PHONE_NUM", className: "hidden" }
         , { title: "주민번호", data: "PSNL_NUM", className: "hidden" }
         , { title: "재직구분", data: "TRS_TYPE", className: "hidden" }
+        , { title: "복리후생일", data: "BNF_DT", className: "" }
         , { 
             title: "입/퇴사일", data: "TRS_DT", className: "", render: function (data, row) {
                 if (row.TRS_TYPE === '퇴사' && data) {
