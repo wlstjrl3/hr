@@ -144,11 +144,15 @@ $sql = "SELECT
             GROUP BY PSNL_CD
         ) CM ON CM.PSNL_CD = A.PSNL_CD
 
-        /* [추가] 발령구분 '입사'(TRS_TYPE=1) 레코드의 BNF_DT 조회 */
+        /* [추가] 발령구분 '입사'(TRS_TYPE=1) 레코드의 BNF_DT 조회 (1건 보장) */
         LEFT OUTER JOIN (
             SELECT PSNL_CD, BNF_DT
-            FROM PSNL_TRANSFER
-            WHERE TRS_TYPE = '1'
+            FROM (
+                SELECT PSNL_CD, BNF_DT,
+                       ROW_NUMBER() OVER (PARTITION BY PSNL_CD ORDER BY TRS_DT ASC, TRS_CD ASC) AS rn
+                FROM PSNL_TRANSFER
+                WHERE TRS_TYPE = '1'
+            ) t WHERE rn = 1
         ) HIRE_TRS ON HIRE_TRS.PSNL_CD = A.PSNL_CD
         
         LEFT OUTER JOIN (
