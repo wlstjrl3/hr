@@ -32,18 +32,19 @@ $toEmail  = $_POST['EMAIL'] ?? '';
 $orgNm    = $_POST['ORG_NM'] ?? '';
 $psnlNm   = $_POST['PSNL_NM'] ?? '';
 $certType = $_POST['CERT_TYPE'] ?? '';
-$imageData = $_POST['IMAGE_DATA'] ?? '';
+$pdfData  = $_POST['PDF_DATA'] ?? '';
 
-if (empty($toEmail) || empty($imageData)) {
+if (empty($toEmail) || empty($pdfData)) {
     die(json_encode(["result" => "error", "message" => "Required data missing"]));
 }
 
-// 4. 이미지 데이터 가공 (Base64 -> Binary)
-$imgParts = explode(',', $imageData);
-if (count($imgParts) < 2) {
-    die(json_encode(["result" => "error", "message" => "Invalid image data"]));
+// 4. PDF 데이터 가공 (Data URI -> Binary)
+// 형식: data:application/pdf;filename=generated.pdf;base64,JVBERi0xLjQK...
+$pdfParts = explode('base64,', $pdfData);
+if (count($pdfParts) < 2) {
+    die(json_encode(["result" => "error", "message" => "Invalid PDF data"]));
 }
-$binaryData = base64_decode($imgParts[1]);
+$binaryData = base64_decode($pdfParts[1]);
 
 // 5. PHPMailer를 통한 SMTP 발송
 $mail = new PHPMailer(true);
@@ -64,8 +65,8 @@ try {
     $mail->addAddress($toEmail, $psnlNm);
 
     // 첨부 파일 등록
-    $fileName = "Certificate_{$issueNo}.png";
-    $mail->addStringAttachment($binaryData, $fileName);
+    $fileName = "Certificate_{$issueNo}.pdf";
+    $mail->addStringAttachment($binaryData, $fileName, 'base64', 'application/pdf');
 
     // 메일 콘텐츠 설정 (HTML)
     $mail->isHTML(true);
@@ -75,7 +76,7 @@ try {
         <div style='font-family: sans-serif; line-height: 1.6;'>
             <h2 style='color: #2c3e50;'>제증명서 발송 안내</h2>
             <p>안녕하세요, <b>제1대리구 인사관리시스템</b>입니다.</p>
-            <p>요청하신 제증명서 파일(이미지)을 첨부하여 보내드립니다.</p>
+            <p>요청하신 제증명서 파일(PDF)을 첨부하여 보내드립니다.</p>
             <div style='background: #f8f9fa; padding: 15px; border-left: 5px solid #3498db; margin: 20px 0;'>
                 <ul style='list-style: none; padding: 0;'>
                     <li><b>발급번호:</b> {$issueNo}</li>

@@ -354,7 +354,17 @@ async function sendEmail() {
             backgroundColor: "#ffffff",
             scrollY: -window.scrollY // 스크롤 위치 보정
         });
-        const imageData = canvas.toDataURL("image/png");
+
+        // [PDF 변환]
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgData = canvas.toDataURL("image/png");
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        const pdfBase64 = pdf.output('datauristring');
 
         // 캡처 완료 후 모달 숨기기
         printModal.style.visibility = "hidden";
@@ -369,7 +379,7 @@ async function sendEmail() {
         formData.append("ORG_NM", d.CURR_ORG_NM);
         formData.append("PSNL_NM", d.PSNL_NM);
         formData.append("CERT_TYPE", d.CERT_TYPE);
-        formData.append("IMAGE_DATA", imageData);
+        formData.append("PDF_DATA", pdfBase64); // IMAGE_DATA -> PDF_DATA
 
         const emailResp = await fetch(DIR_ROOT + "/sys/sendCertEmail.php", {
             method: "POST",
