@@ -91,6 +91,10 @@ while ($row = mysqli_fetch_assoc($result)) {
             </select></div>
         </div>
         <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>조직코드</b></span></div>
+            <div class="colBd"><input id="ORG_CD" class="filter"></div>
+        </div>
+        <div class="colGrp">
             <div class="colHd clBg5 cl2"><span><b>조직명</b></span></div>
             <div class="colBd"><input id="ORG_NM" class="filter"></div>
         </div>

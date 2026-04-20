@@ -31,6 +31,11 @@ if (@$_REQUEST['UPR_ORG']) {
     $params[] = $_REQUEST['UPR_ORG'];
     $types .= "s";
 }
+if (@$_REQUEST['ORG_CD']) {
+    $whereSql .= " AND A.ORG_CD LIKE ?";
+    $params[] = '%' . $_REQUEST['ORG_CD'] . '%';
+    $types .= "s";
+}
 if (@$_REQUEST['ORG_NM']) {
     $whereSql .= " AND A.ORG_NM LIKE ?";
     $params[] = '%' . $_REQUEST['ORG_NM'] . '%';

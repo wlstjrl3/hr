@@ -17,6 +17,7 @@ var mytbl = new hr_tbl({
     columns: [
         //반드시 첫열이 key값이되는 열이 와야한다. 숨김여부는 class로 추가 지정
         { title: "idx", data: "ORG_CD", className: "hidden" }
+        , { title: "조직코드", data: "ORG_CD", className: "" }
         , { title: "조직명", data: "ORG_NM", className: "" }
         , { title: "상위조직", data: "UPR_ORG_NM", className: "" }
         , { title: "조직타입", data: "ORG_TYPE", className: "" }
