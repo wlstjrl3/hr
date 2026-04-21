@@ -15,7 +15,7 @@
 
 <link href="<?php echo DIR_ROOT; ?>/assets/css/index.css?ver=1775259319" rel="stylesheet" />
 <link href="<?php echo DIR_ROOT; ?>/assets/css/addTblForm.css?ver=1775259319" rel="stylesheet" />
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/index.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/index.js?v=1'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/dateFormat.js'></script>
 
 <?php include('components/footer.php'); ?>

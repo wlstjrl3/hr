@@ -40,13 +40,13 @@ async function xhrLoad() {
         document.getElementById("rtrTbl").innerHTML = htmlTxt1;
 
         // 2~4. 장기 근속자 정보 (10, 20, 30년)
-        const years = [10, 20, 30];
+        const years = [30, 20, 10];
         let htmlTxtSum = `<ul><li>발령기간</li><li>성명</li><li>소속</li><li>직책</li><li>발령일</li><li>생년월일</li><li>근무형태</li><li>급</li><li>호</li></ul>`;
 
         for (const year of years) {
             const dtFrom = dateFormat(dateCalc(dateCalc(new Date(), "m", 0), "y", -year));
             const dtTo = dateFormat(dateCalc(dateCalc(new Date(), "m", 6), "y", -year));
-            const url = `${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&TRS_TYPE=1&ORDER=TRS_DT ASC&TRS_DT_From=${dtFrom}&TRS_DT_To=${dtTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
+            const url = `${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&TRS_TYPE=1&ORDER=${encodeURIComponent('TRS_DT ASC')}&TRS_DT_From=${dtFrom}&TRS_DT_To=${dtTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
 
             const res = await fetch(url).then(r => r.json());
             if (res.data) {
