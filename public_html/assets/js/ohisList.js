@@ -164,29 +164,51 @@ batchDel.addEventListener("click", () => {
 document.querySelector("#file").addEventListener('change', target => {
     let fileName = target.currentTarget.value;
     document.querySelector(".upload-name").value = fileName; //파일명 표시
-    // [input 태그에 파일이 선텍 된 경우 로직 수행]
+    
     if (fileName.slice(-4) == 'xlsx' || fileName.slice(-4) == '.xls') {
-        let input = target.currentTarget; //??? 사용되는 코드인가?
+        const fetchDate = prompt("교구양업 조회날짜를 입력하세요");
+        if (!fetchDate) {
+            alert("조회날짜가 입력되지 않아 중단합니다.");
+            return;
+        }
+
+        let input = target.currentTarget;
         let reader = new FileReader();
         reader.onload = function () {
             let data = reader.result;
             let workBook = XLSX.read(data, { type: 'binary' });
             workBook.SheetNames.forEach(function (sheetName) {
-                let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
-                if (rows[0]['OH_DT']) {
-                    if (rows[0]['OH_DT'].length != 10) { rows[0]['OH_DT'] = excelDateToJSDate(rows[0]['OH_DT']); }//엑셀에서 날짜가 숫자로 변환되어버린 경우 재보정
-                    if (!confirm(rows[0]['OH_DT'] + "기준일의 " + rows[0]['ORG_NM'] + " 성당 / 신자수" + rows[0]['PERSON_CNT'] + "명 외 " + (rows.length - 1) + "건 의 정보를 일괄등록 하시겠습니까?")) {
-                        // 취소(아니오) 버튼 클릭 시 이벤트
-                        return false;
+                // {header: 1} 옵션을 사용하여 원시 배열 형태로 읽음
+                let rawRows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName], { header: 1 });
+                
+                // 데이터 매핑 (A열: ORG_NM, I열: PERSON_CNT)
+                // 3행(index 2)부터 실제 데이터가 시작됨
+                let processedRows = [];
+                for (let i = 2; i < rawRows.length; i++) {
+                    let row = rawRows[i];
+                    if (row[0] && row[8]) { // 조직명과 인원수가 모두 있는 경우만 추가
+                        processedRows.push({
+                            OH_DT: fetchDate,
+                            ORG_NM: String(row[0]).trim(),
+                            PERSON_CNT: row[8],
+                            ETC: '교구양업 업로드'
+                        });
                     }
-                } else {
-                    alert("파일 구조가 잘못되었습니다.");
+                }
+
+                if (processedRows.length === 0) {
+                    alert("업로드할 유효한 데이터가 없습니다. (3행부터 데이터를 확인해주세요)");
+                    return;
+                }
+
+                if (!confirm(fetchDate + " 기준일의 정보를 포함하여 총 " + processedRows.length + "건의 정보를 일괄등록 하시겠습니까?")) {
                     return false;
                 }
+
                 fetch(DIR_ROOT + '/sys/ohisBatchInsert.php?key=' + API_TOKEN, {
                     method: 'POST',
                     headers: { 'Content-type': 'application/json;charset=UTF-8' },
-                    body: JSON.stringify(rows)
+                    body: JSON.stringify(processedRows)
                 })
                     .then(response => {
                         if (!response.ok) throw new Error(response.statusText);
@@ -194,15 +216,16 @@ document.querySelector("#file").addEventListener('change', target => {
                     })
                     .then(text => {
                         console.log(text);
+                        alert("업로드가 완료되었습니다.");
                         mytbl.show("myTbl");
                     })
                     .catch(error => {
                         console.error("통신 실패:", error);
+                        alert("업로드 중 오류가 발생했습니다.");
                     });
             })
         };
 
-        // [input 태그 파일 읽음]
         reader.readAsBinaryString(input.files[0]);
     } else {
         alert("엑셀 파일형식이 아닙니다.");

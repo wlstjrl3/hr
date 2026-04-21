@@ -167,6 +167,11 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                             </a>
                         </li>
                         <li>
+                            <a href="<?php echo DIR_ROOT; ?>/orgFinancial">
+                                └&nbsp;본당결산 관리
+                            </a>
+                        </li>
+                        <li>
                             <a href="<?php echo DIR_ROOT; ?>/ohisList">
                                 └&nbsp;년도별 신자수
                             </a>
@@ -207,6 +212,11 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/statPsnlTable">
                                 └&nbsp;인사관리 대상 현황
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?php echo DIR_ROOT; ?>/statSalaryOhis">
+                                └&nbsp;신자수대비급여
                             </a>
                         </li>
                     </ul>

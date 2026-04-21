@@ -46,7 +46,7 @@ async function xhrLoad() {
         for (const year of years) {
             const dtFrom = dateFormat(dateCalc(dateCalc(new Date(), "m", 0), "y", -year));
             const dtTo = dateFormat(dateCalc(dateCalc(new Date(), "m", 6), "y", -year));
-            const url = `${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&TRS_TYPE=1&ORDER=PSNL_NUM ASC&TRS_DT_From=${dtFrom}&TRS_DT_To=${dtTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
+            const url = `${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&TRS_TYPE=1&ORDER=TRS_DT ASC&TRS_DT_From=${dtFrom}&TRS_DT_To=${dtTo}&EXCLUDE_POS=${encodeURIComponent('가사사용인')}`;
 
             const res = await fetch(url).then(r => r.json());
             if (res.data) {
