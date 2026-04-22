@@ -73,18 +73,21 @@ function safeDateParam($date)
 function executeQuery($conn, $sql, $types = "", $params = [])
 {
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new Exception("Prepare failed: " . $conn->error . " | SQL: " . $sql);
+    }
     if (!empty($params)) {
         // Bind parameters by reference to satisfy mysqli_stmt::bind_param requirements.
-        // Merge the type string with the parameters and create a reference array.
         $bind_names = array_merge([$types], $params);
         $tmp = [];
         foreach ($bind_names as $key => $value) {
             $tmp[$key] = &$bind_names[$key];
         }
-        // Use call_user_func_array to bind the parameters.
         call_user_func_array([$stmt, 'bind_param'], $tmp);
     }
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception("Execute failed: " . $stmt->error);
+    }
     $result = $stmt->get_result();
     $data = [];
     while ($row = mysqli_fetch_assoc($result)) {
@@ -94,21 +97,13 @@ function executeQuery($conn, $sql, $types = "", $params = [])
     return $data;
 }
 
-/**
- * Prepared Statement를 실행합니다 (INSERT/UPDATE/DELETE 용).
- * 결과 행이 필요 없는 쿼리에 사용합니다.
- * 
- * @param mysqli $conn DB 연결 객체
- * @param string $sql SQL 문자열
- * @param string $types bind_param 타입 문자열
- * @param array $params 바인딩할 파라미터 배열
- * @return int 영향받은 행 수
- */
 function executeUpdate($conn, $sql, $types = "", $params = [])
 {
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new Exception("Prepare failed: " . $conn->error . " | SQL: " . $sql);
+    }
     if (!empty($params)) {
-        // Bind parameters by reference similar to executeQuery.
         $bind_names = array_merge([$types], $params);
         $tmp = [];
         foreach ($bind_names as $key => $value) {
@@ -116,7 +111,9 @@ function executeUpdate($conn, $sql, $types = "", $params = [])
         }
         call_user_func_array([$stmt, 'bind_param'], $tmp);
     }
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        throw new Exception("Execute failed: " . $stmt->error);
+    }
     $affected = $stmt->affected_rows;
     $stmt->close();
     return $affected;

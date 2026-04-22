@@ -54,13 +54,11 @@ class hr_tbl {
                         }
                         this.hrDt.columns.forEach((cl, key) => {
                             str += `<td class="` + cl.className + `" data-label="` + cl.title + `"><p class="sharp">`;
-                            let cellData = row[cl.data];
-                            if (cellData !== null && cellData !== undefined && cellData !== '') {
-                                if (cl.render) {
-                                    str += cl.render(cellData, row);
-                                } else {
-                                    str += cellData;
-                                }
+                            let cellData = cl.data ? row[cl.data] : null;
+                            if (cl.render) {
+                                str += cl.render(cellData, row);
+                            } else if (cellData !== null && cellData !== undefined && cellData !== '') {
+                                str += cellData;
                             }
                             str += `</p></td>`;
                         });

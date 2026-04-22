@@ -16,15 +16,16 @@ if ($crud === 'U') {
     foreach ($input as $row) {
         $org_cd = $row['org_cd'];
         $acc_nm = $row['acc_nm'];
+        $acc_type = $row['acc_type'];
         $amount = $row['amount'] ?: 0;
         $fsc_year = $row['fsc_year'];
 
-        $sql = "INSERT INTO BONDANG_HR.ORG_FINANCIAL (ORG_CD, ACC_NM, AMOUNT, FSC_YEAR) 
-                VALUES (?, ?, ?, ?) 
+        $sql = "INSERT INTO BONDANG_HR.ORG_BUDGET (ORG_CD, ACC_NM, ACC_TYPE, AMOUNT, FSC_YEAR) 
+                VALUES (?, ?, ?, ?, ?) 
                 ON DUPLICATE KEY UPDATE AMOUNT = VALUES(AMOUNT)";
         
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssi", $org_cd, $acc_nm, $amount, $fsc_year);
+        $stmt->bind_param("ssssi", $org_cd, $acc_nm, $acc_type, $amount, $fsc_year);
         if ($stmt->execute()) {
             $successCount++;
         }
@@ -37,15 +38,16 @@ if ($crud === 'U') {
     // Create or Update single record
     $org_cd = $input['ORG_CD'];
     $acc_nm = $input['ACC_NM'];
+    $acc_type = $input['ACC_TYPE'];
     $amount = $input['AMOUNT'] ?: 0;
     $fsc_year = $input['FSC_YEAR'];
 
-    $sql = "INSERT INTO BONDANG_HR.ORG_FINANCIAL (ORG_CD, ACC_NM, AMOUNT, FSC_YEAR) 
-            VALUES (?, ?, ?, ?) 
+    $sql = "INSERT INTO BONDANG_HR.ORG_BUDGET (ORG_CD, ACC_NM, ACC_TYPE, AMOUNT, FSC_YEAR) 
+            VALUES (?, ?, ?, ?, ?) 
             ON DUPLICATE KEY UPDATE AMOUNT = VALUES(AMOUNT)";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssi", $org_cd, $acc_nm, $amount, $fsc_year);
+    $stmt->bind_param("ssssi", $org_cd, $acc_nm, $acc_type, $amount, $fsc_year);
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success']);
     } else {
@@ -58,10 +60,11 @@ if ($crud === 'U') {
     $fsc_year = $_REQUEST['FSC_YEAR'];
     $org_cd = $_REQUEST['ORG_CD'];
     $acc_nm = $_REQUEST['ACC_NM'];
+    $acc_type = $_REQUEST['ACC_TYPE'];
 
-    $sql = "DELETE FROM BONDANG_HR.ORG_FINANCIAL WHERE FSC_YEAR = ? AND ORG_CD = ? AND ACC_NM = ?";
+    $sql = "DELETE FROM BONDANG_HR.ORG_BUDGET WHERE FSC_YEAR = ? AND ORG_CD = ? AND ACC_NM = ? AND ACC_TYPE = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $fsc_year, $org_cd, $acc_nm);
+    $stmt->bind_param("ssss", $fsc_year, $org_cd, $acc_nm, $acc_type);
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success']);
     } else {

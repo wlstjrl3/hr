@@ -167,8 +167,8 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                             </a>
                         </li>
                         <li>
-                            <a href="<?php echo DIR_ROOT; ?>/orgFinancial">
-                                └&nbsp;본당결산 관리
+                            <a href="<?php echo DIR_ROOT; ?>/orgBudget">
+                                └&nbsp;본당예산 관리
                             </a>
                         </li>
                         <li>
@@ -216,7 +216,7 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                         </li>
                         <li>
                             <a href="<?php echo DIR_ROOT; ?>/statSalaryOhis">
-                                └&nbsp;신자수대비급여
+                                └&nbsp;예산액 비율현황
                             </a>
                         </li>
                     </ul>

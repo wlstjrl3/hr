@@ -7,7 +7,7 @@ include('./components/header.php');
     <div class="modalBg"></div>
     <div class="modalWindow">
         <div class="modalHeader">
-            <b>결산 정보 상세</b>
+            <b>예산 정보 상세</b>
             <button></button>
         </div>
         <div class="modalBody">
@@ -30,6 +30,15 @@ include('./components/header.php');
                 <div class="modalBd"><input id="ACC_NM" autocomplete='off'></div>
             </div>
             <div class="modalGrp">
+                <div class="modalHd">구분</div>
+                <div class="modalBd">
+                    <select id="ACC_TYPE">
+                        <option value="수입">수입</option>
+                        <option value="지출">지출</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modalGrp">
                 <div class="modalHd">금액</div>
                 <div class="modalBd"><input id="AMOUNT" autocomplete='off' type="number"></div>
             </div>
@@ -45,7 +54,7 @@ include('./components/header.php');
 <div class="container">
 
     <h4 class="cl3 pddS">
-        본당 결산 관리
+        본당 예산 관리
     </h4>
 
     <div class="searchArea">
@@ -61,6 +70,16 @@ include('./components/header.php');
             <div class="colHd clBg5 cl2"><span><b>계정명</b></span></div>
             <div class="colBd"><input id="S_ACC_NM" class="filter"></div>
         </div>
+        <div class="colGrp">
+            <div class="colHd clBg5 cl2"><span><b>구분</b></span></div>
+            <div class="colBd">
+                <select id="S_ACC_TYPE" class="filter">
+                    <option value="">전체</option>
+                    <option value="수입">수입</option>
+                    <option value="지출">지출</option>
+                </select>
+            </div>
+        </div>
     </div>
     <div class="clearB"></div>
 
@@ -69,7 +88,7 @@ include('./components/header.php');
         <div class="pddS floatL">
             <a id="newCol" class="pddS clBg3 clW rndCorner pointer">신규</a>
             <input type="file" id="excelFile" style="display:none;" accept=".xlsx, .xls">
-            <a id="uploadExcel" class="pddS clBg3 clW rndCorner pointer">결산 엑셀 업로드</a>
+            <a id="uploadExcel" class="pddS clBg3 clW rndCorner pointer">예산 엑셀 업로드</a>
             <a id="xport" class="pddS clBg3 clW rndCorner pointer">엑셀 다운로드</a>
         </div>
         <div class="pddS floatR">
@@ -93,6 +112,6 @@ include('./components/header.php');
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/hr_tbl.js?ver=1775259319'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/modal.js?ver=1775259319'></script>
 <script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/library/xlsx.mini.min.js'></script>
-<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/orgFinancial.js'></script>
+<script type='text/javascript' src='<?php echo DIR_ROOT; ?>/assets/js/orgBudget.js'></script>
 
 <?php include('components/footer.php'); ?>

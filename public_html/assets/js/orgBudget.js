@@ -1,7 +1,7 @@
 //데이터테이블을 지정한다.
 var mytbl = new hr_tbl({
     xhr: {
-        url: DIR_ROOT + '/sys/orgFinancial.php',
+        url: DIR_ROOT + '/sys/orgBudget.php',
         columXHR: '',
         key: API_TOKEN,
         where: {
@@ -20,6 +20,7 @@ var mytbl = new hr_tbl({
         , { title: "조직코드", data: "ORG_CD", className: "" }
         , { title: "조직명", data: "ORG_NM", className: "" }
         , { title: "계정명", data: "ACC_NM", className: "" }
+        , { title: "구분", data: "ACC_TYPE", className: "" }
         , { title: "금액", data: "AMOUNT", className: "txtR", render: (data) => data ? Number(data).toLocaleString() : '0' }
     ],
 });
@@ -47,9 +48,10 @@ document.getElementById('excelFile').addEventListener('change', (e) => {
         const processedData = json.map(row => ({
             org_cd: row['조직코드'],
             acc_nm: row['계정명'],
+            acc_type: row['구분'],
             amount: row['금액'],
             fsc_year: row['회계연도']
-        })).filter(row => row.org_cd && row.acc_nm);
+        })).filter(row => row.org_cd && row.acc_nm && row.acc_type);
 
         if (processedData.length === 0) {
             alert("유효한 데이터가 없습니다. 엑셀 파일을 확인해주세요.");
@@ -57,7 +59,7 @@ document.getElementById('excelFile').addEventListener('change', (e) => {
         }
 
         if (confirm(processedData.length + "개의 데이터를 업로드/갱신 하시겠습니까?")) {
-            const url = DIR_ROOT + "/sys/orgFinancialConfig.php?key=" + API_TOKEN + "&CRUD=U";
+            const url = DIR_ROOT + "/sys/orgBudgetConfig.php?key=" + API_TOKEN + "&CRUD=U";
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -93,7 +95,7 @@ newCol.addEventListener("click", () => {
 // 행 클릭 시 상세조회
 function trDataXHR(uid) {
     if (!uid) return;
-    const [fsc_year, org_cd, acc_nm] = uid.split('|');
+    const [fsc_year, org_cd, acc_nm, acc_type] = uid.split('|');
     
     // 테이블 내에서 데이터를 찾아 모달에 채움 (서버 호출 최소화)
     const tr = document.querySelector(`tr[data-idx="${uid}"]`);
@@ -102,6 +104,7 @@ function trDataXHR(uid) {
         document.getElementById('ORG_CD').value = org_cd;
         document.getElementById('ORG_NM').value = tr.querySelector('[data-label="조직명"]').innerText;
         document.getElementById('ACC_NM').value = acc_nm;
+        document.getElementById('ACC_TYPE').value = acc_type || tr.querySelector('[data-label="구분"]').innerText;
         const amtStr = tr.querySelector('[data-label="금액"]').innerText.replace(/,/g, '');
         document.getElementById('AMOUNT').value = amtStr;
     }
@@ -113,15 +116,16 @@ modalEdtBtn.addEventListener("click", () => {
         FSC_YEAR: document.getElementById('FSC_YEAR').value,
         ORG_CD: document.getElementById('ORG_CD').value,
         ACC_NM: document.getElementById('ACC_NM').value,
+        ACC_TYPE: document.getElementById('ACC_TYPE').value,
         AMOUNT: document.getElementById('AMOUNT').value,
     };
 
-    if (!data.FSC_YEAR || !data.ORG_CD || !data.ACC_NM) {
+    if (!data.FSC_YEAR || !data.ORG_CD || !data.ACC_NM || !data.ACC_TYPE) {
         alert("필수 항목을 입력하세요.");
         return;
     }
 
-    const url = DIR_ROOT + "/sys/orgFinancialConfig.php?key=" + API_TOKEN + "&CRUD=C";
+    const url = DIR_ROOT + "/sys/orgBudgetConfig.php?key=" + API_TOKEN + "&CRUD=C";
     fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,9 +153,10 @@ modalDelBtn.addEventListener("click", () => {
     const fsc_year = document.getElementById('FSC_YEAR').value;
     const org_cd = document.getElementById('ORG_CD').value;
     const acc_nm = document.getElementById('ACC_NM').value;
+    const acc_type = document.getElementById('ACC_TYPE').value;
 
-    const url = DIR_ROOT + "/sys/orgFinancialConfig.php?key=" + API_TOKEN + "&CRUD=D" 
-                + "&FSC_YEAR=" + fsc_year + "&ORG_CD=" + org_cd + "&ACC_NM=" + encodeURIComponent(acc_nm);
+    const url = DIR_ROOT + "/sys/orgBudgetConfig.php?key=" + API_TOKEN + "&CRUD=D" 
+                + "&FSC_YEAR=" + fsc_year + "&ORG_CD=" + org_cd + "&ACC_NM=" + encodeURIComponent(acc_nm) + "&ACC_TYPE=" + encodeURIComponent(acc_type);
     
     fetch(url)
     .then(response => response.json())
