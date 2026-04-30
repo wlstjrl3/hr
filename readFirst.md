@@ -20,11 +20,14 @@ AI는 작업 주제 (readFirst/todo.md) 따라 필요한 내용만 참조하여 
 
 | 유형 | 경로 | 설명 |
 |---|---|---|
-| NEW | `sys/tuitionList.php` | 학자금 발급 내역 및 검색용 리스트 조회 API |
-| NEW | `sys/tuitionConfig.php` | 발급 정보 저장(CRUD) 및 번호 자동 채번 API |
-| NEW | `public_html/tuition.php` | 자녀학비보조금 서치 및 UI 웹 페이지 |
-| NEW | `public_html/assets/js/tuition.js` | 자녀학비보조금 전용 자바스크립트 로직 분리 파일 |
-| MODIFY | `public_html/components/header.php` | 헤더에 자녀학비보조금(tuition.php) 메뉴 링크 추가 |
+| NEW | `public_html/newEmpReg.php` | 여러 페이지로 흩어져 있던 직원 정보(기초, 발령, 급호봉, 제수당, 가족)를 한 곳에서 조회/입력/수정하는 통합 인사정보 관리 UI |
+| NEW | `public_html/assets/js/newEmpReg.js` | 통합 인사정보 관리 페이지 전용 자바스크립트 로직 (데이터 로드, 모달 제어, 저장/삭제 로직) |
+| MODIFY | `public_html/components/header.php` | 사이드 메뉴에 통합 인사정보 관리(newEmpReg.php) 링크 추가 |
+
+---
+
+## 🎯 향후 주요 목표 (Future Goals)
+- **UI/UX 모던 리뉴얼**: 이번 통합 인사정보 관리 페이지(`newEmpReg.php`) 구축 사례처럼, 기존에 여러 화면을 이동하며 팝업과 탭을 반복해야 했던 불편한 구형 UX를 찾아내어 한 화면에서 깔끔하고 직관적으로 처리할 수 있도록 **현대적인 UX/UI로 전면 리뉴얼**해 나가는 것을 목표로 합니다.
 
 ---
 

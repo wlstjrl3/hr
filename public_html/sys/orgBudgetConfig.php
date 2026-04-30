@@ -71,7 +71,47 @@ if ($crud === 'U') {
         echo json_encode(['status' => 'error', 'message' => $stmt->error]);
     }
     $stmt->close();
+} else if ($crud === 'BD') {
+    // Bulk Delete
+    $uids = $input['uids'] ?? [];
+    if (!is_array($uids)) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid input data']);
+        exit;
+    }
 
+    $successCount = 0;
+    $sql = "DELETE FROM BONDANG_HR.ORG_BUDGET WHERE FSC_YEAR = ? AND ORG_CD = ? AND ACC_NM = ? AND ACC_TYPE = ?";
+    $stmt = $conn->prepare($sql);
+    
+    foreach ($uids as $uid) {
+        $parts = explode('|', $uid);
+        if (count($parts) === 4) {
+            $stmt->bind_param("ssss", $parts[0], $parts[1], $parts[2], $parts[3]);
+            if ($stmt->execute()) {
+                $successCount++;
+            }
+        }
+    }
+    $stmt->close();
+    echo json_encode(['status' => 'success', 'message' => $successCount . ' rows deleted']);
+} else if ($crud === 'DY') {
+    // Delete by Year
+    $fsc_year = $_REQUEST['FSC_YEAR'];
+    if (!$fsc_year) {
+        echo json_encode(['status' => 'error', 'message' => 'Fiscal year is required']);
+        exit;
+    }
+
+    $sql = "DELETE FROM BONDANG_HR.ORG_BUDGET WHERE FSC_YEAR = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $fsc_year);
+    if ($stmt->execute()) {
+        $affectedRows = $stmt->affected_rows;
+        echo json_encode(['status' => 'success', 'message' => $affectedRows . ' rows deleted']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => $stmt->error]);
+    }
+    $stmt->close();
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid CRUD operation']);
 }

@@ -5,7 +5,7 @@ verifyApiKey($conn, @$_REQUEST['key']);
 
 // Get selected accounts from request for the interactive sum
 $selectedAccounts = @$_REQUEST['ACCOUNTS'] ? explode(',', $_REQUEST['ACCOUNTS']) : [];
-$accType = @$_REQUEST['ACC_TYPE'] ?: '지출';
+$accType = $_REQUEST['ACC_TYPE'] ?? '지출';
 
 // Subquery to get latest believer count of the year for each org
 $historySql = "
@@ -31,12 +31,24 @@ $empSql = "
 ";
 
 // Subquery to get total budget for the year/org/type
-$totalBudgetSql = "
-    SELECT ORG_CD, FSC_YEAR, SUM(AMOUNT) AS TOTAL_BUDGET
-    FROM BONDANG_HR.ORG_BUDGET
-    WHERE ACC_TYPE = ?
-    GROUP BY ORG_CD, FSC_YEAR
-";
+if ($accType === '') {
+    $totalBudgetSql = "
+        SELECT ORG_CD, FSC_YEAR, SUM(AMOUNT) AS TOTAL_BUDGET
+        FROM BONDANG_HR.ORG_BUDGET
+        GROUP BY ORG_CD, FSC_YEAR
+    ";
+    $totalBudgetParams = [];
+    $totalBudgetTypes = "";
+} else {
+    $totalBudgetSql = "
+        SELECT ORG_CD, FSC_YEAR, SUM(AMOUNT) AS TOTAL_BUDGET
+        FROM BONDANG_HR.ORG_BUDGET
+        WHERE ACC_TYPE = ?
+        GROUP BY ORG_CD, FSC_YEAR
+    ";
+    $totalBudgetParams = [$accType];
+    $totalBudgetTypes = "s";
+}
 
 // Dynamic SQL generation for each group
 $activeGroups = $BUDGET_GROUPS[$accType] ?? [];
@@ -103,9 +115,15 @@ $sql = "
     LEFT JOIN ($totalBudgetSql) B ON F.ORG_CD = B.ORG_CD AND F.FSC_YEAR = B.FSC_YEAR
 ";
 
-$whereSql = " WHERE F.ACC_TYPE = ? ";
-$params = [$accType];
-$types = "s";
+if ($accType === '') {
+    $whereSql = " WHERE 1=1 ";
+    $params = [];
+    $types = "";
+} else {
+    $whereSql = " WHERE F.ACC_TYPE = ? ";
+    $params = [$accType];
+    $types = "s";
+}
 
 if (@$_REQUEST['FSC_YEAR']) {
     $whereSql .= " AND F.FSC_YEAR = ?";
@@ -125,11 +143,12 @@ if (!$orderSql) $orderSql = " ORDER BY F.FSC_YEAR DESC, O.ORG_NM ASC";
 $limitSql = safeLimit(@$_REQUEST['LIMIT']);
 
 // Merge join params with where params
-$allParams = array_merge([$accType], $historyParams, $params);
-$allTypes = "s" . $historyTypes . $types;
+$allParams = array_merge($totalBudgetParams, $historyParams, $params);
+$allTypes = $totalBudgetTypes . $historyTypes . $types;
 
 // For count, we need a wrapper query because of GROUP BY
 $countSql = "SELECT COUNT(*) AS ROW_CNT FROM (SELECT 1 FROM BONDANG_HR.ORG_BUDGET F INNER JOIN BONDANG_HR.ORG_INFO O ON F.ORG_CD = O.ORG_CD LEFT JOIN ($totalBudgetSql) B ON F.ORG_CD = B.ORG_CD AND F.FSC_YEAR = B.FSC_YEAR $whereSql GROUP BY F.FSC_YEAR, O.ORG_CD) AS T";
+
 
 $data = executeQuery($conn, $sql . $whereSql . $groupSql . $orderSql . $limitSql, $allTypes, $allParams);
 

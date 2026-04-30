@@ -90,6 +90,8 @@ include('./components/header.php');
             <input type="file" id="excelFile" style="display:none;" accept=".xlsx, .xls">
             <a id="uploadExcel" class="pddS clBg3 clW rndCorner pointer">예산 엑셀 업로드</a>
             <a id="xport" class="pddS clBg3 clW rndCorner pointer">엑셀 다운로드</a>
+            <a id="bulkDel" class="pddS clBg6 clW rndCorner pointer">선택 삭제</a>
+            <a id="yearBulkDel" class="pddS clBg6 clW rndCorner pointer">연도별 일괄삭제</a>
         </div>
         <div class="pddS floatR">
             <span>페이지당</span>

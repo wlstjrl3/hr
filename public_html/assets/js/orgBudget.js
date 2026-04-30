@@ -23,6 +23,7 @@ var mytbl = new hr_tbl({
         , { title: "구분", data: "ACC_TYPE", className: "" }
         , { title: "금액", data: "AMOUNT", className: "txtR", render: (data) => data ? Number(data).toLocaleString() : '0' }
     ],
+    tblType: "chkTbl",
 });
 mytbl.show('myTbl');
 mytbl.xportBind();
@@ -165,6 +166,67 @@ modalDelBtn.addEventListener("click", () => {
             alert("삭제 완료");
             mytbl.show('myTbl');
             modalClose();
+        } else {
+            alert("삭제 실패: " + res.message);
+        }
+    })
+    .catch(error => {
+        alert("삭제 중 오류 발생: " + error.message);
+    });
+});
+
+// 일괄 삭제 버튼
+bulkDel.addEventListener("click", () => {
+    const chks = document.querySelectorAll(".chkTd input:checked");
+    if (chks.length === 0) {
+        alert("삭제할 항목을 선택하세요.");
+        return;
+    }
+
+    if (!confirm(chks.length + "개의 항목을 삭제 하시겠습니까?")) return;
+
+    const uids = Array.from(chks).map(chk => chk.closest("tr").dataset.idx);
+
+    const url = DIR_ROOT + "/sys/orgBudgetConfig.php?key=" + API_TOKEN + "&CRUD=BD";
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uids: uids })
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === 'success') {
+            alert("일괄 삭제 완료");
+            mytbl.show('myTbl');
+        } else {
+            alert("삭제 실패: " + res.message);
+        }
+    })
+    .catch(error => {
+        alert("일괄 삭제 중 오류 발생: " + error.message);
+    });
+});
+
+// 연도별 일괄 삭제 버튼
+yearBulkDel.addEventListener("click", () => {
+    const fscYear = prompt("삭제할 연도를 입력하세요 (YYYY)");
+    if (!fscYear) return;
+    
+    if (!/^\d{4}$/.test(fscYear)) {
+        alert("올바른 연도 형식이 아닙니다 (예: 2026)");
+        return;
+    }
+
+    if (!confirm(fscYear + "년의 모든 데이터를 삭제하시겠습니까?\n이 작업은 복구가 불가능합니다.")) return;
+    if (!confirm("정말 " + fscYear + "년의 모든 데이터를 삭제하시겠습니까?")) return;
+
+    const url = DIR_ROOT + "/sys/orgBudgetConfig.php?key=" + API_TOKEN + "&CRUD=DY&FSC_YEAR=" + fscYear;
+    fetch(url)
+    .then(response => response.json())
+    .then(res => {
+        if (res.status === 'success') {
+            alert(fscYear + "년 데이터 삭제 완료: " + res.message);
+            mytbl.show('myTbl');
         } else {
             alert("삭제 실패: " + res.message);
         }

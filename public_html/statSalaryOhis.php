@@ -33,6 +33,7 @@
             <div class="colHd clBg5 cl2"><span><b>구분</b></span></div>
             <div class="colBd">
                 <select id="S_ACC_TYPE" class="filter">
+                    <option value="">전체</option>
                     <option value="수입">수입</option>
                     <option value="지출" selected>지출</option>
                 </select>

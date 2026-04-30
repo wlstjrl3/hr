@@ -55,6 +55,11 @@ if (empty($_SESSION["USER_ID"]) && $_SERVER['PHP_SELF'] != DIR_ROOT . '/login.ph
                     </a>
                     <ul>
                         <li>
+                            <a href="<?php echo DIR_ROOT; ?>/newEmpReg" style="color:#2563eb;font-weight:bold;">
+                                └&nbsp;✚ 통합 직원등록
+                            </a>
+                        </li>
+                        <li>
                             <a href="<?php echo DIR_ROOT; ?>/psnlTotal?TRS_TYPE=1">
                                 └&nbsp;직원 종합정보
                             </a>
