@@ -155,11 +155,15 @@
     color: #1d4ed8;
     border-left-color: #3b82f6;
 }
-.hd-dropdown a.hd-highlight {
+.hd-dropdown a.active {
     color: #1d4ed8;
     font-weight: 700;
     background: #eff6ff;
     border-left-color: #3b82f6;
+}
+.hd-dropdown a.hd-highlight {
+    color: #1d4ed8;
+    font-weight: 600;
 }
 .hd-dropdown hr {
     margin: 4px 12px;
@@ -266,11 +270,12 @@
     border-radius: 6px;
     transition: background .12s, color .12s;
 }
-.hd-mob-group a:hover, .hd-mob-group a.hd-highlight {
+.hd-mob-group a:hover, .hd-mob-group a.active {
     background: rgba(59,130,246,.2);
     color: #93c5fd;
 }
-.hd-mob-group a.hd-highlight { font-weight: 700; }
+.hd-mob-group a.active, .hd-mob-group a.hd-highlight { font-weight: 700; }
+.hd-mob-group a.hd-highlight { color: #93c5fd; }
 
 /* ── 여백 스페이서 ── */
 .hd-spacer { height: 56px; }

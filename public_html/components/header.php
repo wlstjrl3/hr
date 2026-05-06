@@ -110,7 +110,7 @@ function groupHasActive($group, $curPath) {
                     <?php foreach ($group['items'] as $item): ?>
                     <li>
                         <a href="<?php echo $item['url']; ?>"
-                           class="<?php echo (!empty($item['highlight']) ? 'hd-highlight' : '') . (isActive($item['url'], $curPath) ? ' hd-highlight' : ''); ?>">
+                           class="<?php echo (isActive($item['url'], $curPath) ? 'active ' : '') . (!empty($item['highlight']) ? 'hd-highlight' : ''); ?>">
                             <?php echo $item['label']; ?>
                         </a>
                     </li>
@@ -142,7 +142,7 @@ function groupHasActive($group, $curPath) {
         <div class="hd-mob-group-title"><?php echo $group['label']; ?></div>
         <?php foreach ($group['items'] as $item): ?>
         <a href="<?php echo $item['url']; ?>"
-           class="<?php echo (!empty($item['highlight']) ? 'hd-highlight' : '') . (isActive($item['url'], $curPath) ? ' hd-highlight' : ''); ?>"
+           class="<?php echo (isActive($item['url'], $curPath) ? 'active ' : '') . (!empty($item['highlight']) ? 'hd-highlight' : ''); ?>"
            onclick="closeMobileMenu()">
             <?php echo $item['label']; ?>
         </a>
