@@ -38,7 +38,7 @@ $curPath = strtok($_SERVER['REQUEST_URI'], '?');
         [
             'label' => '인사정보',
             'items' => [
-                ['url' => DIR_ROOT . '/newEmpReg', 'label' => '통합 직원등록', 'highlight' => true],
+                ['url' => DIR_ROOT . '/newEmpReg', 'label' => '통합 직원등록'],
                 ['url' => DIR_ROOT . '/psnlTotal?TRS_TYPE=1', 'label' => '직원 종합정보'],
                 ['url' => DIR_ROOT . '/certPrint', 'label' => '증명서 발급'],
                 ['url' => DIR_ROOT . '/insList', 'label' => '보증보험 정보'],
