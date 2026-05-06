@@ -413,6 +413,11 @@ $totalCnt = mysqli_fetch_assoc(mysqli_query($conn, $rowCntSql));
 $filterResult = executeQuery($conn, $rowCntSql . $whereSql, $types, $params);
 $filterCnt = $filterResult[0];
 $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
+if ($data) {
+    foreach ($data as &$row) {
+        $row['HAS_PHOTO'] = file_exists("../assets/photos/" . $row['PSNL_CD'] . ".jpg") ? 'Y' : 'N';
+    }
+}
 jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);
 
 ?>

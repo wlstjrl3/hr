@@ -10,6 +10,10 @@ let currentPosition = '';
 
 let trsDataList = [];
 let grdDataList = [];
+let opiDataList = [];
+let currentGrdTab = 'grd'; // 'grd' | 'ptt'
+let currentTuiFmlCd = '';  // 현재 선택된 자녀 FML_CD
+let tuitionDataList = [];
 
 // ── UI 제어 (잠금 해제 등) ──
 function updateLockState() {
@@ -32,29 +36,33 @@ function updateLockState() {
         document.getElementById('bannerOrg').textContent = currentOrgNm || '-';
         document.getElementById('bannerPos').textContent = currentPosition || '-';
         
-        // 엠티 테이블 메시지 업데이트
         const trsEmpty = document.querySelector('#trsBody .tbl-empty');
-        if (trsEmpty && document.getElementById('trsBody').children.length === 1) {
+        if (trsEmpty && document.getElementById('trsBody').children.length === 1)
             trsEmpty.textContent = '등록된 발령 이력이 없습니다. 신규 발령을 등록하세요.';
-        }
         const grdEmpty = document.querySelector('#grdBody .tbl-empty');
-        if (grdEmpty && document.getElementById('grdBody').children.length === 1) {
+        if (grdEmpty && document.getElementById('grdBody').children.length === 1)
             grdEmpty.textContent = '등록된 급호봉 이력이 없습니다. 신규 승급을 등록하세요.';
-        }
         const adjEmpty = document.querySelector('#adjBody .tbl-empty');
-        if (adjEmpty && document.getElementById('adjBody').children.length === 1) {
+        if (adjEmpty && document.getElementById('adjBody').children.length === 1)
             adjEmpty.textContent = '등록된 제수당 내역이 없습니다. 행 추가를 눌러 등록하세요.';
-        }
         const fmlEmpty = document.querySelector('#fmlBody .tbl-empty');
-        if (fmlEmpty && document.getElementById('fmlBody').children.length === 1) {
+        if (fmlEmpty && document.getElementById('fmlBody').children.length === 1)
             fmlEmpty.textContent = '등록된 가족 정보가 없습니다. 행 추가를 눌러 등록하세요.';
-        }
+        const pttEmpty = document.querySelector('#pttBody .tbl-empty');
+        if (pttEmpty && document.getElementById('pttBody').children.length === 1)
+            pttEmpty.textContent = '등록된 최저임금 내역이 없습니다. 행 추가를 눌러 등록하세요.';
+        const opiEmpty = document.querySelector('#opiBody .tbl-empty');
+        if (opiEmpty && document.getElementById('opiBody').children.length === 1)
+            opiEmpty.textContent = '등록된 평가 내역이 없습니다. 신규 등록을 눌러 등록하세요.';
     } else {
         document.getElementById('empBanner').style.display = 'none';
         document.getElementById('trsBody').innerHTML = '<tr><td colspan="5" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr>';
         document.getElementById('grdBody').innerHTML = '<tr><td colspan="4" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr>';
+        document.getElementById('pttBody').innerHTML = '<tr><td colspan="9" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr>';
         document.getElementById('adjBody').innerHTML = '<tr><td colspan="12" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr>';
         document.getElementById('fmlBody').innerHTML = '<tr><td colspan="10" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr>';
+        document.getElementById('opiBody').innerHTML = '<tr><td colspan="6" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr>';
+        document.getElementById('tuiBody').innerHTML = '<tr><td colspan="6" class="tbl-empty">자녀를 선택하면 지급 이력이 표시됩니다</td></tr>';
     }
 }
 
@@ -96,6 +104,9 @@ document.getElementById('newEmpBtn').addEventListener('click', () => {
         currentPosition = '';
         trsDataList = [];
         grdDataList = [];
+        opiDataList = [];
+        tuitionDataList = [];
+        currentTuiFmlCd = '';
         
         // 모든 input, select 초기화
         document.querySelectorAll('.card-body input:not([readonly])').forEach(el => el.value = '');
@@ -108,6 +119,11 @@ document.getElementById('newEmpBtn').addEventListener('click', () => {
         
         document.getElementById('p1_PSNL_CD').value = '';
         document.getElementById('orgCd').value = '';
+
+        // 자녀 선택 초기화
+        const sel = document.getElementById('tuiChildSelect');
+        sel.innerHTML = '<option value="">— 가족정보에서 자녀를 먼저 등록하세요 —</option>';
+        document.getElementById('tuiRemainBadge').style.display = 'none';
         
         updateBadge('badge1', false);
         updateLockState();
@@ -254,6 +270,21 @@ function loadAllDataByPsnlCd(psnlCd) {
     fetch(DIR_ROOT + '/sys/fmlList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&limit=0&page=0')
         .then(r => r.json()).then(json => {
             renderFmlRows(json.data || []);
+            // 가족정보 로드 후 자녀 선택 드롭다운 갱신
+            setTimeout(() => refreshTuiChildSelect(), 300);
+        }).catch(() => {});
+
+    // 6. 최저임금 (PTT)
+    fetch(DIR_ROOT + '/sys/pttList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&LIMIT=0,1000')
+        .then(r => r.json()).then(json => {
+            renderPttRows(json.data || []);
+        }).catch(() => {});
+
+    // 7. 상벌/직무평가 (OPI)
+    fetch(DIR_ROOT + '/sys/opiList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&ORDER=OPI_DT desc&LIMIT=0,1000')
+        .then(r => r.json()).then(json => {
+            opiDataList = json.data || [];
+            renderOpiRows(opiDataList);
         }).catch(() => {});
 }
 
@@ -644,6 +675,422 @@ window.delFmlRow = function(fmlCd, idx) {
             document.getElementById('fmlBody').innerHTML = '<tr><td colspan="10" class="tbl-empty">등록된 가족 정보가 없습니다. 행 추가를 눌러 등록하세요.</td></tr>';
         }
     }
+};
+
+// ── ③ 탭 전환 (급호봉 ↔ 최저임금) ──
+window.switchGrdTab = function(tab) {
+    currentGrdTab = tab;
+    document.getElementById('panelGrd').classList.toggle('on', tab === 'grd');
+    document.getElementById('panelPtt').classList.toggle('on', tab === 'ptt');
+    document.getElementById('tabGrd').classList.toggle('active', tab === 'grd');
+    document.getElementById('tabPtt').classList.toggle('active', tab === 'ptt');
+    document.getElementById('newGrdBtn').style.display  = tab === 'grd' ? '' : 'none';
+    document.getElementById('addPttBtn').style.display  = tab === 'ptt' ? '' : 'none';
+};
+
+// ── ③ 최저임금 (PTT) 인라인 테이블 ──
+let pttRowIdx = 0;
+
+function renderPttRows(rows) {
+    const tbody = document.getElementById('pttBody');
+    tbody.innerHTML = '';
+    if (!rows || rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="tbl-empty">등록된 최저임금 내역이 없습니다. 행 추가를 눌러 등록하세요.</td></tr>';
+        return;
+    }
+    rows.forEach(d => addPttRow(d));
+}
+
+function addPttRow(d) {
+    if (!currentPsnlCd) { alert('기초정보를 먼저 저장하세요'); return; }
+    const tbody = document.getElementById('pttBody');
+    if (tbody.querySelector('.tbl-empty')) tbody.innerHTML = '';
+    d = d || {};
+    pttRowIdx++;
+    const idx = pttRowIdx;
+    const tr = document.createElement('tr');
+    tr.id = 'pttRow_' + idx;
+    tr.innerHTML = `
+        <td>${idx}</td>
+        <td><input class="pttYear" value="${escH(d.PTT_YEAR||'')}" placeholder="2024" maxlength="4"></td>
+        <td><input type="number" class="pttDay" value="${escH(d.PTT_DAY||'')}" placeholder="5"></td>
+        <td><input type="number" class="pttHour" value="${escH(d.PTT_HOUR||'')}" placeholder="40"></td>
+        <td><input type="number" class="pttAddHour" value="${escH(d.PTT_ADDHOUR||'')}" placeholder="0"></td>
+        <td><input class="pttAdj" value="${escH(d.PTT_ADJ||'')}" placeholder="추가사유"></td>
+        <td><input type="number" class="pttAdjPay" value="${escH(d.PTT_ADJPAY||'')}" placeholder="0"></td>
+        <td><button class="btn-save-row" onclick="savePttRow('${escH(d.PTT_CD||'')}','${idx}')">저장</button></td>
+        <td><button class="btn-del-row" onclick="delPttRow('${escH(d.PTT_CD||'')}','${idx}')">삭제</button></td>`;
+    tbody.appendChild(tr);
+}
+
+document.getElementById('addPttBtn').addEventListener('click', () => {
+    if (!currentPsnlCd) { alert('기초정보를 먼저 저장하세요'); return; }
+    switchGrdTab('ptt');
+    addPttRow({});
+});
+
+window.savePttRow = function(pttCd, idx) {
+    const tr = document.getElementById('pttRow_' + idx);
+    const year = tr.querySelector('.pttYear').value.trim();
+    const day  = tr.querySelector('.pttDay').value.trim();
+    const hour = tr.querySelector('.pttHour').value.trim();
+    if (year.length < 4) { alert('기준년도 4자리를 입력하세요.'); return; }
+    if (!day)  { alert('주근무일수는 필수입니다.'); return; }
+    if (!hour) { alert('주근무시간은 필수입니다.'); return; }
+    if (parseFloat(hour) > 80) { alert('최대 근무시간(80)을 초과하였습니다.'); return; }
+
+    let qs = '&PTT_CD='      + encodeURIComponent(pttCd)
+           + '&PSNL_CD='     + encodeURIComponent(currentPsnlCd)
+           + '&PTT_YEAR='    + encodeURIComponent(year)
+           + '&PTT_DAY='     + encodeURIComponent(day)
+           + '&PTT_HOUR='    + encodeURIComponent(hour)
+           + '&PTT_ADDHOUR=' + encodeURIComponent(tr.querySelector('.pttAddHour').value)
+           + '&PTT_ADJ='     + encodeURIComponent(tr.querySelector('.pttAdj').value)
+           + '&PTT_ADJPAY='  + encodeURIComponent(tr.querySelector('.pttAdjPay').value)
+           + '&CRUD=C';
+
+    fetch(DIR_ROOT + '/sys/pttConfig.php?key=' + API_TOKEN + qs)
+        .then(r => r.text()).then(txt => {
+            alert('최저임금 정보가 저장되었습니다.');
+            loadAllDataByPsnlCd(currentPsnlCd);
+            setTimeout(() => switchGrdTab('ptt'), 100);
+        }).catch(e => alert('저장 오류: ' + e.message));
+};
+
+window.delPttRow = function(pttCd, idx) {
+    if (!confirm('이 최저임금 항목을 삭제하시겠습니까?')) return;
+    const tr = document.getElementById('pttRow_' + idx);
+    if (pttCd) {
+        fetch(DIR_ROOT + '/sys/pttConfig.php?key=' + API_TOKEN + '&PTT_CD=' + pttCd + '&CRUD=D')
+            .then(() => {
+                tr.remove();
+                if (document.getElementById('pttBody').children.length === 0) {
+                    document.getElementById('pttBody').innerHTML = '<tr><td colspan="9" class="tbl-empty">등록된 최저임금 내역이 없습니다.</td></tr>';
+                }
+            }).catch(e => alert('삭제 오류: ' + e.message));
+    } else {
+        tr.remove();
+        if (document.getElementById('pttBody').children.length === 0) {
+            document.getElementById('pttBody').innerHTML = '<tr><td colspan="9" class="tbl-empty">등록된 최저임금 내역이 없습니다.</td></tr>';
+        }
+    }
+};
+
+// ── ⑥ 상벌/직무평가 (OPI) 모달 방식 ──
+const OPI_TYPE_MAP = {'1':'긍정','2':'부정','3':'포상','4':'징계'};
+
+function renderOpiRows(rows) {
+    const tbody = document.getElementById('opiBody');
+    tbody.innerHTML = '';
+    if (!rows || rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="tbl-empty">등록된 평가 내역이 없습니다. 신규 등록을 눌러 등록하세요.</td></tr>';
+        document.getElementById('opiMoreWrap').style.display = 'none';
+        return;
+    }
+    rows.forEach((r, i) => {
+        const tr = document.createElement('tr');
+        tr.className = 'list-row';
+        if (i >= 5) tr.classList.add('hidden-row', 'opi-hidden-row');
+        const dtlShort = (r.OPI_DTL || '').replace(/<br>/g,' ').substring(0, 40);
+        tr.innerHTML = `
+            <td>${escH(r.OPI_DT||'')}</td>
+            <td>${escH(r.OPI_PERSON||'')}</td>
+            <td>${escH(OPI_TYPE_MAP[r.OPI_TYPE]||r.OPI_TYPE||'')}</td>
+            <td style="text-align:left;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escH(dtlShort)}</td>
+            <td><button class="btn-save-row" onclick="openOpiModal(${i})">수정</button></td>
+            <td><button class="btn-del-row" onclick="deleteOpi('${escH(r.OPI_CD||'')}')">삭제</button></td>`;
+        tbody.appendChild(tr);
+    });
+    if (rows.length > 5) {
+        document.getElementById('opiHiddenCnt').textContent = rows.length - 5;
+        document.getElementById('opiMoreWrap').style.display = 'block';
+    } else {
+        document.getElementById('opiMoreWrap').style.display = 'none';
+    }
+}
+
+document.getElementById('opiMoreBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('.opi-hidden-row').forEach(el => el.classList.remove('hidden-row'));
+    document.getElementById('opiMoreWrap').style.display = 'none';
+});
+
+window.openOpiModal = function(idx) {
+    if (!currentPsnlCd) { alert('기초정보를 먼저 저장하세요.'); return; }
+    if (idx === -1) {
+        document.getElementById('p6_OPI_CD').value     = '';
+        document.getElementById('p6_OPI_TYPE').value   = '1';
+        document.getElementById('p6_OPI_DT').value     = '';
+        document.getElementById('p6_OPI_PERSON').value = '';
+        document.getElementById('p6_OPI_DTL').value    = '';
+        document.getElementById('delOpiBtn').style.display = 'none';
+    } else {
+        const d = opiDataList[idx];
+        document.getElementById('p6_OPI_CD').value     = d.OPI_CD     || '';
+        document.getElementById('p6_OPI_TYPE').value   = d.OPI_TYPE   || '1';
+        document.getElementById('p6_OPI_DT').value     = d.OPI_DT     || '';
+        document.getElementById('p6_OPI_PERSON').value = d.OPI_PERSON || '';
+        document.getElementById('p6_OPI_DTL').value    = (d.OPI_DTL||'').replace(/<br>/g,'\n');
+        document.getElementById('delOpiBtn').style.display = 'inline-block';
+    }
+    bindDateBoxes(document.getElementById('opiModal'));
+    document.getElementById('opiModal').classList.add('on');
+};
+
+document.getElementById('newOpiBtn').addEventListener('click', () => openOpiModal(-1));
+
+document.getElementById('saveOpiBtn').addEventListener('click', () => {
+    const opiDt     = document.getElementById('p6_OPI_DT').value;
+    const opiPerson = document.getElementById('p6_OPI_PERSON').value.trim();
+    if (opiDt.length < 3)     { alert('평가일시는 필수입니다.'); return; }
+    if (opiPerson.length < 2) { alert('평가자는 필수입니다.'); return; }
+
+    const opiDtl = document.getElementById('p6_OPI_DTL').value.replace(/(?:\r\n|\r|\n)/g,'<br>');
+    let qs = '&OPI_CD='     + encodeURIComponent(document.getElementById('p6_OPI_CD').value)
+           + '&PSNL_CD='    + encodeURIComponent(currentPsnlCd)
+           + '&OPI_TYPE='   + encodeURIComponent(document.getElementById('p6_OPI_TYPE').value)
+           + '&OPI_DT='     + encodeURIComponent(opiDt)
+           + '&OPI_PERSON=' + encodeURIComponent(opiPerson)
+           + '&OPI_DTL='    + encodeURIComponent(opiDtl)
+           + '&CRUD=C';
+
+    fetch(DIR_ROOT + '/sys/opiConfig.php?key=' + API_TOKEN + qs)
+        .then(r => r.text()).then(txt => {
+            if (txt !== '') { alert('오류: ' + txt); return; }
+            alert('평가 정보가 저장되었습니다.');
+            document.getElementById('opiModal').classList.remove('on');
+            loadAllDataByPsnlCd(currentPsnlCd);
+        }).catch(e => alert('저장 오류: ' + e.message));
+});
+
+document.getElementById('delOpiBtn').addEventListener('click', () => {
+    const cd = document.getElementById('p6_OPI_CD').value;
+    if (!cd || !confirm('이 평가 이력을 삭제하시겠습니까?')) return;
+    fetch(DIR_ROOT + '/sys/opiConfig.php?key=' + API_TOKEN + '&OPI_CD=' + cd + '&CRUD=D')
+        .then(r => r.text()).then(txt => {
+            if (txt !== '') { alert('오류: ' + txt); return; }
+            alert('삭제되었습니다.');
+            document.getElementById('opiModal').classList.remove('on');
+            loadAllDataByPsnlCd(currentPsnlCd);
+        });
+});
+
+window.deleteOpi = function(opiCd) {
+    if (!opiCd || !confirm('이 평가 이력을 삭제하시겠습니까?')) return;
+    fetch(DIR_ROOT + '/sys/opiConfig.php?key=' + API_TOKEN + '&OPI_CD=' + opiCd + '&CRUD=D')
+        .then(r => r.text()).then(() => loadAllDataByPsnlCd(currentPsnlCd));
+};
+
+// ── ⑦ 자녀 학비 보조금 (Tuition) ──
+
+// 가족 테이블에서 자녀만 추출하여 드롭다운 갱신
+function refreshTuiChildSelect() {
+    const sel = document.getElementById('tuiChildSelect');
+    const prevFmlCd = sel.value;
+    sel.innerHTML = '<option value="">— 자녀를 선택하세요 —</option>';
+
+    const fmlRows = document.querySelectorAll('#fmlBody tr:not(.tbl-empty)');
+    let hasChild = false;
+    fmlRows.forEach(tr => {
+        const relationEl = tr.querySelector('.fmlRelation');
+        const nmEl = tr.querySelector('.fmlNm');
+        if (!relationEl || !nmEl) return;
+        if (relationEl.value === '자녀') {
+            // fmlCd는 저장 버튼 onclick에서 첫 인자로 파악하거나 데이터로부터
+            // 저장된 행은 btn-save-row onclick="saveFmlRow('FML_CD','idx')" 형태
+            const saveBtn = tr.querySelector('.btn-save-row');
+            if (!saveBtn) return;
+            const match = saveBtn.getAttribute('onclick').match(/saveFmlRow\('([^']*)'/);
+            if (!match) return;
+            const fmlCd = match[1];
+            if (!fmlCd) return; // 미저장 자녀는 제외
+            hasChild = true;
+            const opt = document.createElement('option');
+            opt.value = fmlCd;
+            opt.textContent = nmEl.value || '(이름없음)';
+            if (fmlCd === prevFmlCd) opt.selected = true;
+            sel.appendChild(opt);
+        }
+    });
+
+    if (!hasChild) {
+        sel.innerHTML = '<option value="">— 가족정보에서 자녀를 먼저 등록하세요 —</option>';
+        document.getElementById('tuiRemainBadge').style.display = 'none';
+        document.getElementById('tuiBody').innerHTML = '<tr><td colspan="6" class="tbl-empty">가족정보에 자녀를 먼저 등록하세요.</td></tr>';
+        currentTuiFmlCd = '';
+        return;
+    }
+
+    // 이전 선택값 유지 or 첫번째 자녀 자동 선택
+    if (!sel.value) sel.selectedIndex = 1;
+    const newFmlCd = sel.value;
+    if (newFmlCd !== currentTuiFmlCd) {
+        currentTuiFmlCd = newFmlCd;
+        loadTuitionData(newFmlCd);
+    }
+}
+
+// 자녀 드롭다운 변경 이벤트
+document.getElementById('tuiChildSelect').addEventListener('change', function() {
+    currentTuiFmlCd = this.value;
+    if (!currentTuiFmlCd) {
+        document.getElementById('tuiBody').innerHTML = '<tr><td colspan="6" class="tbl-empty">자녀를 선택하면 지급 이력이 표시됩니다</td></tr>';
+        document.getElementById('tuiRemainBadge').style.display = 'none';
+        return;
+    }
+    loadTuitionData(currentTuiFmlCd);
+});
+
+function loadTuitionData(fmlCd) {
+    if (!fmlCd) return;
+    fetch(DIR_ROOT + '/sys/tuitionList.php?key=' + API_TOKEN + '&FML_CD=' + encodeURIComponent(fmlCd))
+        .then(r => r.json()).then(json => {
+            const row = json.data && json.data[0];
+            if (!row) {
+                tuitionDataList = [];
+                document.getElementById('tuiBody').innerHTML = '<tr><td colspan="6" class="tbl-empty">지급 내역이 없습니다. 지급 등록을 눌러 등록하세요.</td></tr>';
+                updateTuiBadge(0);
+                return;
+            }
+            tuitionDataList = row.ISSUE_DETAILS || [];
+            renderTuitionRows(tuitionDataList);
+            updateTuiBadge(parseInt(row.SUPPORT_CNT)||0);
+        }).catch(() => {});
+}
+
+function updateTuiBadge(cnt) {
+    const badge = document.getElementById('tuiRemainBadge');
+    const remain = 8 - cnt;
+    badge.style.display = 'inline-block';
+    badge.textContent = `총 ${cnt}회 지급 / 잔여 ${remain}회`;
+    badge.className = 'tui-remain-badge' + (remain <= 0 ? ' full' : '');
+    // 8회 초과 시 신규 버튼 비활성화
+    document.getElementById('newTuiBtn').disabled = remain <= 0;
+    document.getElementById('newTuiBtn').title = remain <= 0 ? '최대 8회 지급 한도를 초과하였습니다.' : '';
+}
+
+function renderTuitionRows(issues) {
+    const tbody = document.getElementById('tuiBody');
+    tbody.innerHTML = '';
+    if (!issues || issues.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="tbl-empty">지급 내역이 없습니다.</td></tr>';
+        return;
+    }
+    issues.forEach((item, i) => {
+        if (!item.ISSUE_CD) return;
+        const tr = document.createElement('tr');
+        tr.className = 'list-row';
+        tr.innerHTML = `
+            <td>${escH(item.ISSUE_DT||'')}</td>
+            <td style="text-align:right;">${Number(item.ISSUE_AMT||0).toLocaleString()}</td>
+            <td>${escH(item.SCHOOL_GRADE||'')}</td>
+            <td style="text-align:left;">${escH(item.MEMO||'')}</td>
+            <td><button class="btn-save-row" onclick="openTuiModal(${i})">수정</button></td>
+            <td><button class="btn-del-row" onclick="deleteTuition('${escH(item.ISSUE_CD||'')}')">삭제</button></td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+window.openTuiModal = function(idx) {
+    if (!currentPsnlCd) { alert('기초정보를 먼저 저장하세요.'); return; }
+    if (!currentTuiFmlCd) { alert('자녀를 먼저 선택하세요.'); return; }
+
+    // 잔여 회차 확인 (신규일 때)
+    const badge = document.getElementById('tuiRemainBadge');
+    if (idx === -1) {
+        const remain = parseInt((badge.textContent.match(/잔여 (\d+)회/) || [])[1] || 8);
+        if (remain <= 0) { alert('최대 8회 지급 한도를 초과하였습니다.'); return; }
+        document.getElementById('p7_ISSUE_CD').value   = '';
+        document.getElementById('p7_FML_CD').value     = currentTuiFmlCd;
+        // 자녀 이름
+        const selOpt = document.getElementById('tuiChildSelect').selectedOptions[0];
+        document.getElementById('p7_FML_NM').value     = selOpt ? selOpt.textContent : '';
+        document.getElementById('p7_ISSUE_DT').value   = new Date().toISOString().substring(0,10);
+        document.getElementById('p7_ISSUE_AMT').value  = '';
+        document.getElementById('p7_SCHOOL_GRADE').value = '';
+        document.getElementById('p7_MEMO').value       = '';
+        document.getElementById('delTuiBtn').style.display = 'none';
+    } else {
+        const d = tuitionDataList[idx];
+        document.getElementById('p7_ISSUE_CD').value   = d.ISSUE_CD    || '';
+        document.getElementById('p7_FML_CD').value     = currentTuiFmlCd;
+        const selOpt = document.getElementById('tuiChildSelect').selectedOptions[0];
+        document.getElementById('p7_FML_NM').value     = selOpt ? selOpt.textContent : '';
+        document.getElementById('p7_ISSUE_DT').value   = d.ISSUE_DT    || '';
+        document.getElementById('p7_ISSUE_AMT').value  = d.ISSUE_AMT   || '';
+        document.getElementById('p7_SCHOOL_GRADE').value = d.SCHOOL_GRADE || '';
+        document.getElementById('p7_MEMO').value       = d.MEMO        || '';
+        document.getElementById('delTuiBtn').style.display = 'inline-block';
+    }
+    bindDateBoxes(document.getElementById('tuiModal'));
+    document.getElementById('tuiModal').classList.add('on');
+};
+
+document.getElementById('newTuiBtn').addEventListener('click', () => openTuiModal(-1));
+
+document.getElementById('saveTuiBtn').addEventListener('click', () => {
+    const issueDt  = document.getElementById('p7_ISSUE_DT').value;
+    const issueAmt = document.getElementById('p7_ISSUE_AMT').value;
+    if (issueDt.length < 3) { alert('지급일은 필수입니다.'); return; }
+    if (!issueAmt)           { alert('지급액은 필수입니다.'); return; }
+
+    const formData = new URLSearchParams();
+    formData.append('key', API_TOKEN);
+    const issueCd = document.getElementById('p7_ISSUE_CD').value;
+    formData.append('CRUD', issueCd ? 'U' : 'C');
+    if (issueCd) formData.append('ISSUE_CD', issueCd);
+    formData.append('FML_CD',       document.getElementById('p7_FML_CD').value);
+    formData.append('PSNL_CD',      currentPsnlCd);
+    formData.append('ISSUE_DT',     issueDt);
+    formData.append('ISSUE_AMT',    issueAmt);
+    formData.append('SCHOOL_GRADE', document.getElementById('p7_SCHOOL_GRADE').value);
+    formData.append('MEMO',         document.getElementById('p7_MEMO').value);
+
+    fetch(DIR_ROOT + '/sys/tuitionConfig.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString()
+    }).then(r => r.text()).then(() => {
+        alert(issueCd ? '수정되었습니다.' : '지급 내역이 추가되었습니다.');
+        document.getElementById('tuiModal').classList.remove('on');
+        loadTuitionData(currentTuiFmlCd);
+        // 배지 갱신을 위해 전체 reload
+        fetch(DIR_ROOT + '/sys/tuitionList.php?key=' + API_TOKEN + '&FML_CD=' + encodeURIComponent(currentTuiFmlCd))
+            .then(r => r.json()).then(json => {
+                const row = json.data && json.data[0];
+                if (row) updateTuiBadge(parseInt(row.SUPPORT_CNT)||0);
+            });
+    }).catch(e => alert('저장 오류: ' + e.message));
+});
+
+document.getElementById('delTuiBtn').addEventListener('click', () => {
+    const cd = document.getElementById('p7_ISSUE_CD').value;
+    if (!cd || !confirm('이 지급 내역을 삭제하시겠습니까?')) return;
+    const formData = new URLSearchParams();
+    formData.append('key', API_TOKEN);
+    formData.append('CRUD', 'D');
+    formData.append('ISSUE_CD', cd);
+    fetch(DIR_ROOT + '/sys/tuitionConfig.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString()
+    }).then(() => {
+        alert('삭제되었습니다.');
+        document.getElementById('tuiModal').classList.remove('on');
+        loadTuitionData(currentTuiFmlCd);
+    });
+});
+
+window.deleteTuition = function(issueCd) {
+    if (!issueCd || !confirm('이 지급 내역을 삭제하시겠습니까?')) return;
+    const formData = new URLSearchParams();
+    formData.append('key', API_TOKEN);
+    formData.append('CRUD', 'D');
+    formData.append('ISSUE_CD', issueCd);
+    fetch(DIR_ROOT + '/sys/tuitionConfig.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString()
+    }).then(() => loadTuitionData(currentTuiFmlCd));
 };
 
 // ── 유틸 ──

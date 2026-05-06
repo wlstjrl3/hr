@@ -17,6 +17,8 @@
 .card-hd--grd{background:linear-gradient(135deg,#6d28d9,#8b5cf6);}
 .card-hd--adj{background:linear-gradient(135deg,#c2410c,#f97316);}
 .card-hd--fml{background:linear-gradient(135deg,#0e7490,#22d3ee);}
+.card-hd--opi{background:linear-gradient(135deg,#7c3aed,#a78bfa);}
+.card-hd--tui{background:linear-gradient(135deg,#0369a1,#38bdf8);}
 .card-body{padding:16px 18px;}
 
 /* ── 2열 그리드 ── */
@@ -84,6 +86,22 @@
 }
 .inline-tbl td input:focus,.inline-tbl td select:focus{border-color:#3b82f6;outline:none;}
 .tbl-empty{text-align:center;color:#9ca3af;padding:20px;font-size:13px;}
+
+/* ── 급호봉/최저임금 탭 ── */
+.grd-tab-wrap{display:flex;gap:4px;}
+.grd-tab{padding:3px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:12px;cursor:pointer;transition:background .15s;}
+.grd-tab.active{background:rgba(255,255,255,.28);font-weight:700;border-color:#fff;}
+.grd-tab-panel{display:none;}
+.grd-tab-panel.on{display:block;}
+
+/* ── 학비보조금 자녀 선택 ── */
+.tui-child-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.tui-child-row select{padding:7px 10px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;min-width:200px;}
+.tui-remain-badge{font-size:12px;padding:3px 10px;border-radius:20px;background:#dbeafe;color:#1e40af;font-weight:600;white-space:nowrap;}
+.tui-remain-badge.full{background:#fee2e2;color:#dc2626;}
+
+/* ── OPI textarea in modal ── */
+.modal-textarea{width:calc(100% - 22px);height:120px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;resize:vertical;box-sizing:border-box;font-family:inherit;}
 
 /* ── 구분선 ── */
 .section-divider{height:1px;background:linear-gradient(90deg,#e5e7eb,transparent);margin:4px 0 12px;}
@@ -192,24 +210,53 @@
 
     </div><!-- /.two-col -->
 
-    <!-- ③ 급호봉 -->
+    <!-- ③ 급호봉 / 최저임금 탭 카드 -->
     <div class="info-card">
         <div class="card-hd card-hd--grd">
-            <span>③ 급호봉 이력 (GRADE_HISTORY)</span>
+            <span>③ 급호봉 이력</span>
             <div class="card-hd-actions">
+                <div class="grd-tab-wrap">
+                    <button class="grd-tab active" id="tabGrd" onclick="switchGrdTab('grd')">급호봉</button>
+                    <button class="grd-tab" id="tabPtt" onclick="switchGrdTab('ptt')">최저임금</button>
+                </div>
                 <button class="btn btn-sm" id="newGrdBtn" style="background:rgba(255,255,255,.2);color:#fff;">+ 신규 승급</button>
+                <button class="btn btn-sm" id="addPttBtn" style="background:rgba(255,255,255,.2);color:#fff;display:none;">+ 행 추가</button>
             </div>
         </div>
         <div class="card-body lock-wrap" style="padding:12px 14px;">
             <div class="lock-overlay off" id="lock3">🔒 기초정보를 먼저 저장하세요</div>
-            <div style="overflow-x:auto;">
-                <table class="inline-tbl" id="grdTbl">
-                    <thead><tr><th>승급일</th><th>급</th><th>호</th><th>상세메모</th></tr></thead>
-                    <tbody id="grdBody"><tr><td colspan="4" class="tbl-empty">직원을 선택하거나 기초정보를 저장하세요</td></tr></tbody>
-                </table>
+
+            <!-- 급호봉 패널 -->
+            <div class="grd-tab-panel on" id="panelGrd">
+                <div style="overflow-x:auto;">
+                    <table class="inline-tbl" id="grdTbl">
+                        <thead><tr><th>승급일</th><th>급</th><th>호</th><th>상세메모</th></tr></thead>
+                        <tbody id="grdBody"><tr><td colspan="4" class="tbl-empty">직원을 선택하거나 기초정보를 저장하세요</td></tr></tbody>
+                    </table>
+                </div>
+                <div style="text-align:center;margin-top:10px;display:none;" id="grdMoreWrap">
+                    <button class="btn btn-ghost btn-sm" id="grdMoreBtn">👇 과거 이력 더보기 (<span id="grdHiddenCnt">0</span>건)</button>
+                </div>
             </div>
-            <div style="text-align:center;margin-top:10px;display:none;" id="grdMoreWrap">
-                <button class="btn btn-ghost btn-sm" id="grdMoreBtn">👇 과거 이력 더보기 (<span id="grdHiddenCnt">0</span>건)</button>
+
+            <!-- 최저임금 패널 -->
+            <div class="grd-tab-panel" id="panelPtt">
+                <div style="overflow-x:auto;">
+                    <table class="inline-tbl" id="pttTbl" style="min-width:780px;">
+                        <thead><tr>
+                            <th style="width:28px;">#</th>
+                            <th style="width:80px;">기준년도<span class="req">*</span></th>
+                            <th style="width:70px;">주근무일<span class="req">*</span></th>
+                            <th style="width:70px;">주근무시간<span class="req">*</span></th>
+                            <th style="width:70px;">연장시간</th>
+                            <th style="min-width:90px;">추가사유</th>
+                            <th style="width:90px;">추가금액</th>
+                            <th style="width:52px;">저장</th>
+                            <th style="width:44px;">삭제</th>
+                        </tr></thead>
+                        <tbody id="pttBody"><tr><td colspan="9" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -276,6 +323,68 @@
         </div>
     </div>
 
+    <!-- ⑥ 상벌/직무평가 -->
+    <div class="info-card">
+        <div class="card-hd card-hd--opi">
+            <span>⑥ 상벌/직무평가 (PSNL_OPINION)</span>
+            <div class="card-hd-actions">
+                <button class="btn btn-sm" id="newOpiBtn" style="background:rgba(255,255,255,.2);color:#fff;">+ 신규 등록</button>
+            </div>
+        </div>
+        <div class="card-body lock-wrap" style="padding:12px 14px;">
+            <div class="lock-overlay off" id="lock6">🔒 기초정보를 먼저 저장하세요</div>
+            <div style="overflow-x:auto;">
+                <table class="inline-tbl" id="opiTbl">
+                    <thead><tr>
+                        <th style="width:105px;">평가일시</th>
+                        <th style="width:90px;">평가자</th>
+                        <th style="width:70px;">평가유형</th>
+                        <th>평가내용</th>
+                        <th style="width:52px;">수정</th>
+                        <th style="width:44px;">삭제</th>
+                    </tr></thead>
+                    <tbody id="opiBody"><tr><td colspan="6" class="tbl-empty">직원을 선택하거나 기초정보를 저장하면 입력 가능합니다</td></tr></tbody>
+                </table>
+            </div>
+            <div style="text-align:center;margin-top:10px;display:none;" id="opiMoreWrap">
+                <button class="btn btn-ghost btn-sm" id="opiMoreBtn">👇 과거 이력 더보기 (<span id="opiHiddenCnt">0</span>건)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⑦ 자녀 학비 보조금 -->
+    <div class="info-card">
+        <div class="card-hd card-hd--tui">
+            <span>⑦ 자녀 학비 보조금 (TB_TUITION_ISSUE)</span>
+            <div class="card-hd-actions">
+                <button class="btn btn-sm" id="newTuiBtn" style="background:rgba(255,255,255,.2);color:#fff;">+ 지급 등록</button>
+            </div>
+        </div>
+        <div class="card-body lock-wrap" style="padding:12px 14px;">
+            <div class="lock-overlay off" id="lock7">🔒 기초정보를 먼저 저장하세요</div>
+            <div class="tui-child-row">
+                <label style="font-size:12.5px;color:#4b5563;font-weight:600;">자녀 선택</label>
+                <select id="tuiChildSelect">
+                    <option value="">— 가족정보에서 자녀를 먼저 등록하세요 —</option>
+                </select>
+                <span class="tui-remain-badge" id="tuiRemainBadge" style="display:none;"></span>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="inline-tbl" id="tuiTbl">
+                    <thead><tr>
+                        <th style="width:105px;">지급일</th>
+                        <th style="width:100px;">지급액(원)</th>
+                        <th style="width:130px;">학년/학기</th>
+                        <th>비고</th>
+                        <th style="width:52px;">수정</th>
+                        <th style="width:44px;">삭제</th>
+                    </tr></thead>
+                    <tbody id="tuiBody"><tr><td colspan="6" class="tbl-empty">자녀를 선택하면 지급 이력이 표시됩니다</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- 모달: 발령정보 -->
     <div class="custom-modal-wrap" id="trsModal">
         <div class="custom-modal-bg" onclick="document.getElementById('trsModal').classList.remove('on')"></div>
@@ -327,6 +436,57 @@
             <div class="custom-modal-ft">
                 <button class="btn btn-danger" id="delGrdBtn" style="float:left;display:none;">삭제</button>
                 <button class="btn btn-primary" id="saveGrdBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모달: 상벌/직무평가 -->
+    <div class="custom-modal-wrap" id="opiModal">
+        <div class="custom-modal-bg" onclick="document.getElementById('opiModal').classList.remove('on')"></div>
+        <div class="custom-modal-box">
+            <div class="custom-modal-hd">
+                <span>상벌/직무평가 편집</span>
+                <a onclick="document.getElementById('opiModal').classList.remove('on')">✖</a>
+            </div>
+            <div class="custom-modal-bd">
+                <div class="f-row"><div class="f-label">일련번호</div><div class="f-ctrl"><input id="p6_OPI_CD" readonly placeholder="저장 후 자동부여"></div></div>
+                <div class="f-row"><div class="f-label">평가유형</div><div class="f-ctrl"><select id="p6_OPI_TYPE">
+                    <option value="1">긍정</option>
+                    <option value="2">부정</option>
+                    <option value="3">포상</option>
+                    <option value="4">징계</option>
+                </select></div></div>
+                <div class="f-row"><div class="f-label">평가일시<span class="req">*</span></div><div class="f-ctrl"><input id="p6_OPI_DT" class="dateBox" placeholder="YYYY-MM-DD"></div></div>
+                <div class="f-row"><div class="f-label">평가자<span class="req">*</span></div><div class="f-ctrl"><input id="p6_OPI_PERSON" placeholder="평가자 이름"></div></div>
+                <div class="f-row" style="align-items:flex-start;"><div class="f-label" style="padding-top:8px;">평가내용</div><div class="f-ctrl"><textarea id="p6_OPI_DTL" class="modal-textarea" placeholder="평가 내용을 입력하세요"></textarea></div></div>
+            </div>
+            <div class="custom-modal-ft">
+                <button class="btn btn-danger" id="delOpiBtn" style="float:left;display:none;">삭제</button>
+                <button class="btn btn-primary" id="saveOpiBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모달: 자녀 학비 보조금 -->
+    <div class="custom-modal-wrap" id="tuiModal">
+        <div class="custom-modal-bg" onclick="document.getElementById('tuiModal').classList.remove('on')"></div>
+        <div class="custom-modal-box">
+            <div class="custom-modal-hd">
+                <span>학비 보조금 지급 편집</span>
+                <a onclick="document.getElementById('tuiModal').classList.remove('on')">✖</a>
+            </div>
+            <div class="custom-modal-bd">
+                <input type="hidden" id="p7_ISSUE_CD">
+                <input type="hidden" id="p7_FML_CD">
+                <div class="f-row"><div class="f-label">대상 자녀</div><div class="f-ctrl"><input id="p7_FML_NM" readonly style="background:#f3f4f6;"></div></div>
+                <div class="f-row"><div class="f-label">지급일<span class="req">*</span></div><div class="f-ctrl"><input id="p7_ISSUE_DT" class="dateBox" placeholder="YYYY-MM-DD"></div></div>
+                <div class="f-row"><div class="f-label">지급액(원)<span class="req">*</span></div><div class="f-ctrl"><input type="number" id="p7_ISSUE_AMT" placeholder="예: 1500000"></div></div>
+                <div class="f-row"><div class="f-label">학년/학기</div><div class="f-ctrl"><input id="p7_SCHOOL_GRADE" placeholder="예: 1학년 1학기"></div></div>
+                <div class="f-row"><div class="f-label">비고</div><div class="f-ctrl"><input id="p7_MEMO" placeholder="비고 입력"></div></div>
+            </div>
+            <div class="custom-modal-ft">
+                <button class="btn btn-danger" id="delTuiBtn" style="float:left;display:none;">삭제</button>
+                <button class="btn btn-primary" id="saveTuiBtn">저장</button>
             </div>
         </div>
     </div>

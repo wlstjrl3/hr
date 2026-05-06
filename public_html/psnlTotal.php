@@ -2,41 +2,95 @@
 <div class="modalForm">
     <div class="modalBg"></div>
     <div class="modalWindow">
-        <div class="modalHeader">직원 종합정보 조회</div>
-        <div class="modalBody">
-            <div id="psnlTbl">
-                <span class="fontWBold" id="mdBdOrgInTel">내선 : </span>
-                <ul>
-                    <li class="th clBg5"><span>소속</span></li><li class="td clBgW"><span id="mdBdOrgNm">소속임</span></li>
-                    <li class="th clBg5"><span>직책</span></li><li class="td clBgW"><span id="mdBdPosition">직책임</span></li>
-                    <li class="th clBg5"><span>성명</span></li><li class="td clBgW"><span id="mdBdPsnlNm">이름임</span></li>
-                    <li class="th clBg5"><span>세례명</span></li><li class="td clBgW"><span id="mdBdBaptNm">세례임</span></li>
-                    <li class="th clBg5"><span>인사구분</span></li><li class="td clBgW"><span id="mdBdTrsType">인사임</span></li>
-                    <li class="th clBg5"><span>발령일</span></li><li class="td clBgW"><span id="mdBdTrsDt">1000-01-01</span></li>
-                    <li class="th clBg5"><span>채용구분</span></li><li class="td clBgW"><span id="mdBdWorkType">채용임</span></li>
-                    <li class="th clBg5"><span>급호봉</span></li><li class="td clBgW"><span id="mdBdGrdPay">N급 N호</span></li>
-                    <li class="th clBg5"><span>승급일</span></li><li class="td clBgW"><span id="mdBdAdvDt">1000-01-01</span></li>
-                    <li class="th clBg5"><span>승급분기</span></li><li class="td clBgW"><span id="mdBdAdvRng">분기임</span></li>
-                    <li class="th clBg5"><span>주민번호</span></li><li class="td clBgW"><span id="mdBdPsnlNum" class="fs8">000000-0000000</span></li>
-                    <li class="th clBg5"><span>연락처</span></li><li class="td clBgW"><span id="mdBdPhoneNum" class="fs8">010-0000-0000</span></li>
-                </ul>
-            </div>
-            <div id="fmlTbl"></div>
-            <div id="adjTbl"></div>
-            <div id="opiTbl"></div>
-            <div id="tuitionTbl"></div>
+        <div class="modalHeader" style="background:#f8fafc; border-bottom:1px solid #e2e8f0; font-weight:700; font-size:15px; display:flex; justify-content:space-between; align-items:center; padding:14px 20px;">
+            <span style="color:#333;">직원 종합정보 조회</span>
+            <button onclick="modalClose()" style="background:transparent;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0;">✖</button>
         </div>
-        <div class="modalFooter">
-            <button id="goTuitionListBtn" style="margin:0 0 5px 0;padding:5px 9px;">자녀학비보조</button>
-            <button id="goPsnlListBtn" style="margin:0 0 5px 0;padding:5px 9px;">기초정보</button>
-            <button id="goTrsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">발령정보</button>
-            <button id="goGrdListBtn" style="margin:0 0 5px 0;padding:5px 9px;">급호봉관리</button>
-            <button id="goFmlListBtn" style="margin:0 0 5px 0;padding:5px 9px;">가족정보</button>
-            <button id="goAdjListBtn" style="margin:0 0 5px 0;padding:5px 9px;">제수당</button>
-            <button id="goInsListBtn" style="margin:0 0 5px 0;padding:5px 9px;">보증보험</button>
-            <button id="goOpiListBtn" style="margin:0 0 5px 0;padding:5px 9px;">상벌정보</button>
-            <button id="goMPayListBtn" style="margin:0 0 5px 0;padding:5px 9px;">월별급여상세</button>
-            <button id="goPttListBtn" style="margin:0 0 5px 0;padding:5px 9px;">최저시급정보</button>
+        <div class="modalBody" style="background:#f1f5f9; padding:20px;">
+            <div style="margin-bottom:10px; font-size:14px; color:#1e40af; font-weight:bold;" id="mdBdOrgInTel"></div>
+            
+            <div class="info-card" id="cardBasic">
+                <div class="card-hd card-hd--basic">
+                    <span>① 직원 요약 프로필</span>
+                </div>
+                <div class="card-body" id="psnlSummaryBody">
+                    <!-- JS will populate -->
+                </div>
+            </div>
+
+            <div class="info-card" id="cardFml" style="display:none;">
+                <div class="card-hd card-hd--fml"><span>② 가족정보</span></div>
+                <div class="card-body" style="padding:0;">
+                    <table class="inline-tbl">
+                        <thead><tr><th>가족성명</th><th>관계</th><th>생년월일</th><th>상세정보</th></tr></thead>
+                        <tbody id="fmlTblBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="info-card" id="cardAdj" style="display:none;">
+                <div class="card-hd card-hd--adj"><span>③ 제수당</span></div>
+                <div class="card-body" style="padding:0;">
+                    <table class="inline-tbl">
+                        <thead><tr><th>수당타입</th><th>명칭</th><th>등급</th><th>수당금액</th></tr></thead>
+                        <tbody id="adjTblBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="info-card" id="cardOpi" style="display:none;">
+                <div class="card-hd card-hd--opi"><span>④ 상벌/평가</span></div>
+                <div class="card-body" style="padding:0;">
+                    <table class="inline-tbl">
+                        <thead><tr><th>타입</th><th>날짜</th><th>평가자</th><th>내용</th></tr></thead>
+                        <tbody id="opiTblBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="info-card" id="cardTui" style="display:none;">
+                <div class="card-hd card-hd--tui"><span>⑤ 자녀학비보조</span></div>
+                <div class="card-body" style="padding:0;">
+                    <table class="inline-tbl">
+                        <thead><tr><th>자녀명</th><th>생일</th><th>지급시작</th><th>지급회수</th><th>잔여회수</th><th>누계금액</th></tr></thead>
+                        <tbody id="tuitionTblBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="info-card" id="cardPtt" style="display:none;">
+                <div class="card-hd" style="background:linear-gradient(135deg,#7c3aed,#c4b5fd);"><span>① 최저임금 근무조건 이력</span></div>
+                <div class="card-body" id="pttCardsBody" style="padding:12px;">
+                    <!-- JS will populate -->
+                </div>
+            </div>
+
+        </div>
+        <div class="modalFooter" style="background:#fff; border-top:1px solid #e5e7eb; padding:15px 20px; text-align:right;">
+            <button class="btn btn-primary btn-block" id="goEditBtn">직원 통합정보 수정</button>
+        </div>
+    </div>
+</div>
+
+<!-- 모달: 사진 등록 -->
+<div class="custom-modal-wrap" id="photoModal" style="z-index:99999; display:none;">
+    <div class="custom-modal-bg" onclick="document.getElementById('photoModal').style.display='none'"></div>
+    <div class="custom-modal-box" style="max-width:400px;">
+        <div class="custom-modal-hd">
+            <span>개인 사진 등록</span>
+            <a onclick="document.getElementById('photoModal').style.display='none'" style="cursor:pointer;color:#94a3b8;font-size:18px;">✖</a>
+        </div>
+        <div class="custom-modal-bd" style="text-align:center;">
+            <p style="font-size:13px; color:#64748b; margin-bottom:15px;">이미지 파일을 선택하거나, 복사한 이미지를 <b>Ctrl+V</b>로 붙여넣으세요.</p>
+            <div id="photoPreviewBox" style="width:150px; height:180px; margin:0 auto 15px auto; background:#f1f5f9; border:2px dashed #cbd5e1; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;">
+                <span id="photoPreviewPlaceholder" style="color:#94a3b8; font-size:40px;">👤</span>
+                <img id="photoPreviewImg" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+            </div>
+            <input type="file" id="photoFileInput" accept="image/*" style="display:none;">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('photoFileInput').click()">파일 찾기</button>
+        </div>
+        <div class="custom-modal-ft">
+            <button class="btn btn-primary" id="savePhotoBtn">사진 업로드</button>
         </div>
     </div>
 </div>

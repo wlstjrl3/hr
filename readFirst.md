@@ -20,14 +20,15 @@ AI는 작업 주제 (readFirst/todo.md) 따라 필요한 내용만 참조하여 
 
 | 유형 | 경로 | 설명 |
 |---|---|---|
-| NEW | `public_html/newEmpReg.php` | 여러 페이지로 흩어져 있던 직원 정보(기초, 발령, 급호봉, 제수당, 가족)를 한 곳에서 조회/입력/수정하는 통합 인사정보 관리 UI |
-| NEW | `public_html/assets/js/newEmpReg.js` | 통합 인사정보 관리 페이지 전용 자바스크립트 로직 (데이터 로드, 모달 제어, 저장/삭제 로직) |
-| MODIFY | `public_html/components/header.php` | 사이드 메뉴에 통합 인사정보 관리(newEmpReg.php) 링크 추가 |
+| NEW | `public_html/newEmpReg.php` | 기존 8개 개별 페이지(기초, 발령, 급호봉, 제수당, 가족, 최저임금, 상벌평가, 자녀학비)를 한 화면에서 조회/입력/수정하는 **통합 인사정보 관리 UI** |
+| NEW | `public_html/assets/js/newEmpReg.js` | 통합 인사정보 관리 전용 자바스크립트 로직 (탭 전환, 모달 제어, Fetch 기반 저장/삭제) |
+| MODIFY | `public_html/components/header.php` | 구형 사이드 메뉴를 제거하고, **모던 Sticky Topbar 드롭다운** 방식으로 네비게이션 전면 교체 |
+| MODIFY | `public_html/assets/css/header.css` | 모던 Topbar 네비게이션용 반응형 스타일 새로 작성 |
 
 ---
 
 ## 🎯 향후 주요 목표 (Future Goals)
-- **UI/UX 모던 리뉴얼**: 이번 통합 인사정보 관리 페이지(`newEmpReg.php`) 구축 사례처럼, 기존에 여러 화면을 이동하며 팝업과 탭을 반복해야 했던 불편한 구형 UX를 찾아내어 한 화면에서 깔끔하고 직관적으로 처리할 수 있도록 **현대적인 UX/UI로 전면 리뉴얼**해 나가는 것을 목표로 합니다.
+- **레거시 UI 모던 리뉴얼 (Next Task)**: `newEmpReg.php` 및 신규 상단 네비게이션에 적용된 모던한 디자인 시스템과 레이아웃(Card UI, Inline Table 등)을 바탕으로, 아직 구형 디자인에 머물러 있는 다른 낡은 페이지들의 레이아웃을 일관성 있게 **모던한 형태로 리뉴얼**합니다.
 
 ---
 

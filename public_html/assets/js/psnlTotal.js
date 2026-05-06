@@ -77,9 +77,15 @@ var mytbl = new hr_tbl({
 //행을 클릭했을때 fetch로 다시 끌어올 데이터
 async function trDataXHR(idx) {
     //이전 정보 초기화 INIT
-    const ids = ["mdBdOrgNm", "mdBdPsnlNm", "mdBdBaptNm", "mdBdPsnlNum", "mdBdPhoneNum", "mdBdPosition", "mdBdTrsType", "mdBdTrsDt", "mdBdWorkType", "mdBdGrdPay", "mdBdAdvDt", "mdBdAdvRng", "fmlTbl", "adjTbl", "opiTbl", "tuitionTbl"];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
+    const cards = ["cardBasic", "cardFml", "cardAdj", "cardOpi", "cardTui", "cardPtt"];
+    cards.forEach(c => {
+        let el = document.getElementById(c);
+        if(el) el.style.display = "none";
+    });
+    
+    const bodies = ["mdBdOrgInTel", "psnlSummaryBody", "fmlTblBody", "adjTblBody", "opiTblBody", "tuitionTblBody", "pttCardsBody"];
+    bodies.forEach(b => {
+        const el = document.getElementById(b);
         if (el) el.innerHTML = "";
     });
 
@@ -87,86 +93,158 @@ async function trDataXHR(idx) {
         // 1. 기본 정보 조회
         const res1 = await fetch(`${DIR_ROOT}/sys/psnlTotal.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
         const data1 = res1.data;
-        if (!data1) return;
+        if (!data1 || data1.length === 0) return;
 
         const row = data1[0];
         // UI 업데이트
-        if (row.POSITION == "가사사용인") {
-            document.querySelectorAll(".modalFooter button").forEach(ftBtn => ftBtn.style.display = "none");
-            document.getElementById("goPsnlListBtn").style.display = "inline-block";
-            document.getElementById("goTrsListBtn").style.display = "inline-block";
-            document.getElementById("goPttListBtn").style.display = "inline-block";
-        } else {
-            document.querySelectorAll(".modalFooter button").forEach(ftBtn => ftBtn.style.display = "inline-block");
-            document.getElementById("goPttListBtn").style.display = "none";
+        const goEditBtn = document.getElementById("goEditBtn");
+        if (goEditBtn) {
+            // 최저임금 대상자(가사사용인 등 PTT 데이터가 있는 경우)는 newEmpReg가 없으면 수정버튼 숨김,
+            // 단 PSNL_INFO는 있으니 newEmpReg 연동은 허용
+            goEditBtn.style.display = "inline-block";
+            goEditBtn.onclick = () => { location.href = DIR_ROOT + "/newEmpReg?PSNL_CD=" + idx; };
         }
 
-        document.getElementById("mdBdOrgNm").innerHTML = row.ORG_NM;
-        document.getElementById("mdBdPsnlNm").innerHTML = row.PSNL_NM;
-        document.getElementById("mdBdBaptNm").innerHTML = row.BAPT_NM;
-        document.getElementById("mdBdPsnlNum").innerHTML = row.PSNL_NUM;
-        document.getElementById("mdBdPhoneNum").innerHTML = row.PHONE_NUM;
-        document.getElementById("mdBdTrsType").innerHTML = row.TRS_TYPE;
-        document.getElementById("mdBdPosition").innerHTML = row.POSITION;
-        document.getElementById("mdBdTrsDt").innerHTML = row.TRS_DT + (row.TRS_TYPE === '퇴사' ? "(퇴)" : "");
-        document.getElementById("mdBdWorkType").innerHTML = row.WORK_TYPE;
-        if (row.GRD_GRADE) document.getElementById("mdBdGrdPay").innerHTML = row.GRD_GRADE + "급 " + row.GRD_PAY + "호";
-        document.getElementById("mdBdAdvDt").innerHTML = row.ADVANCE_DT;
-        document.getElementById("mdBdAdvRng").innerHTML = row.ADVANCE_RNG;
-        document.getElementById("mdBdOrgInTel").innerHTML = "본당 내선번호 : " + row.ORG_IN_TEL + " / 전화번호 : " + row.ORG_OUT_TEL;
+        document.getElementById("mdBdOrgInTel").innerHTML = "본당 내선번호 : " + (row.ORG_IN_TEL || "-") + " / 전화번호 : " + (row.ORG_OUT_TEL || "-");
 
-        document.getElementById("goTuitionListBtn").onclick = () => { location.href = DIR_ROOT + "/tuition?PSNL_NM=" + row.PSNL_NM };
+        let basicStr = `
+            <div style="display:flex; gap:24px; align-items:center;">
+                <!-- 왼쪽 프로필 아바타 영역 -->
+                <div style="width:75px; height:75px; background:#e2e8f0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; color:#94a3b8; flex-shrink:0; cursor:pointer; position:relative; overflow:hidden; border:2px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.1);" onclick="openPhotoModal('${idx}')" title="클릭하여 사진 등록">
+                    ${row.HAS_PHOTO === 'Y' ? `<img id="profileAvatarImg" src="${DIR_ROOT}/assets/photos/${idx}.jpg?t=${new Date().getTime()}" style="width:100%; height:100%; object-fit:cover;">` : `<img id="profileAvatarImg" style="display:none;">`}
+                    <span style="display:${row.HAS_PHOTO === 'Y' ? 'none' : 'flex'}; align-items:center; justify-content:center; width:100%; height:100%;">👤</span>
+                </div>
+                <!-- 오른쪽 정보 영역 -->
+                <div style="flex:1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                        <span style="font-size:20px; font-weight:800; color:#1e293b;">${row.PSNL_NM || "-"}</span>
+                        ${row.BAPT_NM ? `<span style="font-size:13px; color:#64748b; background:#f1f5f9; padding:2px 8px; border-radius:12px;">${row.BAPT_NM}</span>` : ""}
+                        <span style="font-size:13px; font-weight:600; color:#3b82f6; background:#eff6ff; padding:2px 8px; border-radius:12px; border:1px solid #bfdbfe;">${row.ORG_NM || "-"} / ${row.POSITION || "-"}</span>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; row-gap:10px; column-gap:20px; font-size:13.5px; color:#475569;">
+                        <div style="display:flex; align-items:center;">
+                            <span style="font-weight:600; width:70px; color:#64748b; font-size:12.5px;">주민번호</span>
+                            <span style="color:#1e293b;">${row.PSNL_NUM || "-"}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span style="font-weight:600; width:70px; color:#64748b; font-size:12.5px;">연락처</span>
+                            <span style="color:#1e293b;">${row.PHONE_NUM || "-"}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span style="font-weight:600; width:70px; color:#64748b; font-size:12.5px;">채용구분</span>
+                            <span style="color:#1e293b;">${row.WORK_TYPE || "-"}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span style="font-weight:600; width:70px; color:#64748b; font-size:12.5px;">발령상태</span>
+                            <span style="color:#1e293b;">${row.TRS_TYPE || "-"} <span style="color:#94a3b8;font-size:12px;margin-left:4px;">${row.TRS_DT ? '('+row.TRS_DT+')' : ''}</span></span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span style="font-weight:600; width:70px; color:#64748b; font-size:12.5px;">${row.EXPECT_PAY ? '최저임금' : '급호봉'}</span>
+                            <span style="color:#1e293b;">${row.EXPECT_PAY ? row.EXPECT_PAY : (row.GRD_GRADE ? row.GRD_GRADE + "급 " + row.GRD_PAY + "호" : "-")}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span style="font-weight:600; width:70px; color:#64748b; font-size:12.5px;">최근승급</span>
+                            <span style="color:#1e293b;">${row.ADVANCE_DT || "-"} <span style="color:#94a3b8;font-size:12px;margin-left:4px;">${row.ADVANCE_RNG ? '('+row.ADVANCE_RNG+')' : ''}</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById("psnlSummaryBody").innerHTML = basicStr;
+        document.getElementById("cardBasic").style.display = "block";
 
-        // 버튼 이벤트 바인딩
-        document.getElementById("goPsnlListBtn").onclick = () => { location.href = DIR_ROOT + "/psnlList?PSNL_NM=" + row.PSNL_NM + "&BAPT_NM=" + row.BAPT_NM + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
-        document.getElementById("goTrsListBtn").onclick = () => { location.href = DIR_ROOT + "/trsList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
-        document.getElementById("goGrdListBtn").onclick = () => { location.href = DIR_ROOT + "/grdList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
-        document.getElementById("goFmlListBtn").onclick = () => { location.href = DIR_ROOT + "/fmlList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
-        document.getElementById("goAdjListBtn").onclick = () => { location.href = DIR_ROOT + "/adjList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
-        document.getElementById("goInsListBtn").onclick = () => { location.href = DIR_ROOT + "/insList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
-        document.getElementById("goOpiListBtn").onclick = () => { location.href = DIR_ROOT + "/opiList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
-        document.getElementById("goMPayListBtn").onclick = () => { location.href = DIR_ROOT + "/mpayList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD + "&MPAY_YEAR=" + (row.ADVANCE_DT ? row.ADVANCE_DT.substr(0, 4) : "") };
-        document.getElementById("goPttListBtn").onclick = () => { location.href = DIR_ROOT + "/pttList?PSNL_CD=" + idx + "&PSNL_NM=" + row.PSNL_NM + "&POSITION=" + row.POSITION + "&ORG_NM=" + row.ORG_NM + "&ORG_CD=" + row.ORG_CD };
 
         // 2. 가족 정보 조회
         const res4 = await fetch(`${DIR_ROOT}/sys/fmlList.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
-        if (res4.data) {
-            let tmpStr = `<ul class="clBg5"><li class="th"><span>가족성명</span></li><li class="th"><span>관계</span></li><li class="th"><span>생년월일</span></li><li class="th"><span>상세정보</span></li><li class="clearB"></li></ul>`;
+        if (res4.data && res4.data.length > 0) {
+            let tmpStr = "";
             res4.data.forEach(f => {
-                tmpStr += `<ul class="clBgW"><li class="td"><span>${f.FML_NM}</span></li><li class="td"><span>${f.FML_RELATION}</span></li><li class="td"><span>${f.FML_BIRTH}</span></li><li class="td"><span>${f.FML_DTL}</span></li><li class="clearB"></li></ul>`;
+                tmpStr += `<tr><td>${f.FML_NM}</td><td>${f.FML_RELATION}</td><td>${f.FML_BIRTH}</td><td>${f.FML_DTL}</td></tr>`;
             });
-            document.getElementById("fmlTbl").innerHTML = tmpStr;
+            document.getElementById("fmlTblBody").innerHTML = tmpStr;
+            document.getElementById("cardFml").style.display = "block";
         }
 
         // 3. 제수당 정보 조회
         const res5 = await fetch(`${DIR_ROOT}/sys/adjList.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
-        if (res5.data) {
-            let tmpStr = `<ul class="clBg5"><li class="th"><span>수당타입</span></li><li class="th"><span>명칭</span></li><li class="th"><span>등급</span></li><li class="th"><span>수당금액</span></li><li class="clearB"></li></ul>`;
+        if (res5.data && res5.data.length > 0) {
+            let tmpStr = "";
             res5.data.forEach(a => {
-                tmpStr += `<ul class="clBgW"><li class="td"><span>${a.ADJ_TYPE}</span></li><li class="td"><span>${a.ADJ_NM}</span></li><li class="td"><span>${a.ADJ_LEVEL}</span></li><li class="td"><span>${a.ADJ_PAY}</span></li><li class="clearB"></li></ul>`;
+                let p = a.ADJ_PAY ? Number(a.ADJ_PAY).toLocaleString() + "원" : "-";
+                tmpStr += `<tr><td>${a.ADJ_TYPE}</td><td>${a.ADJ_NM}</td><td>${a.ADJ_LEVEL}</td><td>${p}</td></tr>`;
             });
-            document.getElementById("adjTbl").innerHTML = tmpStr;
+            document.getElementById("adjTblBody").innerHTML = tmpStr;
+            document.getElementById("cardAdj").style.display = "block";
         }
 
         // 4. 상벌/평가 정보 조회
         const res6 = await fetch(`${DIR_ROOT}/sys/opiList.php?key=${API_TOKEN}&PSNL_CD=${idx}&CRUD=R`).then(r => r.json());
-        if (res6.data) {
-            let tmpStr = `<ul class="clBg5"><li class="th"><span>타입</span></li><li class="th"><span>날짜</span></li><li class="th"><span>평가자</span></li><li class="th"><span>내용</span></li><li class="clearB"></li></ul>`;
+        if (res6.data && res6.data.length > 0) {
+            let tmpStr = "";
             const opiTypes = { 1: "긍정", 2: "부정", 3: "포상", 4: "징계" };
             res6.data.forEach(o => {
-                tmpStr += `<ul class="clBgW"><li class="td"><span>${opiTypes[o.OPI_TYPE] || ""}</span></li><li class="td"><span>${o.OPI_DT}</span></li><li class="td"><span>${o.OPI_PERSON}</span></li><li class="td"><span>${o.OPI_DTL}</span></li><li class="clearB"></li></ul>`;
+                tmpStr += `<tr><td>${opiTypes[o.OPI_TYPE] || ""}</td><td>${o.OPI_DT}</td><td>${o.OPI_PERSON}</td><td style="text-align:left;padding-left:10px;">${o.OPI_DTL}</td></tr>`;
             });
-            document.getElementById("opiTbl").innerHTML = tmpStr;
+            document.getElementById("opiTblBody").innerHTML = tmpStr;
+            document.getElementById("cardOpi").style.display = "block";
         }
 
         // 5. 자녀 학비 보조 정보 조회
         const res7 = await fetch(`${DIR_ROOT}/sys/tuitionList.php?key=${API_TOKEN}&PSNL_CD=${idx}`).then(r => r.json());
         if (res7.data && res7.data.length > 0) {
-            let tmpStr = `<ul class="clBg5 mt15"><li class="th"><span>자녀명</span></li><li class="th"><span>생일</span></li><li class="th"><span>지급시작</span></li><li class="th"><span>지급</span></li><li class="th"><span>잔여</span></li><li class="th"><span>누계</span></li><li class="clearB"></li></ul>`;
-            res7.data.forEach(t => {
-                tmpStr += `<ul class="clBgW"><li class="td"><span>${t.FML_NM}</span></li><li class="td"><span>${t.FML_BIRTH}</span></li><li class="td"><span>${t.START_GRADE || '-'}</span></li><li class="td"><span>${t.SUPPORT_CNT}회</span></li><li class="td clRed"><span>${t.REMAIN_CNT}회</span></li><li class="td tar" style="padding-right:5px;"><span>${Number(t.TOTAL_AMT).toLocaleString()}원</span></li><li class="clearB"></li></ul>`;
+            // 학비보조 데이터가 존재하는 자녀만 필터링
+            const validTuitionData = res7.data.filter(t => Number(t.SUPPORT_CNT) > 0);
+            
+            if (validTuitionData.length > 0) {
+                let tmpStr = "";
+                validTuitionData.forEach(t => {
+                    tmpStr += `<tr><td>${t.FML_NM}</td><td>${t.FML_BIRTH}</td><td>${t.START_GRADE || '-'}</td><td>${t.SUPPORT_CNT}회</td><td style="color:#dc2626;font-weight:bold;">${t.REMAIN_CNT}회</td><td style="text-align:right;padding-right:10px;">${Number(t.TOTAL_AMT).toLocaleString()}원</td></tr>`;
+                });
+                document.getElementById("tuitionTblBody").innerHTML = tmpStr;
+                document.getElementById("cardTui").style.display = "block";
+            }
+        }
+        // 6. 최저임금 근무조건 이력 조회 (PTT)
+        const res8 = await fetch(`${DIR_ROOT}/sys/pttList.php?key=${API_TOKEN}&PSNL_CD=${idx}&ORDER=PTT_YEAR DESC`).then(r => r.json());
+        if (res8.data && res8.data.length > 0) {
+            let pttHtml = `<div id="pttListWrapper" style="display:flex; flex-direction:column; gap:8px;">`;
+            res8.data.forEach((p, i) => {
+                const isHidden = i >= 5 ? 'display:none;' : '';
+                const hideClass = i >= 5 ? 'ptt-extra-row' : '';
+                
+                const adjPayNote = Number(p.PTT_ADJPAY || 0) > 0
+                    ? `<span style="font-size:11px;color:#7c3aed;"> +${Number(p.PTT_ADJPAY).toLocaleString()}원 조정</span>`
+                    : '';
+                
+                const totalAddPay = Number(p.PTT_TOTALADDPAY);
+                const addPaySection = (!isNaN(totalAddPay) && totalAddPay > 0) 
+                    ? `<div>추가수당: <span style="color:#dc2626;"><b>${totalAddPay.toLocaleString()}원</b></span></div>` 
+                    : '';
+
+                pttHtml += `
+                <div class="${hideClass}" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 15px; ${isHidden}">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="font-size:15px; font-weight:800; color:#475569;">${p.PTT_YEAR}년 <small style="font-weight:normal; color:#64748b; margin-left:5px;">(${p.POSITION || '-'})</small></span>
+                        <span style="font-size:12px; color:#64748b;">주 <b>${p.PTT_DAY}일 ${p.PTT_HOUR}시간</b>${adjPayNote}</span>
+                    </div>
+                    <div style="font-size:13px; color:#1e293b; display:flex; gap:15px; align-items:center;">
+                        ${addPaySection}
+                        <div style="font-size:11px; color:#94a3b8;">(내역: ${p.PTT_TOTALPAY} 기본 + ${Number(p.PTT_ADDPAY || 0).toLocaleString()} 연장)</div>
+                    </div>
+                </div>`;
             });
-            document.getElementById("tuitionTbl").innerHTML = tmpStr;
+            
+            if (res8.data.length > 5) {
+                pttHtml += `
+                <button id="btnPttMore" class="btn btn-ghost btn-sm" style="width:100%; margin-top:5px; border:1px dashed #cbd5e1;" onclick="showAllPtt()">
+                    전체 이력 보기 (${res8.data.length}건) ▾
+                </button>`;
+            }
+            
+            pttHtml += `</div>`;
+            document.getElementById("pttCardsBody").innerHTML = pttHtml;
+            document.getElementById("cardPtt").style.display = "block";
         }
     } catch (e) {
         console.error("Data load failed:", e);
@@ -466,4 +544,108 @@ window.onload = function () {
         mytbl.show('myTbl');
         mytbl.xportBind();
     }, 50);
+}
+
+// --- 사진 등록 기능 ---
+let currentPhotoPsnlCd = "";
+let currentPhotoFile = null;
+let currentPhotoBase64 = null;
+
+function openPhotoModal(idx) {
+    currentPhotoPsnlCd = idx;
+    currentPhotoFile = null;
+    currentPhotoBase64 = null;
+    
+    document.getElementById("photoFileInput").value = "";
+    document.getElementById("photoPreviewImg").style.display = "none";
+    document.getElementById("photoPreviewPlaceholder").style.display = "inline-block";
+    
+    // 기존 이미지가 있다면 DOM에서 확인 후 미리보기에 표시
+    const avatarImg = document.getElementById("profileAvatarImg");
+    if (avatarImg && avatarImg.src && avatarImg.src.indexOf("assets/photos") !== -1 && avatarImg.style.display !== "none") {
+        document.getElementById("photoPreviewImg").src = avatarImg.src;
+        document.getElementById("photoPreviewImg").style.display = "block";
+        document.getElementById("photoPreviewPlaceholder").style.display = "none";
+    }
+
+    document.getElementById("photoModal").style.display = "flex";
+}
+
+document.getElementById("photoFileInput").addEventListener("change", function(e) {
+    if(e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        currentPhotoFile = file;
+        currentPhotoBase64 = null;
+        
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById("photoPreviewImg").src = ev.target.result;
+            document.getElementById("photoPreviewImg").style.display = "block";
+            document.getElementById("photoPreviewPlaceholder").style.display = "none";
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+document.addEventListener("paste", function(e) {
+    if (document.getElementById("photoModal").style.display === "none" || !document.getElementById("photoModal").style.display) return;
+    
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    for (let index in items) {
+        const item = items[index];
+        if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+            const blob = item.getAsFile();
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                currentPhotoBase64 = event.target.result;
+                currentPhotoFile = null;
+                document.getElementById("photoPreviewImg").src = currentPhotoBase64;
+                document.getElementById("photoPreviewImg").style.display = "block";
+                document.getElementById("photoPreviewPlaceholder").style.display = "none";
+            };
+            reader.readAsDataURL(blob);
+        }
+    }
+});
+
+document.getElementById("savePhotoBtn").addEventListener("click", async function() {
+    if (!currentPhotoPsnlCd) return;
+    if (!currentPhotoFile && !currentPhotoBase64) {
+        alert("업로드할 이미지를 선택하거나 붙여넣어주세요.");
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append("key", API_TOKEN);
+    formData.append("PSNL_CD", currentPhotoPsnlCd);
+    
+    if (currentPhotoFile) {
+        formData.append("photoFile", currentPhotoFile);
+    } else if (currentPhotoBase64) {
+        formData.append("photoBase64", currentPhotoBase64);
+    }
+    
+    try {
+        const res = await fetch(`${DIR_ROOT}/sys/uploadPhoto.php`, {
+            method: 'POST',
+            body: formData
+        }).then(r => r.json());
+        
+        if (res.success) {
+            alert("사진이 등록되었습니다.");
+            document.getElementById("photoModal").style.display = "none";
+            trDataXHR(currentPhotoPsnlCd); // 프로필 다시 로드하여 이미지 갱신
+        } else {
+            alert("업로드 실패: " + res.message);
+        }
+    } catch(e) {
+        console.error(e);
+        alert("업로드 중 오류가 발생했습니다.");
+    }
+});
+
+function showAllPtt() {
+    document.querySelectorAll('.ptt-extra-row').forEach(el => el.style.display = 'block');
+    const btn = document.getElementById('btnPttMore');
+    if (btn) btn.style.display = 'none';
 }
