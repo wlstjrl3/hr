@@ -4,7 +4,7 @@
     <div class="modalWindow">
         <div class="modalHeader" style="background:#f8fafc; border-bottom:1px solid #e2e8f0; font-weight:700; font-size:15px; display:flex; justify-content:space-between; align-items:center; padding:14px 20px;">
             <span style="color:#333;">직원 종합정보 조회</span>
-            <button onclick="modalClose()" style="background:transparent;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0;">✖</button>
+            <button onclick="modalClose()" style="background:transparent;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0;"></button>
         </div>
         <div class="modalBody" style="background:#f1f5f9; padding:20px;">
             <div style="margin-bottom:10px; font-size:14px; color:#1e40af; font-weight:bold;" id="mdBdOrgInTel"></div>

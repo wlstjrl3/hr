@@ -415,7 +415,7 @@ $filterCnt = $filterResult[0];
 $data = executeQuery($conn, $sql . $whereSql . $orderSql . $limitSql, $types, $params);
 if ($data) {
     foreach ($data as &$row) {
-        $row['HAS_PHOTO'] = file_exists("../assets/photos/" . $row['PSNL_CD'] . ".jpg") ? 'Y' : 'N';
+        $row['HAS_PHOTO'] = file_exists(__DIR__ . "/../assets/photos/" . $row['PSNL_CD'] . ".jpg") ? 'Y' : 'N';
     }
 }
 jsonResponse($conn, ["data" => $data ?: null, "totalCnt" => $totalCnt["ROW_CNT"], "filterCnt" => $filterCnt["ROW_CNT"]]);

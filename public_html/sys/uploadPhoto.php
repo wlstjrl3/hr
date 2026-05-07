@@ -43,9 +43,13 @@ if (isset($_FILES['photoFile']) && $_FILES['photoFile']['error'] === UPLOAD_ERR_
     }
     
     if ($image !== false) {
-        imagejpeg($image, $destPath, 90);
-        imagedestroy($image);
-        jsonResponse($conn, ["success" => true, "message" => "Photo uploaded successfully"]);
+        if (imagejpeg($image, $destPath, 90)) {
+            imagedestroy($image);
+            jsonResponse($conn, ["success" => true, "message" => "Photo uploaded successfully"]);
+        } else {
+            imagedestroy($image);
+            jsonResponse($conn, ["success" => false, "message" => "Failed to save image file"]);
+        }
     } else {
         if (move_uploaded_file($tmpName, $destPath)) {
             jsonResponse($conn, ["success" => true, "message" => "Photo moved successfully"]);
@@ -80,13 +84,20 @@ else if (isset($_POST['photoBase64'])) {
         
         $im = imagecreatefromstring($data);
         if ($im !== false) {
-            imagejpeg($im, $destPath, 90);
-            imagedestroy($im);
-            jsonResponse($conn, ["success" => true, "message" => "Base64 photo uploaded successfully"]);
+            if (imagejpeg($im, $destPath, 90)) {
+                imagedestroy($im);
+                jsonResponse($conn, ["success" => true, "message" => "Base64 photo uploaded successfully"]);
+            } else {
+                imagedestroy($im);
+                jsonResponse($conn, ["success" => false, "message" => "Failed to save base64 image file"]);
+            }
         } else {
             // fallback
-            file_put_contents($destPath, $data);
-            jsonResponse($conn, ["success" => true, "message" => "Base64 photo saved"]);
+            if (file_put_contents($destPath, $data)) {
+                jsonResponse($conn, ["success" => true, "message" => "Base64 photo saved"]);
+            } else {
+                jsonResponse($conn, ["success" => false, "message" => "Failed to save base64 data to file"]);
+            }
         }
     } else {
         jsonResponse($conn, ["success" => false, "message" => "Invalid base64 string"]);
