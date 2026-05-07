@@ -10,6 +10,7 @@ let currentPosition = '';
 
 let trsDataList = [];
 let grdDataList = [];
+let pttDataList = [];
 let opiDataList = [];
 let currentGrdTab = 'grd'; // 'grd' | 'ptt'
 let currentTuiFmlCd = '';  // 현재 선택된 자녀 FML_CD
@@ -104,6 +105,7 @@ document.getElementById('newEmpBtn').addEventListener('click', () => {
         currentPosition = '';
         trsDataList = [];
         grdDataList = [];
+        pttDataList = [];
         opiDataList = [];
         tuitionDataList = [];
         currentTuiFmlCd = '';
@@ -225,7 +227,7 @@ function loadAllDataByPsnlCd(psnlCd) {
         }).catch(() => {});
 
     // 3. 급호봉
-    fetch(DIR_ROOT + '/sys/grdList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&ORDER=ADVANCE_DT desc&LIMIT=0,1000')
+    const pGrd = fetch(DIR_ROOT + '/sys/grdList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&ORDER=ADVANCE_DT desc&LIMIT=0,1000')
         .then(r => r.json()).then(json => {
             grdDataList = json.data || [];
             const tbody = document.getElementById('grdBody');
@@ -234,7 +236,7 @@ function loadAllDataByPsnlCd(psnlCd) {
             if (grdDataList.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" class="tbl-empty">등록된 급호봉 이력이 없습니다</td></tr>';
                 document.getElementById('grdMoreWrap').style.display = 'none';
-                return;
+                return grdDataList;
             }
             
             grdDataList.forEach((r, i) => {
@@ -258,7 +260,8 @@ function loadAllDataByPsnlCd(psnlCd) {
             } else {
                 document.getElementById('grdMoreWrap').style.display = 'none';
             }
-        }).catch(() => {});
+            return grdDataList;
+        }).catch(() => []);
 
     // 4. 제수당
     fetch(DIR_ROOT + '/sys/adjList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&limit=0&page=0')
@@ -275,10 +278,17 @@ function loadAllDataByPsnlCd(psnlCd) {
         }).catch(() => {});
 
     // 6. 최저임금 (PTT)
-    fetch(DIR_ROOT + '/sys/pttList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&LIMIT=0,1000')
+    const pPtt = fetch(DIR_ROOT + '/sys/pttList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&LIMIT=0,1000')
         .then(r => r.json()).then(json => {
-            renderPttRows(json.data || []);
-        }).catch(() => {});
+            pttDataList = json.data || [];
+            renderPttRows(pttDataList);
+            return pttDataList;
+        }).catch(() => []);
+
+    // 급호봉/최저임금 자동 탭 선택
+    Promise.all([pGrd, pPtt]).then(([grd, ptt]) => {
+        autoSelectGrdTab(grd, ptt);
+    });
 
     // 7. 상벌/직무평가 (OPI)
     fetch(DIR_ROOT + '/sys/opiList.php?key=' + API_TOKEN + '&PSNL_CD=' + psnlCd + '&ORDER=OPI_DT desc&LIMIT=0,1000')
@@ -734,6 +744,43 @@ window.switchGrdTab = function(tab) {
     document.getElementById('newGrdBtn').style.display  = tab === 'grd' ? '' : 'none';
     document.getElementById('addPttBtn').style.display  = tab === 'ptt' ? '' : 'none';
 };
+
+/**
+ * 급호봉/최저임금 데이터 중 더 최근 이력이 있는 탭을 자동 선택
+ */
+function autoSelectGrdTab(grdList, pttList) {
+    if (!grdList || !pttList) return;
+    
+    const hasGrd = grdList.length > 0;
+    const hasPtt = pttList.length > 0;
+
+    if (hasGrd && !hasPtt) {
+        switchGrdTab('grd');
+        return;
+    }
+    if (!hasGrd && hasPtt) {
+        switchGrdTab('ptt');
+        return;
+    }
+    if (hasGrd && hasPtt) {
+        // 양쪽 다 있으면 날짜/년도 비교
+        // grdList[0].ADVANCE_DT (YYYY-MM-DD), pttList[0].PTT_YEAR (YYYY)
+        const grdYear = parseInt((grdList[0].ADVANCE_DT || '0000').substring(0, 4));
+        
+        // pttList에서 가장 큰 년도 찾기
+        let maxPttYear = 0;
+        pttList.forEach(r => {
+            const y = parseInt(r.PTT_YEAR || 0);
+            if (y > maxPttYear) maxPttYear = y;
+        });
+
+        if (grdYear >= maxPttYear) {
+            switchGrdTab('grd');
+        } else {
+            switchGrdTab('ptt');
+        }
+    }
+}
 
 // ── ③ 최저임금 (PTT) 인라인 테이블 ──
 let pttRowIdx = 0;
