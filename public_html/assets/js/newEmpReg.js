@@ -353,15 +353,27 @@ function openTrsModal(idx) {
     if (idx === -1) {
         // 신규
         document.getElementById('p2_TRS_CD').value = '';
-        document.getElementById('orgCd').value = '';
-        document.getElementById('orgNm').value = '';
+
+        // 입사(Hire) 기록을 찾아 기본값으로 세팅
+        const hireRecord = [...trsDataList].reverse().find(r => String(r.TRS_TYPE) === '1');
+        if (hireRecord) {
+            document.getElementById('orgCd').value = hireRecord.ORG_CD || '';
+            document.getElementById('orgNm').value = hireRecord.ORG_NM || '';
+            document.getElementById('p2_WORK_TYPE').value = hireRecord.WORK_TYPE || '계약직';
+            document.getElementById('p2_POSITION').value = hireRecord.POSITION || '사무원';
+            document.getElementById('p2_TRS_TYPE').value = '2'; // 이 조직은 입사 후 다음 발령으로 퇴사가 더 빈번하므로 2(퇴사) 세팅
+        } else {
+            document.getElementById('orgCd').value = '';
+            document.getElementById('orgNm').value = '';
+            document.getElementById('p2_WORK_TYPE').selectedIndex = 0;
+            document.getElementById('p2_POSITION').selectedIndex = 0;
+            document.getElementById('p2_TRS_TYPE').selectedIndex = 0;
+        }
+
         document.getElementById('p2_TRS_DTL').value = '';
         document.getElementById('p2_TRS_DT').value = '';
         document.getElementById('p2_APP_DT').value = '';
         document.getElementById('p2_BNF_DT').value = '';
-        document.getElementById('p2_WORK_TYPE').selectedIndex = 0;
-        document.getElementById('p2_POSITION').selectedIndex = 0;
-        document.getElementById('p2_TRS_TYPE').selectedIndex = 0;
         document.getElementById('delTrsBtn').style.display = 'none';
     } else {
         const d = trsDataList[idx];
