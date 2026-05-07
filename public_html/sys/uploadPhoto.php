@@ -25,7 +25,7 @@ if (isset($_FILES['photoFile']) && $_FILES['photoFile']['error'] === UPLOAD_ERR_
         exit;
     }
 
-    $uploadDir = '../assets/photos/';
+    $uploadDir = __DIR__ . '/../assets/photos/';
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
@@ -76,7 +76,7 @@ else if (isset($_POST['photoBase64'])) {
             exit;
         }
 
-        $uploadDir = '../assets/photos/';
+        $uploadDir = __DIR__ . '/../assets/photos/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
