@@ -424,6 +424,9 @@ document.getElementById('delTrsBtn').addEventListener('click', () => {
 document.getElementById('orgSerchPop').addEventListener('click', () => {
     window.open(DIR_ROOT + '/components/orgPopup.php', '조직검색', 'width=320,height=500');
 });
+document.getElementById('orgNm').addEventListener('keyup', e => {
+    if (e.keyCode === 13) document.getElementById('orgSerchPop').click();
+});
 window.setOrg = function(cd, nm) {
     document.getElementById('orgCd').value = cd;
     document.getElementById('orgNm').value = nm;
