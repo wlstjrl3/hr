@@ -636,8 +636,38 @@ window.saveFmlRow = function(fmlCd, idx) {
     const tr = document.getElementById('fmlRow_' + idx);
     const nm = tr.querySelector('.fmlNm').value.trim();
     const bth = tr.querySelector('.fmlBirth').value;
+    const rel = tr.querySelector('.fmlRelation').value;
     if (nm.length < 2) { alert('가족성명은 필수입니다.'); return; }
     if (bth.length < 3) { alert('생년월일은 필수입니다.'); return; }
+
+    // [추가] 가족수당 자동 계산 로직 (자녀, 20세 미만)
+    if (rel === '자녀' && bth.length >= 10) {
+        const birthYear = parseInt(bth.substring(0, 4));
+        if (!isNaN(birthYear)) {
+            const today = new Date();
+            const limitDate = new Date(birthYear + 19, 11, 31); // 19세 되는 해의 12월 31일
+            
+            if (today <= limitDate) {
+                const payVal = tr.querySelector('.fmlPay').value;
+                const sttVal = tr.querySelector('.fmlSttDt').value;
+                
+                if (!payVal || !sttVal) {
+                    if (confirm('가족관계가 자녀이고 20세 미만입니다.\n가족수당 2만원을 자동 설정하시겠습니까?\n(지급기간: 입사일 ~ ' + (birthYear + 19) + '-12-31)')) {
+                        const hireRecord = [...trsDataList].reverse().find(r => r.TRS_TYPE === '1');
+                        const hireDate = hireRecord ? hireRecord.TRS_DT : '';
+                        
+                        if (hireDate) {
+                            tr.querySelector('.fmlPay').value = 20000;
+                            tr.querySelector('.fmlSttDt').value = hireDate;
+                            tr.querySelector('.fmlEndDt').value = (birthYear + 19) + '-12-31';
+                        } else {
+                            alert('입사일 정보를 찾을 수 없습니다. 발령정보에서 입사 기록을 먼저 등록해주세요.');
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     let qs = '&FML_CD='       + encodeURIComponent(fmlCd)
            + '&PSNL_CD='      + encodeURIComponent(currentPsnlCd)
