@@ -653,7 +653,9 @@ window.saveFmlRow = function(fmlCd, idx) {
                 
                 if (!payVal || !sttVal) {
                     if (confirm('가족관계가 자녀이고 20세 미만입니다.\n가족수당 2만원을 자동 설정하시겠습니까?\n(지급기간: 입사일 ~ ' + (birthYear + 19) + '-12-31)')) {
-                        const hireRecord = [...trsDataList].reverse().find(r => r.TRS_TYPE === '1');
+                        // 입사일 찾기 (최초 입사 발령일)
+                        // TRS_TYPE이 숫자 1이거나 문자 '1'일 수 있으므로 String으로 변환하여 체크
+                        const hireRecord = [...trsDataList].reverse().find(r => String(r.TRS_TYPE) === '1');
                         const hireDate = hireRecord ? hireRecord.TRS_DT : '';
                         
                         if (hireDate) {
