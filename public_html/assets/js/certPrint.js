@@ -349,7 +349,7 @@ async function sendEmail() {
 
         // 3. html2canvas로 캡처
         const canvas = await html2canvas(document.getElementById("certPaper"), {
-            scale: 2,           // 고해상도
+            scale: 1.5,           // 해상도 조절 (너무 높으면 전송 실패 가능성)
             useCORS: true,      // 외부 이미지 로드 허용
             backgroundColor: "#ffffff",
             scrollY: -window.scrollY // 스크롤 위치 보정
@@ -358,13 +358,17 @@ async function sendEmail() {
         // [PDF 변환]
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 0.8); // PNG -> JPEG (용량 최적화)
         const imgProps = pdf.getImageProperties(imgData);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
         const pdfBase64 = pdf.output('datauristring');
+
+        if (!pdfBase64 || pdfBase64.length < 100) {
+            throw new Error("PDF 생성에 실패했습니다. (데이터 누락)");
+        }
 
         // 캡처 완료 후 모달 숨기기
         printModal.style.visibility = "hidden";

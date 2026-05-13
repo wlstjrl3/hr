@@ -35,7 +35,10 @@ $certType = $_POST['CERT_TYPE'] ?? '';
 $pdfData  = $_POST['PDF_DATA'] ?? '';
 
 if (empty($toEmail) || empty($pdfData)) {
-    die(json_encode(["result" => "error", "message" => "Required data missing"]));
+    $missing = [];
+    if (empty($toEmail)) $missing[] = "EMAIL";
+    if (empty($pdfData)) $missing[] = "PDF_DATA";
+    die(json_encode(["result" => "error", "message" => "Required data missing: " . implode(", ", $missing)]));
 }
 
 // 4. PDF 데이터 가공 (Data URI -> Binary)
