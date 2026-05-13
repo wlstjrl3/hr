@@ -2,6 +2,17 @@
 include "sql_safe_helper.php";
 verifyApiKey($conn);
 
+// [추가] 테이블 자동 생성 로직 (실서버 migration 대응)
+$createTableSql = "CREATE TABLE IF NOT EXISTS TB_SMTP_CONFIG (
+    SMTP_HOST VARCHAR(255),
+    SMTP_PORT INT,
+    SMTP_USER VARCHAR(255),
+    SMTP_PASS VARCHAR(255),
+    SMTP_SECURE VARCHAR(50),
+    UPDATE_DT DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)";
+mysqli_query($conn, $createTableSql);
+
 $userAuth = $_SESSION['USER_AUTH'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
