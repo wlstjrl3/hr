@@ -51,17 +51,33 @@ $binaryData = base64_decode($pdfParts[1]);
 
 // 5. PHPMailer를 통한 SMTP 발송
 $mail = new PHPMailer(true);
+$debugLog = "";
+$mail->Debugoutput = function($str, $level) use (&$debugLog) {
+    $debugLog .= "$level: $str\n";
+};
 
 try {
     // 서버 설정 (dbconn.php에서 로드된 변수 사용)
+    $mail->SMTPDebug  = 2;                          // 디버그 로그 활성화
     $mail->isSMTP();
-    $mail->Host       = $smtpHost;                  // smtp.casuwon.or.kr
+    $mail->Host       = $smtpHost;
+    $mail->Hostname   = 'casuwon.or.kr';            // HELO/EHLO 호스트명 명시
     $mail->SMTPAuth   = true;
-    $mail->Username   = $smtpUser;                  // v1-samu
-    $mail->Password   = $smtpPass;                  // .env 비밀번호
-    $mail->SMTPSecure = strtolower($smtpSecure);    // tls
-    $mail->Port       = $smtpPort;                  // 587
+    $mail->Username   = $smtpUser;
+    $mail->Password   = $smtpPass;
+    $mail->SMTPSecure = !empty($smtpSecure) ? strtolower($smtpSecure) : '';
+    $mail->SMTPAutoTLS = false;                     // [핵심] 자동 STARTTLS 업그레이드 비활성화
+    $mail->Port       = $smtpPort;
     $mail->CharSet    = 'UTF-8';
+
+    // [추가] SSL 인증서 검증 건너뛰기 (일부 서버 환경 대응)
+    $mail->SMTPOptions = array(
+        'ssl' => array(
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        )
+    );
 
     // 수신자 설정
     $mail->setFrom('v1-samu@casuwon.or.kr', '제1대리구 인사관리시스템');
@@ -102,7 +118,7 @@ try {
     echo json_encode(["result" => "success", "message" => "Email sent successfully via SMTP"]);
 
 } catch (Exception $e) {
-    echo json_encode(["result" => "error", "message" => "SMTP Error: {$mail->ErrorInfo}"]);
+    echo json_encode(["result" => "error", "message" => "SMTP Error: {$mail->ErrorInfo}", "debug_log" => $debugLog]);
 }
 
 mysqli_close($conn);

@@ -396,7 +396,12 @@ async function sendEmail() {
             mytbl.show('myTbl'); // 목록 즉시 새로고침
             modalClose();       // 입력 모달 닫기
         } else {
-            alert("이메일 발송 실패: " + emailResult.message);
+            let errorMsg = "이메일 발송 실패: " + emailResult.message;
+            if (emailResult.debug_log) {
+                console.error("SMTP Debug Log:", emailResult.debug_log);
+                errorMsg += "\n\n[상세 로그는 개발자 도구(F12) 콘솔을 확인해주세요]";
+            }
+            alert(errorMsg);
         }
 
     } catch (e) {
