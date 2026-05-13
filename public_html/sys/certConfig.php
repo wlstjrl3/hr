@@ -98,13 +98,31 @@ else if ($_REQUEST['CRUD'] == 'R') { // 단건 조회 (인쇄용 등)
                 (SELECT EMAIL FROM ORG_INFO WHERE ORG_CD = (SELECT ORG_CD FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1)) AS CURR_ORG_EMAIL,
                 (SELECT POSITION FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_DT <= A.ISSUE_DT ORDER BY TRS_DT DESC, TRS_CD DESC LIMIT 1) AS POSITION,
                 
-                /* [JOIN_DT 로직]: 퇴직증명서일 경우 마지막 퇴직 직전의 입사일을 가져옴 */
-                CASE 
-                    WHEN A.CERT_TYPE = '퇴직' THEN 
-                        (SELECT MAX(TRS_DT) FROM PSNL_TRANSFER 
-                         WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '1' 
+                /* [JOIN_DT 로직]
+                   - 퇴직증명서 : 마지막 퇴직일 직전의 입사일
+                   - 재직증명서 : 퇴사 후 1일 초과 공백이 있는 재입사자 → 가장 최근 입사일
+                                 퇴사-입사 간격이 1일 이하(정년 후 계약직 전환)   → 최초 입사일 */
+                CASE
+                    WHEN A.CERT_TYPE = '퇴직' THEN
+                        (SELECT MAX(TRS_DT) FROM PSNL_TRANSFER
+                         WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '1'
                          AND TRS_DT <= (SELECT MAX(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '2'))
-                    ELSE (SELECT MIN(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO) 
+                    ELSE
+                        /* 재입사(공백 1일 초과)한 마지막 입사일이 있으면 그것을, 없으면 최초 입사일 사용 */
+                        COALESCE(
+                            (SELECT J.TRS_DT
+                             FROM PSNL_TRANSFER J
+                             WHERE J.PSNL_CD = A.EMP_NO
+                               AND J.TRS_TYPE = '1'
+                               AND DATEDIFF(
+                                   J.TRS_DT,
+                                   (SELECT MAX(R.TRS_DT) FROM PSNL_TRANSFER R
+                                    WHERE R.PSNL_CD = A.EMP_NO AND R.TRS_TYPE = '2' AND R.TRS_DT < J.TRS_DT)
+                               ) > 1
+                             ORDER BY J.TRS_DT DESC
+                             LIMIT 1),
+                            (SELECT MIN(TRS_DT) FROM PSNL_TRANSFER WHERE PSNL_CD = A.EMP_NO AND TRS_TYPE = '1')
+                        )
                 END AS JOIN_DT,
                 
                 /* [RETIRE_DT 로직]: 마지막 퇴직일 */

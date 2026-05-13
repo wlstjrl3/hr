@@ -222,8 +222,42 @@
                 </div>
             </div>
         </div>
+        <!-- 수기 수정 패널 -->
+        <div id="manualEditPanel" class="no-print" style="background:#f8f9fa; border-top:1px solid #ddd; padding:12px 16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                <span style="font-size:12px; font-weight:bold; color:#555;">✏️ 수기 수정</span>
+                <span style="font-size:11px; color:#999;">인쇄 전 내용을 직접 수정할 수 있습니다. (DB에 저장되지 않음)</span>
+                <button id="manualToggleBtn" style="margin-left:auto; padding:3px 10px; font-size:11px; background:#6c757d; color:#fff; border:none; border-radius:4px; cursor:pointer;">펼치기 ▼</button>
+            </div>
+            <div id="manualEditBody" style="display:none;">
+                <!-- 재직/퇴직 공통 -->
+                <div id="manualPanel_standard">
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px;">
+                        <label style="font-size:12px; color:#444; white-space:nowrap;">입사일</label>
+                        <input id="m_JOIN_DT" placeholder="예) 2015년 3월 1일" style="width:160px; font-size:12px; padding:4px 6px; border:1px solid #ccc; border-radius:4px;">
+                        <label style="font-size:12px; color:#444; white-space:nowrap;" id="m_RETIRE_DT_label">퇴직일</label>
+                        <input id="m_RETIRE_DT" placeholder="예) 2024년 12월 31일" style="width:160px; font-size:12px; padding:4px 6px; border:1px solid #ccc; border-radius:4px;">
+                        <label style="font-size:12px; color:#444; white-space:nowrap;">소속/직책</label>
+                        <input id="m_ORG_POSITION" placeholder="예) OO성당 사무국장" style="width:200px; font-size:12px; padding:4px 6px; border:1px solid #ccc; border-radius:4px;">
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <label style="font-size:12px; color:#444; white-space:nowrap;">본문 전체 직접입력</label>
+                        <textarea id="m_BODY_TEXT" rows="2" placeholder="본문 전체를 직접 입력하면 위 항목을 무시하고 적용됩니다." style="flex:1; font-size:12px; padding:4px 6px; border:1px solid #ccc; border-radius:4px; resize:vertical;"></textarea>
+                    </div>
+                </div>
+                <!-- 경력 전용 -->
+                <div id="manualPanel_career" style="display:none;">
+                    <div style="font-size:11px; color:#888; margin-bottom:6px;">경력 기간 수정 (각 행의 시작일/종료일을 직접 입력)</div>
+                    <div id="manualCareerRows"></div>
+                </div>
+                <div style="margin-top:10px; text-align:right;">
+                    <button id="manualApplyBtn" style="padding:5px 14px; background:#0d6efd; color:#fff; border:none; border-radius:4px; font-size:12px; cursor:pointer;">적용하여 미리보기 갱신</button>
+                    <button id="manualResetBtn" style="padding:5px 10px; background:#aaa; color:#fff; border:none; border-radius:4px; font-size:12px; cursor:pointer; margin-left:6px;">초기화</button>
+                </div>
+            </div>
+        </div>
         <div class="modalFooter no-print">
-            <button onclick="window.print()" style="padding:5px 9px;">인쇄하기</button>
+            <button onclick="handlePrint()" style="padding:5px 9px;">인쇄하기</button>
             <button
                 onclick="document.getElementById('certPrintModal').style.visibility='hidden'; document.getElementById('certPrintModal').style.opacity='0';"
                 style="padding:5px 9px;">닫기</button>

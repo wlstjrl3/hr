@@ -460,3 +460,210 @@ function modalClose() {
         m.style.opacity = "0";
     });
 }
+
+// ============================================================
+// 수기 수정 패널 로직
+// ============================================================
+
+// 현재 열린 증명서 데이터를 보관 (초기화 시 복원용)
+let _currentCertData = null;
+let _isManualEdited = false;
+let _manualEditLog = "";
+
+// openPrintModal 래핑: 데이터 보관 및 패널 초기화
+const _origOpenPrintModal = openPrintModal;
+window.openPrintModal = function(issueNo) {
+    fetch(DIR_ROOT + `/sys/certConfig.php?key=${API_TOKEN}&CRUD=R&ISSUE_NO=${issueNo}`)
+        .then(res => res.json())
+        .then(json => {
+            const d = json.data;
+            if (!d) return;
+            _currentCertData = d;
+            _isManualEdited = false;
+            _manualEditLog = "";
+            renderCertificate(d);
+            manualPanel_init(d);
+            document.getElementById("certPrintModal").style.visibility = "visible";
+            document.getElementById("certPrintModal").style.opacity = "1";
+        });
+};
+
+// 패널 초기화: 종류에 맞는 서브패널 표시 + 입력값 세팅
+function manualPanel_init(d) {
+    const isCareer = (d.CERT_TYPE === '경력');
+    document.getElementById("manualPanel_standard").style.display = isCareer ? "none" : "block";
+    document.getElementById("manualPanel_career").style.display  = isCareer ? "block" : "none";
+
+    if (!isCareer) {
+        // 재직/퇴직 - 인사 시스템 값을 기본값으로 채워넣기
+        const formatKrDate = (dateStr) => {
+            if (!dateStr) return "";
+            const b = dateStr.split("-");
+            return b[0] + "년 " + parseInt(b[1]) + "월 " + parseInt(b[2]) + "일";
+        };
+        document.getElementById("m_JOIN_DT").value    = formatKrDate(d.JOIN_DT);
+        document.getElementById("m_RETIRE_DT").value  = formatKrDate(d.RETIRE_DT);
+
+        // 재직이면 퇴직일 입력란 흐리게
+        const retireLbl = document.getElementById("m_RETIRE_DT_label");
+        const retireInput = document.getElementById("m_RETIRE_DT");
+        if (d.CERT_TYPE === '재직') {
+            retireLbl.style.opacity = "0.35";
+            retireInput.style.opacity = "0.35";
+            retireInput.placeholder = "재직 중 - 불필요";
+        } else {
+            retireLbl.style.opacity = "1";
+            retireInput.style.opacity = "1";
+            retireInput.placeholder = "예) 2024년 12월 31일";
+        }
+
+        const orgNm  = d.ORG_NM || "";
+        const orgType = d.ORG_TYPE == '1' ? '' : '성당';
+        const pos    = d.POSITION || "";
+        document.getElementById("m_ORG_POSITION").value = orgNm ? `${orgNm} ${orgType} ${pos}`.trim() : pos;
+        document.getElementById("m_BODY_TEXT").value = "";
+
+    } else {
+        // 경력 - 각 히스토리 행마다 수정 인풋 생성
+        const formatDot = (s) => s ? s.replace(/-/g, '.') : "";
+        const rows = d.history || [];
+        const container = document.getElementById("manualCareerRows");
+        container.innerHTML = "";
+        rows.forEach((h, i) => {
+            const row = document.createElement("div");
+            row.style.cssText = "display:flex; gap:8px; align-items:center; margin-bottom:6px; flex-wrap:wrap;";
+            row.innerHTML = `
+                <span style="font-size:11px; color:#555; white-space:nowrap;">${i+1}행</span>
+                <label style="font-size:11px; color:#666; white-space:nowrap;">부터</label>
+                <input id="m_career_stt_${i}" value="${formatDot(h.STT_DT)}" style="width:130px; font-size:12px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;" placeholder="YYYY.MM.DD">
+                <label style="font-size:11px; color:#666; white-space:nowrap;">까지</label>
+                <input id="m_career_end_${i}" value="${formatDot(h.END_DT || '')}" style="width:130px; font-size:12px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;" placeholder="YYYY.MM.DD (재직중 빈칸)">
+                <label style="font-size:11px; color:#666; white-space:nowrap;">부서</label>
+                <input id="m_career_org_${i}" value="${h.ORG_NM || ''}" style="width:150px; font-size:12px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;" placeholder="부서명">
+                <label style="font-size:11px; color:#666; white-space:nowrap;">직위</label>
+                <input id="m_career_pos_${i}" value="${h.POSITION || ''}" style="width:120px; font-size:12px; padding:3px 6px; border:1px solid #ccc; border-radius:4px;" placeholder="직위/직급">
+            `;
+            container.appendChild(row);
+        });
+    }
+}
+
+// 패널 펼치기/접기
+document.getElementById("manualToggleBtn").addEventListener("click", () => {
+    const body = document.getElementById("manualEditBody");
+    const btn  = document.getElementById("manualToggleBtn");
+    if (body.style.display === "none") {
+        body.style.display = "block";
+        btn.textContent = "접기 ▲";
+    } else {
+        body.style.display = "none";
+        btn.textContent = "펼치기 ▼";
+    }
+});
+
+// 적용 버튼: 수기 입력값을 반영하여 미리보기 갱신
+document.getElementById("manualApplyBtn").addEventListener("click", () => {
+    if (!_currentCertData) return;
+    const d = JSON.parse(JSON.stringify(_currentCertData)); // 깊은 복사
+    _isManualEdited = true;
+    _manualEditLog = "[수기수정인쇄] ";
+
+    if (d.CERT_TYPE === '경력') {
+        _manualEditLog += "경력 기간/부서/직위 수정됨";
+        // 경력: 각 행의 기간/부서/직위 덮어쓰기
+        const rows = d.history || [];
+        rows.forEach((h, i) => {
+            const sttEl = document.getElementById(`m_career_stt_${i}`);
+            const endEl = document.getElementById(`m_career_end_${i}`);
+            const orgEl = document.getElementById(`m_career_org_${i}`);
+            const posEl = document.getElementById(`m_career_pos_${i}`);
+            if (sttEl) h.STT_DT = sttEl.value.replace(/\./g, '-'); // YYYY-MM-DD 형식 복원
+            if (endEl) h.END_DT = endEl.value ? endEl.value.replace(/\./g, '-') : "";
+            if (orgEl) h.ORG_NM = orgEl.value;
+            if (posEl) h.POSITION = posEl.value;
+        });
+        renderCertificate(d);
+
+    } else {
+        // 재직/퇴직: 본문 직접 또는 항목별 조합
+        const bodyText = document.getElementById("m_BODY_TEXT").value.trim();
+        if (bodyText) {
+            _manualEditLog += "본문 전체 직접입력 적용";
+            // 본문 전체 직접 입력 우선 적용
+            renderCertificate(d);
+            document.getElementById("p_BODY_CONTENT").innerHTML = bodyText.replace(/\n/g, '<br>');
+        } else {
+            const joinDt   = document.getElementById("m_JOIN_DT").value.trim();
+            const retireDt = document.getElementById("m_RETIRE_DT").value.trim();
+            const orgPos   = document.getElementById("m_ORG_POSITION").value.trim();
+            _manualEditLog += `입사:${joinDt||'빈칸'} / 퇴직:${retireDt||'빈칸'} / 소속:${orgPos||'빈칸'}`;
+
+            renderCertificate(d); // 기본 렌더 먼저
+
+            let bodyHtml = "";
+            if (d.CERT_TYPE === '재직') {
+                const orgPart = orgPos ? orgPos : `${d.ORG_NM || ""} ${d.ORG_TYPE == '1' ? '' : '성당'} ${d.POSITION || ""}`.trim();
+                bodyHtml = `이 사람은 ${joinDt || "（　　）"} 부터 현재 까지 본 천주교 수원교구 ${orgPart}으로 재직 중임을 증명함.`;
+            } else {
+                const orgPart = orgPos ? orgPos : `${d.ORG_NM || ""} ${d.ORG_TYPE == '1' ? '' : '성당'} ${d.POSITION || ""}`.trim();
+                bodyHtml = `위 사람은 ${joinDt || "（　　）"} 입사하여<br>${retireDt || "（　　）"} 퇴직하였음을 증명함.`;
+                if (orgPart) bodyHtml += `<br>(${orgPart})`;
+            }
+            document.getElementById("p_BODY_CONTENT").innerHTML = bodyHtml;
+        }
+    }
+});
+
+// 초기화 버튼: 원본 인사 데이터로 복원
+document.getElementById("manualResetBtn").addEventListener("click", () => {
+    if (!_currentCertData) return;
+    _isManualEdited = false;
+    _manualEditLog = "";
+    renderCertificate(_currentCertData);
+    manualPanel_init(_currentCertData);
+});
+
+// 인쇄 버튼 클릭 시 처리 (수기수정 반영 여부 로깅)
+function handlePrint() {
+    if (_isManualEdited && _currentCertData) {
+        let currentMemo = _currentCertData.MEMO || "";
+        let timeStr = new Date().toISOString().substring(2, 10).replace(/-/g, ''); // YYMMDD
+        let newMemo = currentMemo;
+        if (currentMemo) {
+            newMemo += " | " + timeStr + " " + _manualEditLog;
+        } else {
+            newMemo = timeStr + " " + _manualEditLog;
+        }
+
+        let params = new URLSearchParams({
+            key: API_TOKEN,
+            CRUD: 'C',
+            ISSUE_NO: _currentCertData.ISSUE_NO,
+            EMP_NO: _currentCertData.EMP_NO,
+            CERT_TYPE: _currentCertData.CERT_TYPE,
+            ORIGIN_ADDR: _currentCertData.ORIGIN_ADDR || '',
+            CURR_ADDR: _currentCertData.CURR_ADDR || '',
+            ORG_ADDR: _currentCertData.ORG_ADDR || '',
+            MEMO: newMemo
+        });
+
+        fetch(DIR_ROOT + "/sys/certConfig.php", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params.toString()
+        }).then(res => res.json()).then(json => {
+            if (json.result == "success") {
+                _currentCertData.MEMO = newMemo;
+                mytbl.show('myTbl'); // 목록 갱신
+            }
+            window.print();
+        }).catch(e => {
+            console.error(e);
+            window.print();
+        });
+    } else {
+        window.print();
+    }
+}
