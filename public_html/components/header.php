@@ -60,6 +60,7 @@ $curPath = strtok($_SERVER['REQUEST_URI'], '?');
                 ['url' => DIR_ROOT . '/orgBudget', 'label' => '본당예산 관리'],
                 ['url' => DIR_ROOT . '/ohisList', 'label' => '년도별 신자수'],
                 ['url' => DIR_ROOT . '/user', 'label' => '사용자 관리'],
+                ['url' => DIR_ROOT . '/smtpManage', 'label' => 'SMTP 설정 관리'],
             ]
         ],
         [

@@ -49,7 +49,14 @@ if (count($pdfParts) < 2) {
 }
 $binaryData = base64_decode($pdfParts[1]);
 
-// 5. PHPMailer를 통한 SMTP 발송
+// 5. DB에서 SMTP 설정 정보 조회
+$smtpRow = executeQuery($conn, "SELECT * FROM TB_SMTP_CONFIG LIMIT 1");
+if (empty($smtpRow)) {
+    die(json_encode(["result" => "error", "message" => "SMTP 설정 정보가 없습니다. 관리자에게 문의하세요."]));
+}
+$s = $smtpRow[0];
+
+// 6. PHPMailer를 통한 SMTP 발송
 $mail = new PHPMailer(true);
 $debugLog = "";
 $mail->Debugoutput = function($str, $level) use (&$debugLog) {
@@ -57,17 +64,17 @@ $mail->Debugoutput = function($str, $level) use (&$debugLog) {
 };
 
 try {
-    // 서버 설정 (dbconn.php에서 로드된 변수 사용)
+    // 서버 설정
     $mail->SMTPDebug  = 2;                          // 디버그 로그 활성화
     $mail->isSMTP();
-    $mail->Host       = $smtpHost;
+    $mail->Host       = $s['SMTP_HOST'];
     $mail->Hostname   = 'casuwon.or.kr';            // HELO/EHLO 호스트명 명시
     $mail->SMTPAuth   = true;
-    $mail->Username   = $smtpUser;
-    $mail->Password   = $smtpPass;
-    $mail->SMTPSecure = !empty($smtpSecure) ? strtolower($smtpSecure) : '';
+    $mail->Username   = $s['SMTP_USER'];
+    $mail->Password   = $s['SMTP_PASS'];
+    $mail->SMTPSecure = !empty($s['SMTP_SECURE']) ? strtolower($s['SMTP_SECURE']) : '';
     $mail->SMTPAutoTLS = false;                     // [핵심] 자동 STARTTLS 업그레이드 비활성화
-    $mail->Port       = $smtpPort;
+    $mail->Port       = $s['SMTP_PORT'];
     $mail->CharSet    = 'UTF-8';
 
     // [추가] SSL 인증서 검증 건너뛰기 (일부 서버 환경 대응)
@@ -80,7 +87,8 @@ try {
     );
 
     // 수신자 설정
-    $mail->setFrom('v1-samu@casuwon.or.kr', '제1대리구 인사관리시스템');
+    $fromEmail = (strpos($s['SMTP_USER'], '@') !== false) ? $s['SMTP_USER'] : 'v1-samu@casuwon.or.kr';
+    $mail->setFrom($fromEmail, '제1대리구 인사관리시스템');
     $mail->addAddress($toEmail, $psnlNm);
 
     // 첨부 파일 등록
